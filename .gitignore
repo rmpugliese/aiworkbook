@@ -1,0 +1,15 @@
+# Materiali e documenti: non versionare
+*.pdf
+*.pptx
+*.docx
+*.xlsx
+
+# Segreti / configurazione locale
+.env
+.env.*
+!.env.example
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
