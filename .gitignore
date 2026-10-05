@@ -8,6 +8,8 @@
 .env
 .env.*
 !.env.example
+# Public Vite settings (no secrets), bundled into the frontend
+!frontend/.env
 
 # OS / editor
 .DS_Store
@@ -26,3 +28,6 @@ __pycache__/
 # Node
 node_modules/
 dist/
+
+# Generated OpenAPI dump used by `make gen-api`
+frontend/openapi.json
