@@ -7,18 +7,18 @@ codice.
 
 ---
 
-## Fase 0: Scaffolding del monorepo
+## Fase 0: Scaffolding del monorepo (Completata)
 
 **Obiettivo:** backend e frontend che partono, si testano e si parlano.
 
-- [ ] `backend/` con uv, FastAPI, endpoint `GET /api/health`, configurazione da env
-- [ ] SQLAlchemy + Alembic configurati su SQLite, prima migrazione vuota
-- [ ] pytest, ruff e mypy funzionanti, con un test per `/api/health`
-- [ ] `frontend/` con Vite, React, TypeScript e Mantine, con una pagina che mostra lo stato di
+- [x] `backend/` con uv, FastAPI, endpoint `GET /api/health`, configurazione da env
+- [x] SQLAlchemy + Alembic configurati su SQLite, prima migrazione vuota
+- [x] pytest, ruff e mypy funzionanti, con un test per `/api/health`
+- [x] `frontend/` con Vite, React, TypeScript e Mantine, con una pagina che mostra lo stato di
       `/api/health`
-- [ ] Proxy di Vite verso il backend; generazione dei tipi da OpenAPI (`npm run gen:api`)
-- [ ] Vitest, ESLint e Prettier funzionanti
-- [ ] README con i comandi di avvio
+- [x] Proxy di Vite verso il backend; generazione dei tipi da OpenAPI (`npm run gen:api`)
+- [x] Vitest, oxlint e Prettier funzionanti
+- [x] README con i comandi di avvio
 
 ---
 

@@ -55,7 +55,8 @@ backend/
 
 ## Frontend — `frontend/`
 
-- **React 19 + TypeScript** (strict), build con **Vite**
+- **React 19 + TypeScript 5.9** (strict), build con **Vite**. TypeScript resta alla 5.x finché
+  `openapi-typescript` non supporta la 6
 - **React Router** per la navigazione
 - **TanStack Query** per le chiamate API, la cache e il salvataggio automatico ottimistico
 - **Tipi API generati** dallo schema OpenAPI del backend (`openapi-typescript`): il contratto API
@@ -66,19 +67,25 @@ backend/
   una fase successiva
 - **Test**: **Vitest** e **Testing Library**; **Playwright** per i test end-to-end a partire dalla
   fase di compilazione
-- **Qualità**: ESLint e Prettier; `tsc --noEmit` come controllo dei tipi
+- **Qualità**: **oxlint** (il linter predefinito del template Vite), Prettier e `tsc -b` come
+  controllo dei tipi
 
-## Comandi (da definire nella Fase 0)
+## Comandi
+
+Tutto passa dal `Makefile` alla radice. Su questo Mac si usa `gmake` (GNU make di MacPorts),
+perché il `make` di sistema richiede di accettare la licenza di Xcode.
 
 | Scopo | Comando |
 |---|---|
-| Avvio backend in sviluppo | `cd backend && uv run fastapi dev app/main.py` |
-| Test backend | `cd backend && uv run pytest` |
-| Lint e tipi backend | `cd backend && uv run ruff check . && uv run mypy app` |
-| Avvio frontend in sviluppo | `cd frontend && npm run dev` (proxy `/api` verso il backend) |
-| Test frontend | `cd frontend && npm test` |
-| Tipi frontend | `cd frontend && npm run typecheck` |
-| Rigenera i tipi API | `cd frontend && npm run gen:api` |
+| Installa le dipendenze | `make install` |
+| Avvia backend (http://127.0.0.1:8001) e frontend (http://localhost:5173) | `make dev` |
+| Test (pytest + Vitest) | `make test` |
+| Lint, format check e tipi | `make lint` |
+| Formatta il codice | `make format` |
+| Rigenera i tipi API del frontend | `make gen-api` |
+| Applica le migrazioni | `make migrate` |
+
+Il backend usa la porta **8001** perché la 8000 è occupata da un altro progetto locale.
 
 ## Deploy (da decidere nella fase di rilascio pubblico)
 
