@@ -39,17 +39,20 @@ via API.
 
 ---
 
-## Fase 2: Progetti e iterazioni
+## Fase 2: Progetti e iterazioni (Completata)
 
 **Obiettivo:** gestire più progetti e le loro iterazioni. Per ora in modalità locale a utente
 singolo, senza login: l'app si usa solo sul proprio computer.
 
-- [ ] Modelli `projects` e `iterations` con le relative migrazioni (`owner_id` arriverà con gli
+- [x] Modelli `projects` e `iterations` con le relative migrazioni (`owner_id` arriverà con gli
       account, Fase 5)
-- [ ] API CRUD di progetti e iterazioni
-- [ ] Nuova iterazione vuota oppure copiata dalla precedente
-- [ ] Dashboard React: elenco dei progetti, dettaglio del progetto con le iterazioni
-- [ ] Test su CRUD e copia di un'iterazione
+- [x] API CRUD di progetti e iterazioni
+- [x] Tabella `answers` (anticipata dalla Fase 3, serve alla copia delle iterazioni)
+- [x] Nuova iterazione vuota oppure copiata da una precedente
+- [x] Archiviazione ed eliminazione definitiva con conferma del nome
+- [x] Dashboard React: elenco dei progetti, dettaglio del progetto con le iterazioni
+- [x] Test su CRUD e copia di un'iterazione
+- [x] Nessun nuovo tentativo sugli errori 4xx lato frontend (le richieste ripetute bloccavano i reindirizzamenti)
 
 ---
 
@@ -57,7 +60,7 @@ singolo, senza login: l'app si usa solo sul proprio computer.
 
 **Obiettivo:** l'utente compila le domande di un'iterazione, con salvataggio automatico.
 
-- [ ] Modello `answers` con migrazione; `GET` e `PUT` delle risposte di un'iterazione
+- [ ] `GET` e `PUT` delle risposte di un'iterazione (la tabella esiste dalla Fase 2)
 - [ ] Navigazione per fase e task (barra laterale), con la guida del task visibile
 - [ ] Editor delle domande `text` con salvataggio automatico (debounce) e stato "salvato /
       salvataggio in corso / errore"
