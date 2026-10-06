@@ -1,0 +1,1358 @@
+# Workbook template v1 — compatible with the CPMAI methodology.
+#
+# All texts are written in our own words (Italian). Do NOT copy or literally translate
+# the PMI workbook: see specs/workbook-model.md.
+# Question keys are permanent once released: add new keys, never rename existing ones.
+
+version: 1
+title: Workbook di progetto AI
+
+phases:
+  # ───────────────────────────── Fase I ─────────────────────────────
+  - key: business_understanding
+    number: 1
+    title: Comprensione del business
+    summary: >-
+      Chiarire che cosa vuole ottenere l'organizzazione in questa iterazione, se l'AI è davvero
+      lo strumento giusto e a quali condizioni il progetto potrà dirsi riuscito.
+    task_groups:
+      - key: objectives
+        title: Obiettivi di business
+        summary: Definire il problema di business e il valore atteso.
+        tasks:
+          - key: business_objectives
+            title: Obiettivi di business
+            guidance: >-
+              Partite dal punto di vista del committente: qual è la situazione attuale e che cosa
+              vuole cambiare? Spesso convivono più obiettivi in tensione tra loro: esplicitateli
+              subito, per non investire energie nel rispondere bene alla domanda sbagliata.
+            questions:
+              - key: p1.objectives.business_objectives.problem
+                type: text
+                prompt: Quale problema volete risolvere con l'AI in questa iterazione?
+                help: >-
+                  Descrivete il contesto aziendale di partenza, l'obiettivo principale e le
+                  eventuali domande di business collegate. Siate specifici sull'iterazione
+                  corrente e sulla user story a cui si riferisce.
+
+          - key: success_criteria
+            title: Criteri di successo di business
+            guidance: >-
+              Stabilite in anticipo come si capirà, dal punto di vista del business, che il
+              progetto ha funzionato. Preferite criteri misurabili; se un criterio è
+              qualitativo, indicate chi ne darà il giudizio.
+            questions:
+              - key: p1.objectives.success_criteria.measures
+                type: text
+                prompt: Con quali misure oggettive valuterete il successo di questa iterazione?
+                help: >-
+                  Per esempio una riduzione percentuale di costi, tempi o errori entro una certa
+                  data. Per i criteri soggettivi, indicate il responsabile della valutazione.
+
+          - key: cost_benefit
+            title: Analisi costi-benefici
+            guidance: >-
+              Mettete a confronto ciò che il progetto costerà con il valore che potrà generare se
+              avrà successo. Più il confronto è concreto, meglio è: nei contesti aziendali,
+              esprimetelo in termini economici.
+            questions:
+              - key: p1.objectives.cost_benefit.budget
+                type: text
+                prompt: Di quale budget economico e di quanto tempo disponete per questo progetto?
+                help: >-
+                  Indicate il budget approvato o stimato, le principali voci di costo (persone,
+                  dati, infrastruttura, licenze) e le scadenze da rispettare.
+              - key: p1.objectives.cost_benefit.roi
+                type: text
+                prompt: Quale ritorno sull'investimento vi aspettate?
+                help: >-
+                  Stimate i benefici (risparmi, ricavi, riduzione del rischio) e in quanto tempo
+                  ripagheranno i costi. Esplicitate le ipotesi su cui si basa la stima.
+
+      - key: cognitive
+        title: Requisiti cognitivi
+        summary: >-
+          Capire quali parti del problema richiedono davvero l'AI e quali si risolvono meglio
+          con approcci tradizionali.
+        tasks:
+          - key: cognitive_requirements
+            title: Requisiti cognitivi
+            guidance: >-
+              Non ogni esigenza di business richiede l'AI. Individuate prima la soluzione più
+              semplice, il cosiddetto approccio euristico: una regola fissa, un processo manuale,
+              una classifica statica. L'AI ha senso solo se fa meglio, più velocemente, a costo
+              minore o su scala maggiore. A volte definire bene l'alternativa semplice basta a
+              dimostrare che l'AI non serve.
+            questions:
+              - key: p1.cognitive.cognitive_requirements.why_ai
+                type: text
+                prompt: Perché questo progetto ha bisogno di una soluzione basata sull'AI?
+                help: >-
+                  Spiegate che cosa l'AI permette di fare che oggi non è possibile, o non è
+                  sostenibile, con altri mezzi.
+              - key: p1.cognitive.cognitive_requirements.non_ai_alternatives
+                type: text
+                prompt: >-
+                  Quali alternative senza AI esistono per questo problema, e perché non sono
+                  adatte o non vengono adottate?
+                help: >-
+                  Elencate gli approcci attuali e quelli che potrebbero essere "abbastanza
+                  buoni". Per ciascuno indicate i limiti in termini di costi, sforzo, complessità,
+                  tempi o scalabilità. Se un'alternativa è praticabile, motivate perché si sceglie
+                  comunque l'AI.
+              - key: p1.cognitive.cognitive_requirements.non_cognitive_parts
+                type: text
+                prompt: Quali parti del progetto non useranno l'AI e lavoreranno insieme ai componenti AI?
+                help: >-
+                  Per esempio integrazioni con i sistemi esistenti, interfacce utente, regole di
+                  business, flussi di approvazione, reportistica.
+              - key: p1.cognitive.cognitive_requirements.automation_alternatives
+                type: text
+                prompt: >-
+                  In questa iterazione si potrebbe usare un'automazione tradizionale al posto
+                  dell'AI? Se sì, perché non la si adotta?
+                help: >-
+                  Considerate script, RPA, regole deterministiche o workflow. Se l'automazione
+                  classica è sufficiente per questa iterazione, valutate di rimandare la parte AI.
+
+          - key: cognitive_objectives
+            title: Obiettivi cognitivi
+            guidance: >-
+              Traducete l'obiettivo di business in compiti concreti che il sistema AI deve
+              svolgere: prevedere, classificare, riconoscere, generare, raccomandare. Formulateli
+              in modo tangibile e verificabile.
+            questions:
+              - key: p1.cognitive.cognitive_objectives.objectives
+                type: text
+                prompt: Quali compiti specifici dovrà svolgere la soluzione AI?
+                help: >-
+                  Usate una forma operativa, per esempio "stimare la probabilità di abbandono di
+                  ogni cliente per ordinare le azioni di fidelizzazione".
+
+          - key: cognitive_outcomes
+            title: Risultati cognitivi
+            guidance: >-
+              Collegate i compiti dell'AI ai risultati di business attesi e fissate criteri di
+              riuscita in termini tecnici, come una soglia di accuratezza o una capacità di
+              elaborazione. Se un criterio è soggettivo, indicate chi lo valuterà.
+            questions:
+              - key: p1.cognitive.cognitive_outcomes.outcomes
+                type: text
+                prompt: Quali risultati e traguardi deve raggiungere la componente AI?
+                help: >-
+                  Per esempio "classificare i documenti in ingresso con almeno il 90% di
+                  correttezza, elaborandone almeno 60 all'ora".
+
+          - key: ai_success_criteria
+            title: Criteri di successo dell'AI
+            guidance: >-
+              Definite che cosa deve dimostrare il sistema AI per giustificare la sua scelta
+              rispetto a una soluzione tradizionale, anche agli occhi degli scettici del team o
+              dell'organizzazione.
+            questions:
+              - key: p1.cognitive.ai_success_criteria.criteria
+                type: text
+                prompt: >-
+                  Che cosa deve saper fare il sistema AI che un sistema tradizionale non
+                  saprebbe fare, e in che cosa deve risultare migliore?
+                help: >-
+                  Indicate le capacità distintive e i margini di miglioramento attesi, e quali
+                  prove convincerebbero chi dubita dell'uso dell'AI.
+
+          - key: ai_patterns
+            title: Identificazione dei pattern di AI
+            guidance: >-
+              La metodologia riconosce sette pattern ricorrenti di progetti AI. Riconoscere quali
+              state applicando aiuta a riusare esperienze, architetture e insidie note di
+              progetti simili, vostri o di altri.
+            questions:
+              - key: p1.cognitive.ai_patterns.patterns
+                type: multi_choice
+                prompt: Quali pattern di AI state implementando in questa iterazione?
+                help: >-
+                  Selezionate uno o più pattern. Nelle note spiegate perché li avete riconosciuti
+                  e citate progetti simili da cui trarre spunti o materiali.
+                options:
+                  - key: conversational
+                    label: Conversazione e interazione con le persone
+                  - key: recognition
+                    label: Riconoscimento
+                  - key: predictive
+                    label: Analisi predittiva e supporto alle decisioni
+                  - key: goal_driven
+                    label: Sistemi orientati agli obiettivi
+                  - key: hyper_personalization
+                    label: Iper-personalizzazione
+                  - key: autonomous
+                    label: Sistemi autonomi
+                  - key: anomalies
+                    label: Pattern e anomalie
+
+      - key: situation
+        title: Valutazione della situazione
+        summary: >-
+          Fare il punto su risorse, tempi e vincoli: i prerequisiti entro cui l'obiettivo
+          dovrà essere raggiunto.
+        tasks:
+          - key: resources
+            title: Requisiti di risorse
+            guidance: >-
+              Fate un inventario di ciò che avete a disposizione: persone ed esperti, dati e
+              relativi accessi, infrastruttura di calcolo, strumenti software. Mettete in luce
+              anche i vincoli e le ipotesi che potrebbero ostacolare il progetto.
+            questions:
+              - key: p1.situation.resources.schedule_constraints
+                type: text
+                prompt: Quali vincoli o requisiti di calendario ha questa iterazione?
+                help: >-
+                  Scadenze, finestre di rilascio, dipendenze da altri progetti, disponibilità
+                  stagionale di persone o dati.
+              - key: p1.situation.resources.technology
+                type: text
+                prompt: Di quali risorse tecnologiche avete bisogno per questo progetto?
+                help: >-
+                  Indicate l'infrastruttura e gli strumenti AI già disponibili e quelli da
+                  acquisire: piattaforme cloud, GPU, strumenti di data science, servizi di
+                  modelli.
+              - key: p1.situation.resources.skills
+                type: text
+                prompt: Di quali competenze avete bisogno in questa iterazione?
+                help: >-
+                  Mappate le competenze presenti (dominio, dati, machine learning, ingegneria) e le
+                  lacune da colmare con formazione, assunzioni o partner.
+
+          - key: schedule
+            title: Requisiti di calendario
+            guidance: >-
+              Raccogliete i requisiti che condizionano l'iterazione: tempi di completamento,
+              qualità e comprensibilità dei risultati, sicurezza e aspetti legali. Verificate in
+              particolare di avere il diritto di usare i dati previsti.
+            questions:
+              - key: p1.situation.schedule.team
+                type: text
+                prompt: Di quali persone e ruoli avete bisogno per questo progetto?
+                help: >-
+                  Ruoli, impegno richiesto e periodo di coinvolgimento: sponsor, esperti di
+                  dominio, data engineer, data scientist, sviluppatori, responsabili della
+                  conformità.
+              - key: p1.situation.schedule.other_constraints
+                type: text
+                prompt: Quali altri vincoli potrebbero impedire di completare questa iterazione?
+                help: >-
+                  Vincoli di disponibilità delle risorse ma anche tecnologici, per esempio la
+                  quantità di dati che è realistico gestire, i limiti di sicurezza o le policy
+                  aziendali.
+
+      - key: performance
+        title: Prestazioni e funzionamento del sistema AI
+        summary: >-
+          Fissare i livelli minimi accettabili di prestazione del modello e gli indicatori con
+          cui verrà giudicato il progetto.
+        tasks:
+          - key: model_performance
+            title: Prestazioni accettabili del modello
+            guidance: >-
+              Un sistema AI è probabilistico: sbaglierà una parte delle volte. Decidete quale
+              livello minimo di prestazione è accettabile, sapendo che può partire basso nelle
+              prime iterazioni e crescere in seguito. Per un classificatore, ragionate sulla
+              matrice di confusione: accuratezza, precisione, recall, F1 e tassi di falsi
+              positivi e falsi negativi.
+            questions:
+              - key: p1.performance.model_performance.metrics
+                type: text
+                prompt: >-
+                  Quali metriche di prestazione deve raggiungere il modello, e quanto pesano gli
+                  errori?
+                help: >-
+                  Indicate le soglie minime (o massime, per i tassi di errore) e il costo di un
+                  falso positivo rispetto a un falso negativo. Per l'AI generativa, descrivete
+                  quanto sono tollerabili risposte imprecise e come vanno gestite.
+
+          - key: kpis
+            title: KPI accettabili
+            guidance: >-
+              Oltre alle metriche del modello, servono indicatori misurabili con cui giudicare il
+              progetto: quelli di business (ricavi, efficienza, riduzione degli errori) e quelli
+              tecnologici (tempi di risposta, uso delle risorse, tassi di errore del servizio).
+            questions:
+              - key: p1.performance.kpis.business
+                type: text
+                prompt: Quali KPI di business deve raggiungere questa iterazione?
+                help: >-
+                  Per ogni KPI indicate valore di partenza, obiettivo, orizzonte temporale e come
+                  verrà misurato.
+              - key: p1.performance.kpis.technology
+                type: text
+                prompt: Quali KPI tecnologici deve raggiungere questa iterazione?
+                help: >-
+                  Per esempio latenza massima, disponibilità del servizio, costi di calcolo,
+                  volumi da gestire, tasso di errori tecnici.
+
+      - key: trustworthy
+        title: Requisiti di AI affidabile
+        summary: >-
+          Affrontare fin dall'inizio etica, gestione dei fallimenti, conformità, trasparenza e
+          spiegabilità.
+        tasks:
+          - key: framework
+            title: Framework di AI affidabile
+            guidance: >-
+              Adottare un framework di AI affidabile rende coerenti le scelte etiche e di
+              governance tra un progetto e l'altro. Se non ne usate uno, dichiaratelo: le misure
+              di affidabilità di questo progetto saranno allora specifiche e andranno documentate.
+            questions:
+              - key: p1.trustworthy.framework.framework
+                type: text
+                prompt: Quale framework di AI affidabile adotterete in questo progetto?
+                help: >-
+                  Indicate il framework (interno, di settore o normativo). Se non ne usate
+                  nessuno, spiegate come garantirete un'applicazione coerente dei principi di AI
+                  affidabile in questo progetto e nei prossimi.
+
+          - key: ethics
+            title: Considerazioni etiche
+            guidance: >-
+              Un sistema AI può causare danni anche senza volerlo: individuate chi potrebbe
+              subirli e in che modo, e prevedete come evitarli o limitarli.
+            questions:
+              - key: p1.trustworthy.ethics.harms
+                type: text
+                prompt: Quali danni potrebbe causare il progetto e come intendete mitigarli?
+                help: >-
+                  Considerate danni fisici, economici, psicologici, ambientali o reputazionali,
+                  per gli utenti e per chi è indirettamente coinvolto. Per ciascuno indicate la
+                  mitigazione prevista.
+
+          - key: failure_modes
+            title: Modalità di fallimento
+            guidance: >-
+              Poiché il modello sbaglierà in una parte dei casi, progettate in anticipo come
+              accorgervene e come reagire: soglie di confidenza, ricorso a un sistema di riserva
+              o a una persona, ritorno all'approccio euristico. Includete i rischi di progetto,
+              il ruolo delle persone nel ciclo e il controllo dei bias.
+            questions:
+              - key: p1.trustworthy.failure_modes.handling
+                type: text
+                prompt: >-
+                  Come capirete che il sistema non fornisce risultati adeguati, e come gestirete
+                  i suoi fallimenti in questa iterazione?
+                help: >-
+                  Definite gli intervalli di confidenza da accettare automaticamente, quelli da
+                  passare a una persona o a un sistema di riserva, e come trattare i risultati
+                  nei casi sensibili ai falsi positivi o ai falsi negativi.
+              - key: p1.trustworthy.failure_modes.risks
+                type: text
+                prompt: Quali sono i rischi più rilevanti che potrebbero far fallire il progetto?
+                help: >-
+                  Per ogni rischio indicate probabilità, impatto e piano di contingenza: che cosa
+                  farete se si verifica.
+              - key: p1.trustworthy.failure_modes.human_in_the_loop
+                type: text
+                prompt: Come manterrete il coinvolgimento delle persone nel funzionamento del sistema?
+                help: >-
+                  In quali punti una persona verifica, corregge o approva? Quando il sistema va
+                  sospeso perché non porta valore? Quale monitoraggio previene risultati
+                  indesiderati?
+              - key: p1.trustworthy.failure_modes.bias
+                type: text
+                prompt: Come individuerete e ridurrete i bias nei dati e nei risultati?
+                help: >-
+                  Descrivete le verifiche sui dati di origine umana, le metriche che userete per
+                  rilevare risultati distorti e le azioni correttive previste.
+
+          - key: compliance
+            title: Conformità normativa
+            guidance: >-
+              Il progetto e i suoi dati possono essere soggetti a leggi e regolamenti che
+              dipendono dal paese, dal settore e dal tipo di dati. Individuarli subito evita
+              problemi legali e di responsabilità più avanti.
+            questions:
+              - key: p1.trustworthy.compliance.regulations
+                type: text
+                prompt: Quali leggi, regolamenti o requisiti di conformità si applicano a questa iterazione?
+                help: >-
+                  Per esempio GDPR, AI Act europeo, normative di settore, policy interne. Se non
+                  lo sapete ancora, indicate come e con chi lo verificherete.
+
+          - key: transparency
+            title: Trasparenza
+            guidance: >-
+              Decidete quanta visibilità dare sui dati usati e sul modo in cui sono stati
+              scelti, filtrati e trasformati, e con quali processi la garantirete a chi la
+              richiede.
+            questions:
+              - key: p1.trustworthy.transparency.data_sources
+                type: text
+                prompt: Quale trasparenza offrirete sulle fonti dei dati usati dal progetto?
+                help: >-
+                  Chi può sapere da dove vengono i dati, ed eventualmente accedervi? Con quali
+                  strumenti o documenti lo renderete possibile?
+              - key: p1.trustworthy.transparency.data_selection
+                type: text
+                prompt: >-
+                  Quale trasparenza offrirete sui metodi con cui selezionate, filtrate e
+                  trasformate i dati?
+                help: >-
+                  Descrivete come documenterete i criteri di inclusione ed esclusione e le
+                  trasformazioni applicate, e a chi li renderete visibili.
+
+          - key: explainability
+            title: Spiegabilità
+            guidance: >-
+              In alcuni contesti, per audit, analisi delle cause o obblighi di legge, le decisioni
+              del sistema devono poter essere spiegate. Saperlo subito condiziona la scelta degli
+              algoritmi: modelli molto opachi potrebbero non essere ammessi.
+            questions:
+              - key: p1.trustworthy.explainability.requirements
+                type: text
+                prompt: Quali requisiti di spiegabilità deve rispettare il sistema?
+                help: >-
+                  Indicate a chi vanno spiegati i risultati (utenti, clienti, auditor), con quale
+                  livello di dettaglio e se questo esclude l'uso di modelli "a scatola nera".
+
+      - key: go_no_go
+        title: AI Go/No-Go
+        summary: >-
+          Nove domande di fattibilità, tre per il business, tre per i dati e tre per
+          l'esecuzione. Ogni fattore va valutato come GO, MAYBE o NO-GO.
+        tasks:
+          - key: business_feasibility
+            title: Fattibilità di business
+            guidance: >-
+              Verificate che esistano le condizioni di business perché il progetto possa essere
+              realizzato e adottato. Un fattore va segnato GO solo se la risposta è un sì
+              convinto; in caso contrario, indicate che cosa manca.
+            questions:
+              - key: p1.go_no_go.business_feasibility.problem_definition
+                type: go_no_go
+                factor_group: business
+                prompt: Il problema è descritto in modo chiaro rispetto agli obiettivi di business?
+                help: >-
+                  Se la definizione non è ancora sufficiente, indicate che cosa occorre
+                  chiarire.
+              - key: p1.go_no_go.business_feasibility.willingness_to_adopt
+                type: go_no_go
+                factor_group: business
+                prompt: >-
+                  Il committente è disposto a mettere davvero in produzione la soluzione AI che
+                  il team realizzerà?
+                help: >-
+                  Avete un impegno, verbale o scritto, all'adozione? Se ci sono ostacoli,
+                  elencateli e valutate se possono essere superati entro l'iterazione.
+              - key: p1.go_no_go.business_feasibility.roi
+                type: go_no_go
+                factor_group: business
+                prompt: >-
+                  La soluzione AI offre un ritorno o un impatto sufficiente, e superiore
+                  all'approccio attuale senza AI?
+                help: >-
+                  Se il ritorno non basta, indicate che cosa cambiare nel progetto per renderlo
+                  positivo.
+
+          - key: data_feasibility
+            title: Fattibilità dei dati
+            guidance: >-
+              Verificate che esistano le condizioni sui dati. È una prima stima: la qualità dei
+              dati verrà riesaminata nella Fase II.
+            questions:
+              - key: p1.go_no_go.data_feasibility.data_measures_need
+                type: go_no_go
+                factor_group: data
+                prompt: >-
+                  I dati necessari per costruire il modello esistono e misurano davvero ciò che
+                  vi serve?
+                help: Se no, indicate quali dati mancano.
+              - key: p1.go_no_go.data_feasibility.quantity_and_access
+                type: go_no_go
+                factor_group: data
+                prompt: Avete dati in quantità sufficiente e la possibilità concreta di accedervi?
+                help: Se no, indicate che cosa serve per ottenere i dati o l'accesso.
+              - key: p1.go_no_go.data_feasibility.quality
+                type: go_no_go
+                factor_group: data
+                prompt: I dati hanno una qualità sufficiente per essere utili?
+                help: >-
+                  Date la miglior valutazione possibile con le informazioni attuali; la
+                  rivedrete nella Fase II.
+
+          - key: execution_feasibility
+            title: Fattibilità di esecuzione
+            guidance: >-
+              Verificate di poter realizzare e far funzionare la soluzione come richiesto:
+              tecnologia, competenze, budget e approvazioni, tempi di esecuzione e contesto
+              d'uso. Se mancano risposte, valutate se si possono ottenere prima della fase
+              successiva.
+            questions:
+              - key: p1.go_no_go.execution_feasibility.technology_and_skills
+                type: go_no_go
+                factor_group: execution
+                prompt: Avete accesso alla tecnologia e alle competenze necessarie per questa iterazione?
+                help: >-
+                  Considerate anche i costi della tecnologia, i fondi disponibili e le
+                  approvazioni necessarie. Se manca qualcosa, indicate che cosa.
+              - key: p1.go_no_go.execution_feasibility.timely_execution
+                type: go_no_go
+                factor_group: execution
+                prompt: >-
+                  È possibile realizzare un modello che risponda in tempi adeguati, nel modo e
+                  nel luogo previsti?
+                help: >-
+                  Valutate se servono investimenti importanti in infrastruttura e se il modello
+                  rispetterà i vincoli dell'ambiente in cui verrà usato.
+              - key: p1.go_no_go.execution_feasibility.deployment_sense
+                type: go_no_go
+                factor_group: execution
+                prompt: >-
+                  Ha senso, dal punto di vista tecnico, operativo, economico e di business, usare
+                  il modello dove e come avete previsto?
+                help: >-
+                  Avete stimato costi e complessità della messa in esercizio in quel contesto?
+                  Se no, indicate come otterrete rapidamente queste informazioni.
+
+      - key: project_plan
+        title: Piano di progetto
+        summary: Pianificare lo sprint o l'iterazione corrente.
+        tasks:
+          - key: plan
+            title: Piano di progetto
+            guidance: >-
+              Descrivete come intendete raggiungere gli obiettivi cognitivi e, attraverso questi,
+              quelli di business. Il piano deve coprire i passi rimanenti, le prime scelte di
+              strumenti e tecniche e il modo in cui misurerete i progressi nello sprint.
+            questions:
+              - key: p1.project_plan.plan.stages
+                type: text
+                prompt: >-
+                  Quali sono le fasi del progetto, con durata, risorse, input, output e
+                  dipendenze?
+                help: >-
+                  Indicate dove prevedete di iterare tra fasi (per esempio tra sviluppo e
+                  valutazione del modello), i legami tra calendario e rischi, e come verificherete
+                  l'avanzamento in coerenza con il piano dello sprint e il piano di comunicazione.
+              - key: p1.project_plan.plan.tools
+                type: text
+                prompt: Quali strumenti e tecniche userete inizialmente?
+                help: >-
+                  Indicate se servono acquisti, valutazioni preliminari o procedure di
+                  approvvigionamento e quanto tempo richiederanno. La scelta degli strumenti può
+                  influenzare l'intero progetto, quindi va fatta presto.
+
+      - key: gate
+        title: Go/No-Go della fase
+        summary: Esito complessivo della Fase I.
+        tasks:
+          - key: decision
+            title: Esito della Fase I
+            guidance: >-
+              L'esito della Fase I deriva dai nove fattori dell'AI Go/No-Go: basta un fattore
+              NO-GO perché l'esito sia NO-GO; se non ci sono NO-GO ma almeno un MAYBE, si procede
+              con cautela. L'esito proposto dall'app va confermato. Con un NO-GO non c'è una fase
+              precedente a cui tornare: il problema va ridefinito o ridimensionato, oppure il
+              progetto va fermato.
+            questions:
+              - key: p1.gate.decision.outcome
+                type: phase_gate
+                prompt: Il progetto può passare alla Fase II, Comprensione dei dati?
+                help: >-
+                  Confermate o correggete l'esito calcolato dai nove fattori e motivatelo. In caso
+                  di MAYBE indicate che cosa va chiarito e entro quando; in caso di NO-GO, se
+                  ridefinirete il problema o fermerete il progetto.
+                criteria: []
+
+  # ───────────────────────────── Fase II ─────────────────────────────
+  - key: data_understanding
+    number: 2
+    title: Comprensione dei dati
+    summary: >-
+      Individuare e raccogliere i dati necessari, descriverli, esplorarli e verificarne la
+      qualità, tenendo conto delle esigenze specifiche del machine learning.
+    task_groups:
+      - key: initial_data
+        title: Raccolta iniziale dei dati
+        summary: Capire quali dati sono disponibili, in che formati e con quale qualità.
+        tasks:
+          - key: collect
+            title: Raccolta dei dati
+            guidance: >-
+              Procuratevi i dati individuati nell'analisi delle risorse, caricandoli e
+              preparandoli quanto basta per capirli. Se le fonti sono più di una, considerate fin
+              da ora come integrarle. Annotate problemi e soluzioni: serviranno a chi ripeterà il
+              lavoro.
+            questions:
+              - key: p2.initial_data.collect.data_inventory
+                type: text
+                prompt: >-
+                  Quali dati vi servono per questa iterazione e dove si trovano? Quali problemi
+                  di reperimento o accesso avete incontrato e come li avete risolti?
+                help: >-
+                  Per ogni insieme di dati indicate fonte, posizione, modalità di acquisizione,
+                  proprietario e stato dell'accesso.
+
+          - key: describe
+            title: Descrizione dei dati
+            guidance: >-
+              Esaminate le caratteristiche superficiali dei dati acquisiti (formato, volumi,
+              campi) e verificate che soddisfino i requisiti del progetto e del pattern di AI
+              scelto, sia per i dati strutturati sia per quelli non strutturati.
+            questions:
+              - key: p2.initial_data.describe.data_nature
+                type: text
+                prompt: >-
+                  Di che natura e struttura sono i dati? Contengono gli elementi che vi servono,
+                  e come risolverete eventuali discrepanze?
+                help: >-
+                  Indicate formati, numero di record e di campi, significato dei campi
+                  principali, e se i dati sono strutturati o non strutturati.
+
+          - key: explore
+            title: Esplorazione dei dati
+            guidance: >-
+              Ispezionate i dati con interrogazioni, visualizzazioni e statistiche semplici:
+              distribuzioni degli attributi chiave, relazioni tra attributi, sottogruppi
+              interessanti. Le prime ipotesi che emergono possono orientare il resto del
+              progetto.
+            questions:
+              - key: p2.initial_data.explore.findings
+                type: text
+                prompt: >-
+                  Che cosa avete scoperto ispezionando i dati, e la loro quantità è sufficiente?
+                  Se no, come colmerete la mancanza?
+                help: >-
+                  Riportate i primi risultati e le ipotesi, se i dati bastano per l'addestramento
+                  e se servono integrazioni da fonti di terze parti.
+
+      - key: data_quality
+        title: Qualità dei dati
+        summary: Valutare il livello di qualità dei dati.
+        tasks:
+          - key: verify
+            title: Verifica della qualità dei dati
+            guidance: >-
+              Verificate se i dati sono completi, corretti e nel formato richiesto: quali errori
+              e valori mancanti contengono, quanto sono frequenti, quali attributi mancano e
+              quali trasformazioni servono. Le soluzioni ai problemi di qualità richiedono di
+              solito sia conoscenza dei dati sia del business.
+            questions:
+              - key: p2.data_quality.verify.quality_and_needs
+                type: text
+                prompt: >-
+                  Qual è la qualità attuale dei dati, e di quali attività di preparazione,
+                  arricchimento e trasformazione avranno bisogno?
+                help: >-
+                  Elencate errori, valori mancanti, lacune di copertura, problemi di formato, e
+                  per ciascuno la soluzione possibile.
+
+      - key: ml_data
+        title: Dati per il modello di machine learning
+        summary: Esigenze di dati specifiche per la costruzione dei modelli.
+        tasks:
+          - key: training_test
+            title: Dati di training, validazione e test
+            guidance: >-
+              Specificate i requisiti dei dati di addestramento (quantità minima, formato, fonte,
+              qualità, etichettatura, eventuali fonti esterne) e come verranno ricavati i dati
+              di validazione e di test: suddivisione, eventuale cross-validation, uso dei
+              risultati per ottimizzare gli iperparametri e decidere se riaddestrare.
+            questions:
+              - key: p2.ml_data.training_test.needs
+                type: text
+                prompt: >-
+                  Quali esigenze specifiche avete per i dati di training, e come vi assicurerete
+                  di avere dati di training, validazione e test sufficienti?
+                help: >-
+                  Indicate volumi minimi, strategie per aumentare i dati mantenendone la qualità,
+                  criteri di suddivisione e come i risultati dei test influenzeranno le decisioni
+                  sul modello.
+
+          - key: edge
+            title: Dati per modelli edge
+            guidance: >-
+              Se il modello girerà su dispositivi con capacità di calcolo, memoria o
+              connettività limitate, definite i vincoli che ne derivano: dati catturati sul
+              dispositivo, tempi di risposta, aggiornamento delle versioni e monitoraggio.
+            questions:
+              - key: p2.ml_data.edge.needs
+                type: text
+                prompt: Avete esigenze particolari di dati da o verso dispositivi edge? Se sì, descrivetele.
+                help: Se il modello non verrà usato su dispositivi edge, scrivetelo esplicitamente.
+
+          - key: pretrained
+            title: Modelli preaddestrati e di terze parti
+            guidance: >-
+              Valutate se potete partire da un modello esistente (di una vostra iterazione
+              precedente, di un altro team o di un fornitore esterno), verificando che sia
+              adatto ai dati attuali: origine e metodi di addestramento, prestazioni, costi
+              d'uso e come monitorarli nel tempo.
+            questions:
+              - key: p2.ml_data.pretrained.models
+                type: text
+                prompt: >-
+                  Potete usare modelli preaddestrati, di terze parti o foundation model? Quali,
+                  e come vi accederete? Servono fine-tuning o transfer learning?
+                help: >-
+                  Per ogni modello indicate fonte, licenza, costi, prestazioni verificate sui
+                  vostri dati e le eventuali modifiche necessarie.
+
+      - key: gate
+        title: Go/No-Go della fase
+        summary: Verificare di avere i dati e di conoscere il problema prima di prepararli.
+        tasks:
+          - key: decision
+            title: Passaggio alla Fase III
+            guidance: >-
+              Si passa alla preparazione dei dati solo se si può dire con sicurezza di avere i
+              dati giusti e di conoscere il problema. Non serve aver già risolto tutto, ma nessuna
+              questione aperta deve bloccare il lavoro successivo. Se mancano dati indispensabili
+              che non si possono ottenere, o i dati non sono coerenti con gli obiettivi, conviene
+              tornare alla Fase I e rivedere ambito o natura del progetto.
+            questions:
+              - key: p2.gate.decision.outcome
+                type: phase_gate
+                prompt: Il progetto può passare alla Fase III, Preparazione dei dati?
+                help: >-
+                  Spuntate i criteri soddisfatti. Per quelli mancanti l'app suggerisce la fase a
+                  cui tornare; motivate il verdetto e la scelta finale.
+                criteria:
+                  - key: data_needs_known
+                    label: >-
+                      Sapete quali dati servono per questa iterazione e se è possibile lavorare
+                      con una quantità minore
+                    return_to: 1
+                  - key: sources_and_access
+                    label: >-
+                      Avete individuato fonti, responsabili e modalità di accesso sia per i dati
+                      di addestramento sia per quelli di esercizio
+                    return_to: 1
+                  - key: real_world_gap
+                    label: >-
+                      Avete chiarito in che cosa i dati di addestramento differiscono da quelli
+                      reali
+                  - key: data_characteristics
+                    label: >-
+                      Conoscete volume, tipo, frequenza di cambiamento e collocazione dei dati
+                      (cloud, on-premise, edge)
+                  - key: quality_and_effort
+                    label: >-
+                      Conoscete la qualità dei dati e lo sforzo necessario per pulirli,
+                      etichettarli e arricchirli
+                  - key: ingestion
+                    label: >-
+                      Avete definito come raccogliere e acquisire i dati e chi gestirà le
+                      pipeline
+
+  # ───────────────────────────── Fase III ─────────────────────────────
+  - key: data_preparation
+    number: 3
+    title: Preparazione dei dati
+    summary: >-
+      Portare i dati nella forma necessaria per la modellazione. Il risultato è l'insieme di
+      dati su cui si costruirà il modello.
+    task_groups:
+      - key: selection
+        title: Selezione dei dati
+        summary: Scegliere i dati da usare per la modellazione.
+        tasks:
+          - key: select
+            title: Selezione dei dati
+            guidance: >-
+              Decidete quali dati usare, sia come attributi (colonne) sia come record (righe),
+              in base a pertinenza, qualità e vincoli tecnici. Documentate le fonti, le
+              interrogazioni usate e le ragioni di ogni inclusione o esclusione.
+            questions:
+              - key: p3.selection.select.selection
+                type: text
+                prompt: >-
+                  Quali dati avete selezionato e con quale metodo? Che cosa avete escluso e
+                  perché?
+                help: >-
+                  Indicate fonti, filtri e query applicati, e motivate le esclusioni in modo che
+                  restino comprensibili nelle iterazioni future.
+
+      - key: cleansing
+        title: Pulizia e arricchimento
+        summary: Rendere i dati utilizzabili per la modellazione.
+        tasks:
+          - key: clean
+            title: Pulizia dei dati
+            guidance: >-
+              Portate la qualità dei dati al livello richiesto: deduplicazione, correzione di
+              valori e campi errati, gestione dei mancanti, normalizzazione, riduzione del rumore,
+              riordino di attributi e record, adattamenti di sintassi per gli strumenti, e
+              anonimizzazione dei dati personali dove necessario. Costruite pipeline riutilizzabili
+              sia per i dati di training sia per quelli che il modello riceverà in esercizio.
+            questions:
+              - key: p3.cleansing.clean.methods_and_pipeline
+                type: text
+                prompt: >-
+                  Quali operazioni di pulizia e preparazione avete eseguito, e come è fatta la
+                  pipeline dei dati, dalla raccolta alla preparazione?
+                help: >-
+                  Collegate ogni operazione ai problemi emersi nella verifica della qualità e
+                  valutate il suo possibile impatto sui risultati. Indicate se e come avete
+                  anonimizzato i dati.
+
+          - key: enhance
+            title: Arricchimento e augmentation
+            guidance: >-
+              Create nuovi valori a partire da quelli esistenti: attributi derivati, record
+              generati, unione di più fonti, aggregazioni, integrazione con dati di terze parti.
+              Per le fonti esterne, valutate costi, complessità e affidabilità.
+            questions:
+              - key: p3.cleansing.enhance.methods
+                type: text
+                prompt: >-
+                  Quali operazioni di arricchimento e augmentation avete eseguito, e come avete
+                  modificato la pipeline dei dati?
+                help: >-
+                  Descrivete gli attributi derivati, i record generati, le fonti unite o
+                  aggregate e come avete verificato l'accuratezza dei dati di terze parti.
+
+      - key: labeling
+        title: Etichettatura dei dati
+        summary: Aggiungere le etichette e le annotazioni richieste dall'apprendimento supervisionato.
+        tasks:
+          - key: label
+            title: Etichettatura dei dati
+            guidance: >-
+              Definite che cosa va etichettato e come: personale interno, fornitori esterni,
+              dati già etichettati o una combinazione. Stimate i costi e prevedete un controllo
+              di qualità delle etichette.
+            questions:
+              - key: p3.labeling.label.method
+                type: text
+                prompt: >-
+                  Con quale metodo avete etichettato i dati, come cresceranno i costi
+                  all'aumentare dei volumi, e come avete modificato la pipeline?
+                help: >-
+                  Indicate requisiti di etichettatura, chi la esegue, costi unitari, controlli di
+                  qualità e risultati ottenuti.
+
+      - key: gate
+        title: Go/No-Go della fase
+        summary: Verificare che i dati siano davvero pronti per la modellazione.
+        tasks:
+          - key: decision
+            title: Passaggio alla Fase IV
+            guidance: >-
+              Questa fase non si chiude con un piano, ma con i dati effettivamente preparati,
+              nella forma e nel formato che servono al modello. Si torna alla Fase II se lo
+              sforzo di preparazione supera di molto le stime o le risorse, se restano dati
+              mancanti o errati che non si riescono a correggere, se le pipeline si rivelano
+              irrealizzabili, oppure se i dati non producono risultati adeguati con i modelli
+              preaddestrati o l'AI generativa.
+            questions:
+              - key: p3.gate.decision.outcome
+                type: phase_gate
+                prompt: Il progetto può passare alla Fase IV, Sviluppo del modello?
+                help: >-
+                  Spuntate i criteri soddisfatti e motivate il verdetto. Se tornate alla Fase II,
+                  indicate che cosa cambierete: sottoinsieme di dati, fonti alternative, modalità
+                  di acquisizione.
+                criteria:
+                  - key: data_ready
+                    label: >-
+                      La preparazione è stata eseguita e i dati sono nella forma e nel formato
+                      richiesti dal modello
+                  - key: effort_sustainable
+                    label: >-
+                      Pulizia, preparazione ed etichettatura sono sostenibili con le risorse
+                      disponibili
+                    return_to: 2
+                  - key: missing_data_resolved
+                    label: >-
+                      I dati mancanti o errati sono stati risolti, anche con augmentation o dati
+                      sintetici
+                    return_to: 2
+                  - key: pipelines_feasible
+                    label: >-
+                      Le pipeline per i dati di addestramento e di esercizio sono realizzabili,
+                      anche dal punto di vista legale e della sicurezza
+                    return_to: 2
+                  - key: model_input_quality
+                    label: >-
+                      Con modelli preaddestrati o AI generativa, i dati preparati producono
+                      risultati di qualità adeguata
+                    return_to: 2
+                  - key: no_blockers
+                    label: >-
+                      Non restano incognite che impediscano di iniziare a costruire il modello
+
+  # ───────────────────────────── Fase IV ─────────────────────────────
+  - key: model_development
+    number: 4
+    title: Sviluppo del modello
+    summary: >-
+      Costruire e iterare il modello sui dati preparati per ottenere i risultati richiesti. Il
+      risultato è un modello pronto per la valutazione.
+    task_groups:
+      - key: technique
+        title: Scelta della tecnica di modellazione
+        summary: Scegliere tecnica, algoritmo e impostazioni iniziali.
+        tasks:
+          - key: algorithm
+            title: Algoritmo e tecnica di modellazione
+            guidance: >-
+              Scegliete l'algoritmo o la tecnica di modellazione, partendo dal pattern di AI
+              individuato nella Fase I, e verificate che gli strumenti scelti la supportino.
+              Documentate l'approccio (supervisionato, non supervisionato, per rinforzo), gli
+              iperparametri iniziali e le ipotesi che la tecnica fa sui dati. Se usate più
+              tecniche, ripetete il lavoro per ciascuna.
+            questions:
+              - key: p4.technique.algorithm.choice
+                type: text
+                prompt: Quale algoritmo e quale approccio userete per sviluppare il modello?
+                help: >-
+                  Indicate tecnica, iperparametri iniziali e ipotesi sui dati. Per AI generativa,
+                  foundation model o modelli preaddestrati, compilate anche i task dedicati più
+                  avanti.
+
+          - key: ensemble
+            title: Metodi ensemble
+            guidance: >-
+              Valutate se combinare più modelli migliori le prestazioni complessive e, se sì,
+              con quale metodo (bagging, boosting, media o altro) e quale configurazione.
+            questions:
+              - key: p4.technique.ensemble.configuration
+                type: text
+                prompt: Se svilupperete un ensemble di modelli, come sarà configurato?
+                help: Se non prevedete un ensemble, scrivetelo e spiegate brevemente perché.
+
+          - key: automl
+            title: AutoML
+            guidance: >-
+              Gli strumenti di AutoML possono accelerare la costruzione dei modelli. Se li usate,
+              chiarite come, con quali requisiti, e verificate che i modelli prodotti siano
+              compatibili con il flusso di input e output definito nella Fase I.
+            questions:
+              - key: p4.technique.automl.usage
+                type: text
+                prompt: Userete strumenti di AutoML? Se sì, quali e come?
+                help: Indicate lo strumento, il suo ruolo nel processo e come userete i suoi risultati.
+
+          - key: fine_tuning
+            title: Fine-tuning di modelli preaddestrati
+            guidance: >-
+              Se partite da un modello preaddestrato o da un foundation model che va adattato,
+              definite come lo addestrerete ulteriormente e verificate che gli strumenti lo
+              consentano.
+            questions:
+              - key: p4.technique.fine_tuning.approach
+                type: text
+                prompt: >-
+                  Quali modelli preaddestrati o foundation model userete, e con quale metodo li
+                  adatterete a questa iterazione?
+                help: Indicate modello, dati di adattamento, tecnica di fine-tuning e strumenti.
+
+          - key: generative_ai
+            title: AI generativa
+            guidance: >-
+              Se la soluzione si basa su AI generativa o su modelli linguistici, documentate il
+              servizio usato e i suoi costi e limiti, l'approccio di prompt engineering e le
+              eventuali catene che collegano il modello ad altre fonti o elaborazioni.
+            questions:
+              - key: p4.technique.generative_ai.approach
+                type: text
+                prompt: >-
+                  Quale approccio di AI generativa userete? Se è un servizio via API, quali sono
+                  costi e limiti?
+                help: >-
+                  Indicate fornitore e modello, modalità di accesso, costo incrementale, limiti
+                  di utilizzo e di contesto.
+              - key: p4.technique.generative_ai.prompt_engineering
+                type: text
+                prompt: Quale approccio di prompt engineering adotterete?
+                help: >-
+                  Descrivete la struttura dei prompt, l'uso di esempi, le istruzioni di sistema e
+                  come gestirete le versioni e i test dei prompt.
+              - key: p4.technique.generative_ai.chaining
+                type: text
+                prompt: >-
+                  Come collegherete i risultati del modello ad altre risorse, fonti di dati o
+                  elaborazioni precedenti e successive?
+                help: >-
+                  Per esempio recupero di documenti (RAG), uso di strumenti, controlli
+                  automatici sulle risposte. Se non è previsto, scrivetelo.
+
+      - key: test_design
+        title: Progetto di test e validazione
+        summary: Preparare il modo in cui il modello sarà testato e validato.
+        tasks:
+          - key: design
+            title: Progetto di test del modello
+            guidance: >-
+              Prima di costruire il modello, decidete come ne misurerete qualità e validità: come
+              dividere i dati in training, validazione e test, se usare la cross-validation e con
+              quali parametri, e verificate che gli strumenti supportino questi metodi.
+            questions:
+              - key: p4.test_design.design.approach
+                type: text
+                prompt: >-
+                  Come validerete il modello per evitare overfitting e underfitting e verificare
+                  che raggiunga gli obiettivi?
+                help: Indicate suddivisione dei dati, metriche, eventuale k-fold e criteri di accettazione.
+
+      - key: training
+        title: Addestramento del modello
+        summary: Costruire il modello vero e proprio.
+        tasks:
+          - key: build
+            title: Addestramento e costruzione del modello
+            guidance: >-
+              Addestrate o costruite i modelli secondo le scelte fatte, sui dati preparati.
+              Descrivete i modelli ottenuti, come interpretarli e le eventuali difficoltà
+              incontrate.
+            questions:
+              - key: p4.training.build.results
+                type: text
+                prompt: >-
+                  Quali attività di addestramento, fine-tuning o prompt engineering avete svolto,
+                  e quali risultati possono servire alle fasi o iterazioni successive?
+                help: Indicate i modelli prodotti, dove sono conservati e come vanno interpretati.
+
+      - key: hyperparameters
+        title: Ottimizzazione degli iperparametri
+        summary: Massimizzare l'adattamento e le prestazioni del modello.
+        tasks:
+          - key: optimize
+            title: Ottimizzazione degli iperparametri
+            guidance: >-
+              Rivedete gli iperparametri iniziali in base alla valutazione dei modelli e
+              ripetete costruzione e valutazione finché non siete convinti di avere il modello
+              migliore. Documentate ogni revisione, i valori finali e le ragioni della scelta.
+            questions:
+              - key: p4.hyperparameters.optimize.results
+                type: text
+                prompt: >-
+                  Quanto bene si adatta il modello ai dati di training, validazione e test, e con
+                  quale metodo avete ottimizzato gli iperparametri?
+                help: Riportate le misure di fit, il metodo di ottimizzazione e i valori finali scelti.
+
+      - key: gate
+        title: Go/No-Go della fase
+        summary: Verificare di avere un modello pronto per la valutazione.
+        tasks:
+          - key: decision
+            title: Passaggio alla Fase V
+            guidance: >-
+              Si passa alla valutazione solo con un modello costruito che soddisfa i requisiti
+              della Fase I, sui dati individuati nella Fase II e preparati nella Fase III, e con
+              le scelte documentate: anche perché si è usato, o non usato, un modello
+              preaddestrato o l'AI generativa. Si torna alla Fase III se il problema sta nella
+              preparazione dei dati, alla Fase II se sta nella natura stessa dei dati.
+            questions:
+              - key: p4.gate.decision.outcome
+                type: phase_gate
+                prompt: Il progetto può passare alla Fase V, Valutazione del modello?
+                help: >-
+                  Spuntate i criteri soddisfatti e motivate il verdetto. Non procedete se mancano
+                  risposte alle domande chiave di questa fase o se ci sono segnali di allarme.
+                criteria:
+                  - key: model_meets_requirements
+                    label: >-
+                      Avete un modello che soddisfa i requisiti della Fase I e rispetta i vincoli
+                      individuati
+                  - key: choices_documented
+                    label: >-
+                      Le scelte di modellazione sono documentate, comprese le ragioni per usare o
+                      non usare modelli preaddestrati e AI generativa
+                  - key: prepared_data_fit
+                    label: >-
+                      I dati preparati sono adatti al modello: qualità, etichette e prompt danno
+                      risultati adeguati
+                    return_to: 3
+                  - key: data_matches_reality
+                    label: >-
+                      I dati di addestramento corrispondono a quelli reali e al modello
+                      preaddestrato scelto
+                    return_to: 2
+                  - key: capabilities_known
+                    label: >-
+                      Conoscete capacità e limiti del modello e non ci sono ostacoli bloccanti
+
+  # ───────────────────────────── Fase V ─────────────────────────────
+  - key: model_evaluation
+    number: 5
+    title: Valutazione del modello
+    summary: >-
+      Verificare quanto il modello soddisfa gli obiettivi della Fase I e se c'è qualche motivo
+      di business per considerarlo inadeguato, anche provandolo in un ambiente reale o di
+      staging.
+    task_groups:
+      - key: evaluation
+        title: Valutazione dei risultati
+        summary: Capire se il modello validato e ottimizzato soddisfa gli obiettivi di business.
+        tasks:
+          - key: performance
+            title: Prestazioni del modello
+            guidance: >-
+              Interpretate i modelli ottenuti: adattamento ai dati, accuratezza e altre misure,
+              e i fattori che potrebbero richiedere nuovi iperparametri, un altro algoritmo o un
+              nuovo addestramento. Classificate i modelli candidati secondo i criteri di
+              valutazione e documentate curve e grafici utili.
+            questions:
+              - key: p5.evaluation.performance.measures
+                type: text
+                prompt: >-
+                  Quali sono i risultati della valutazione del modello (matrici di confusione,
+                  curve ROC e altre misure pertinenti)?
+                help: Riassumete le misure principali e il confronto tra i modelli candidati.
+
+          - key: kpi_measurement
+            title: Misurazione dei KPI
+            guidance: >-
+              Misurate il modello rispetto ai KPI di business e tecnologici fissati nella Fase I
+              e concludete se il modello, e il progetto nel suo insieme, soddisfa gli obiettivi
+              di partenza.
+            questions:
+              - key: p5.evaluation.kpi_measurement.business
+                type: text
+                prompt: >-
+                  Come si comporta il modello rispetto ai KPI di business della Fase I? Se non
+                  basta, che cosa farete per migliorarlo in questa iterazione?
+                help: Confrontate ogni KPI con l'obiettivo e indicate le azioni correttive.
+              - key: p5.evaluation.kpi_measurement.technology
+                type: text
+                prompt: >-
+                  Come si comporta il modello rispetto ai KPI tecnologici della Fase I? Se non
+                  basta, che cosa farete per migliorarlo in questa iterazione?
+                help: Confrontate ogni KPI con l'obiettivo e indicate le azioni correttive.
+
+          - key: iteration
+            title: Approccio di iterazione
+            guidance: >-
+              I modelli richiedono iterazioni continue, soprattutto se i risultati sono appena
+              sufficienti. Documentate le modifiche necessarie a modello, dati o processo, che
+              possono riguardare le Fasi II, III e IV.
+            questions:
+              - key: p5.evaluation.iteration.approach
+                type: text
+                prompt: >-
+                  Come itererete sul modello per migliorare i risultati, e quali fasi precedenti
+                  vanno riprese?
+                help: Elencate le modifiche previste e la fase a cui si riferiscono.
+
+          - key: process_review
+            title: Revisione del processo
+            guidance: >-
+              Quando il modello sembra soddisfacente, rivedete l'intero processo per scoprire
+              passaggi trascurati o da ripetere e problemi di qualità: il modello è stato
+              costruito correttamente? Usa solo attributi consentiti e disponibili anche in
+              futuro?
+            questions:
+              - key: p5.evaluation.process_review.approvals
+                type: text
+                prompt: Quali approvazioni o revisioni servono prima di mettere il modello in produzione?
+                help: Indicate chi deve approvare, con quali criteri e in quali tempi.
+
+      - key: gate
+        title: Go/No-Go della fase
+        summary: Verificare che il modello sia pronto per la messa in esercizio.
+        tasks:
+          - key: decision
+            title: Passaggio alla Fase VI
+            guidance: >-
+              Non si passa alla messa in esercizio finché il modello non soddisfa i requisiti.
+              Fissate in anticipo quando il modello si considera insufficiente, per esempio se
+              manca più di un certo numero di KPI. Poi cercate la causa: si torna alla Fase IV se
+              il problema è il modello, alla III se è la preparazione dei dati, alla II se i dati
+              sono inadeguati o poco rappresentativi, alla I se i KPI non vengono raggiunti
+              nonostante tutto e il problema va ridefinito.
+            questions:
+              - key: p5.gate.decision.outcome
+                type: phase_gate
+                prompt: Il progetto può passare alla Fase VI, Messa in esercizio?
+                help: >-
+                  Spuntate i criteri soddisfatti e indicate la soglia oltre la quale considerate
+                  il modello insufficiente. Motivate il verdetto e l'eventuale fase di ritorno.
+                criteria:
+                  - key: model_metrics_met
+                    label: Il modello raggiunge le metriche di prestazione richieste
+                    return_to: 4
+                  - key: preparation_not_limiting
+                    label: >-
+                      Le prestazioni non sono limitate da come sono stati preparati o etichettati
+                      i dati
+                    return_to: 3
+                  - key: data_representative
+                    label: I dati sono adeguati e rappresentativi del contesto reale
+                    return_to: 2
+                  - key: kpis_met
+                    label: Il modello raggiunge i KPI di business e tecnologici fissati nella Fase I
+                    return_to: 1
+                  - key: iteration_plan
+                    label: >-
+                      Esiste un piano per misurare la deriva e per riaddestrare o aggiornare il
+                      modello
+
+  # ───────────────────────────── Fase VI ─────────────────────────────
+  - key: model_operationalization
+    number: 6
+    title: Messa in esercizio del modello
+    summary: >-
+      Rendere operativo il modello in tutti i contesti previsti, monitorarlo, governarlo e
+      decidere i passi successivi.
+    task_groups:
+      - key: operationalization
+        title: Piano di messa in esercizio
+        summary: >-
+          Pianificare con gli altri team come rendere operativo il modello, secondo quanto
+          deciso nella Fase I.
+        tasks:
+          - key: plan
+            title: Piano di messa in esercizio
+            guidance: >-
+              Partendo dai risultati della valutazione, definite la strategia di esercizio
+              (batch, microservizio, tempo reale, streaming, on-premise, cloud) e i passi
+              necessari, coordinandovi con le parti non AI del progetto.
+            questions:
+              - key: p6.operationalization.plan.mode
+                type: text
+                prompt: Come verrà messo in esercizio il modello, in quale modalità e in quali ambienti?
+                help: Descrivete modalità di esecuzione, ambienti, integrazioni e passi di rilascio.
+              - key: p6.operationalization.plan.it_processes
+                type: text
+                prompt: Quali processi IT vanno seguiti per mettere in esercizio il modello come previsto?
+                help: >-
+                  Per esempio gestione dei cambiamenti, revisioni di sicurezza, ambienti di
+                  collaudo, procedure di rilascio.
+
+          - key: scaffolding
+            title: Scaffolding del modello
+            guidance: >-
+              Mettere il modello al lavoro richiede spesso sviluppo applicativo e altre attività
+              non AI, che possono richiedere nuove user story o sprint. In quel caso questa fase
+              resta in sospeso finché quel lavoro non è completato.
+            questions:
+              - key: p6.operationalization.scaffolding.activities
+                type: text
+                prompt: >-
+                  Quali attività non AI, come lo sviluppo applicativo, servono per mettere in
+                  esercizio il modello in questa iterazione?
+                help: Elencate le attività, chi le svolge e le eventuali user story o sprint aggiuntivi.
+
+      - key: monitoring
+        title: Monitoraggio e manutenzione
+        summary: >-
+          Garantire che il modello continui a dare i risultati attesi e prevedere come reagire
+          se smette di farlo.
+        tasks:
+          - key: plan
+            title: Piano di monitoraggio e manutenzione
+            guidance: >-
+              Un modello usato ogni giorno va sorvegliato, per evitare lunghi periodi in cui i
+              suoi risultati vengono usati anche se non sono più corretti. Definite una strategia
+              di monitoraggio e manutenzione adatta al tipo di messa in esercizio.
+            questions:
+              - key: p6.monitoring.plan.approach
+                type: text
+                prompt: Con quale approccio e quali strumenti monitorerete e gestirete il modello?
+                help: >-
+                  Indicate che cosa misurerete (prestazioni, deriva dei dati, costi), con quale
+                  frequenza, le soglie di allarme e le azioni previste.
+
+          - key: governance
+            title: Governance del modello
+            guidance: >-
+              Per un uso duraturo serve una struttura che decida su modifiche e utilizzo del
+              modello, raccogliendo il riscontro degli utenti. Definite chi ne è responsabile,
+              come opera e quale documentazione o conformità sarà richiesta in esercizio.
+            questions:
+              - key: p6.monitoring.governance.ownership
+                type: text
+                prompt: >-
+                  Chi sarà responsabile della governance del modello in questa iterazione e
+                  nelle successive, e come risponderà alle esigenze che emergeranno?
+                help: >-
+                  Indicate i membri del gruppo di governance, come raccoglierà e valuterà il
+                  riscontro degli utenti e la documentazione obbligatoria.
+
+      - key: next_iteration
+        title: Requisiti per la prossima iterazione
+        summary: Decidere come proseguire.
+        tasks:
+          - key: next_steps
+            title: Prossimi passi
+            guidance: >-
+              In base alla valutazione e alla revisione del processo, decidete come procedere:
+              elencate le possibili iterazioni successive con i pro e i contro di ciascuna,
+              tenendo conto delle risorse e del budget rimasti, e motivate la scelta.
+            questions:
+              - key: p6.next_iteration.next_steps.plan
+                type: text
+                prompt: >-
+                  Che cosa va fatto nella prossima iterazione del progetto, e con quali risorse?
+                help: Elencate le opzioni considerate, la decisione presa e le sue motivazioni.
+
+      - key: report
+        title: Report di progetto
+        summary: Riassumere il lavoro svolto perché altri team possano trarne insegnamento.
+        tasks:
+          - key: final_report
+            title: Report finale
+            guidance: >-
+              Il report finale riassume e organizza tutto ciò che è stato prodotto
+              nell'iterazione, e spesso accompagna una presentazione dei risultati al
+              committente. In questa app viene generato automaticamente dalle risposte che avete
+              compilato.
+            questions: []
+
+          - key: project_review
+            title: Revisione del progetto
+            guidance: >-
+              Valutate che cosa ha funzionato e che cosa no, e raccogliete le lezioni apprese:
+              trappole, approcci fuorvianti, indicazioni per scegliere le tecniche in situazioni
+              simili.
+            questions:
+              - key: p6.report.project_review.post_mortem
+                type: text
+                prompt: >-
+                  Che cosa è andato bene in questa iterazione, che cosa no, e che cosa si può
+                  migliorare nelle prossime?
+                help: Includete anche le osservazioni dei singoli membri del team raccolte durante il progetto.
+
+      - key: gate
+        title: Go/No-Go della fase
+        summary: Verificare che il modello funzioni in esercizio prima della prossima iterazione.
+        tasks:
+          - key: decision
+            title: Passaggio alla prossima iterazione
+            guidance: >-
+              Si è pronti per la prossima iterazione quando il modello è in esercizio, funziona
+              come richiesto e continua a farlo nel tempo, con un ciclo di vita gestito. Se in
+              esercizio emergono problemi, si torna alla Fase V quando mancano informazioni sulle
+              prestazioni reali o per lo scaffolding, alla Fase IV quando il modello non rende
+              come previsto nonostante una valutazione accurata.
+            questions:
+              - key: p6.gate.decision.outcome
+                type: phase_gate
+                prompt: Il progetto è pronto per la prossima iterazione?
+                help: >-
+                  Spuntate i criteri soddisfatti e motivate il verdetto. Se tornate a una fase
+                  precedente, indicate se va rifatta, se cambia l'approccio o se vanno aggiornate
+                  delle ipotesi.
+                criteria:
+                  - key: operating_as_required
+                    label: >-
+                      Il modello è in esercizio nella modalità e sull'ambiente previsti e
+                      funziona come richiesto
+                    return_to: 4
+                  - key: real_performance_known
+                    label: >-
+                      Avete informazioni sufficienti sulle prestazioni reali, come tempi di
+                      risposta e dati necessari, per gestirlo in esercizio
+                    return_to: 5
+                  - key: scaffolding_guidance
+                    label: >-
+                      Gli sviluppatori hanno indicazioni sufficienti per integrare il modello e
+                      farlo evolvere
+                    return_to: 5
+                  - key: lifecycle_managed
+                    label: >-
+                      Il ciclo di vita è gestito: versioni, MLOps e monitoraggio di uso, abusi,
+                      prestazioni e deriva
+                  - key: governance_in_place
+                    label: >-
+                      Governance, rischi, sicurezza e conformità sono presidiati secondo il
+                      framework di AI affidabile
+                  - key: next_iteration_defined
+                    label: La prossima iterazione è definita

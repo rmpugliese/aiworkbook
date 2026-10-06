@@ -21,10 +21,84 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/template": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Current Template */
+        get: operations["get_current_template_api_template_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/template/{version}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Template */
+        get: operations["get_template_api_template__version__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** ChoiceOption */
+        ChoiceOption: {
+            /** Key */
+            key: string;
+            /** Label */
+            label: string;
+        };
+        /** GateCriterion */
+        GateCriterion: {
+            /** Key */
+            key: string;
+            /** Label */
+            label: string;
+            /** Return To */
+            return_to?: number | null;
+        };
+        /** GoNoGoQuestion */
+        GoNoGoQuestion: {
+            /** Key */
+            key: string;
+            /** Prompt */
+            prompt: string;
+            /** Help */
+            help: string;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "go_no_go";
+            /**
+             * Factor Group
+             * @enum {string}
+             */
+            factor_group: "business" | "data" | "execution";
+        };
+        /** HTTPValidationError */
+        HTTPValidationError: {
+            /** Detail */
+            detail?: components["schemas"]["ValidationError"][];
+        };
         /** HealthResponse */
         HealthResponse: {
             /**
@@ -39,6 +113,114 @@ export interface components {
              * @enum {string}
              */
             database: "ok" | "error";
+        };
+        /** MultiChoiceQuestion */
+        MultiChoiceQuestion: {
+            /** Key */
+            key: string;
+            /** Prompt */
+            prompt: string;
+            /** Help */
+            help: string;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "multi_choice";
+            /** Options */
+            options: components["schemas"]["ChoiceOption"][];
+        };
+        /** Phase */
+        Phase: {
+            /** Key */
+            key: string;
+            /** Number */
+            number: number;
+            /** Title */
+            title: string;
+            /** Summary */
+            summary: string;
+            /** Task Groups */
+            task_groups: components["schemas"]["TaskGroup"][];
+        };
+        /**
+         * PhaseGateQuestion
+         * @description End-of-phase Go/No-Go: readiness criteria, verdict and the phase to iterate back to.
+         *
+         *     Phase I has no criteria: its outcome is derived from the nine AI Go/No-Go factors.
+         */
+        PhaseGateQuestion: {
+            /** Key */
+            key: string;
+            /** Prompt */
+            prompt: string;
+            /** Help */
+            help: string;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "phase_gate";
+            /** Criteria */
+            criteria: components["schemas"]["GateCriterion"][];
+        };
+        /** Task */
+        Task: {
+            /** Key */
+            key: string;
+            /** Title */
+            title: string;
+            /** Guidance */
+            guidance: string;
+            /** Questions */
+            questions: (components["schemas"]["TextQuestion"] | components["schemas"]["GoNoGoQuestion"] | components["schemas"]["MultiChoiceQuestion"] | components["schemas"]["PhaseGateQuestion"])[];
+        };
+        /** TaskGroup */
+        TaskGroup: {
+            /** Key */
+            key: string;
+            /** Title */
+            title: string;
+            /** Summary */
+            summary?: string | null;
+            /** Tasks */
+            tasks: components["schemas"]["Task"][];
+        };
+        /** Template */
+        Template: {
+            /** Version */
+            version: number;
+            /** Title */
+            title: string;
+            /** Phases */
+            phases: components["schemas"]["Phase"][];
+        };
+        /** TextQuestion */
+        TextQuestion: {
+            /** Key */
+            key: string;
+            /** Prompt */
+            prompt: string;
+            /** Help */
+            help: string;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "text";
+        };
+        /** ValidationError */
+        ValidationError: {
+            /** Location */
+            loc: (string | number)[];
+            /** Message */
+            msg: string;
+            /** Error Type */
+            type: string;
+            /** Input */
+            input?: unknown;
+            /** Context */
+            ctx?: Record<string, never>;
         };
     };
     responses: never;
@@ -65,6 +247,57 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HealthResponse"];
+                };
+            };
+        };
+    };
+    get_current_template_api_template_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Template"];
+                };
+            };
+        };
+    };
+    get_template_api_template__version__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                version: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Template"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

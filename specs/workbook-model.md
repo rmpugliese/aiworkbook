@@ -3,8 +3,13 @@
 Questo documento descrive **come l'app rappresenta il workbook** e quali dati salva. È il
 riferimento di dominio per tutte le fasi della roadmap.
 
-Fonte: `~/Development/cpmai/CPMAI_Workbook.pdf` (versione luglio 2025, 97 pagine), che resta
-**fuori dal repository**.
+Fonti, che restano **fuori dal repository**:
+
+- `~/Development/cpmai/CPMAI_Workbook.pdf` (versione luglio 2025, 97 pagine): fasi, task e
+  domande;
+- i moduli del corso `02_…pdf`–`06_…pdf`: le lezioni "Go/No-Go" e "When to Iterate Back to
+  Previous CPMAI Phases" di fine fase, da cui derivano i Go/No-Go delle Fasi II–VI, che il PDF del
+  workbook non contiene.
 
 ## Politica sui contenuti
 
@@ -34,11 +39,24 @@ Template (versione N)
 | `text` | Quasi tutte le domande aperte | testo libero |
 | `go_no_go` | I 9 fattori della valutazione Go/No-Go | verdetto `go` / `maybe` / `no_go` + testo di motivazione |
 | `multi_choice` | Identificazione dei pattern di AI (7 pattern) | lista di opzioni + testo |
+| `phase_gate` | Go/No-Go di fine fase, uno per fase | verdetto + criteri soddisfatti + fase a cui tornare + testo |
+
+### Go/No-Go di fase
+
+Ogni fase si chiude con una domanda `phase_gate` (chiave `p<n>.gate.decision.outcome`):
+
+- **Fasi II–VI**: una checklist di criteri di passaggio. Ogni criterio può indicare la fase
+  precedente a cui tornare se non è soddisfatto (`return_to`); l'app suggerisce la fase di ritorno
+  in base ai criteri mancanti, ma la scelta finale è dell'utente.
+- **Fase I**: nessun criterio. L'esito si calcola dai 9 fattori dell'AI Go/No-Go: un NO-GO
+  qualsiasi porta a NO-GO, altrimenti un MAYBE qualsiasi porta a MAYBE. L'utente conferma l'esito.
+  Con un NO-GO non c'è una fase a cui tornare: si ridefinisce il problema o si ferma il progetto.
 
 ### Chiavi delle domande
 
-Le chiavi sono stabili, in inglese e puntate, per esempio `p1.objectives.problem`. Non si
-rinominano mai dopo il rilascio, perché le risposte salvate le usano come riferimento.
+Le chiavi sono stabili, in inglese e puntate, nel formato `p<fase>.<gruppo>.<task>.<domanda>`,
+per esempio `p1.objectives.business_objectives.problem`. Non si rinominano mai dopo il rilascio,
+perché le risposte salvate le usano come riferimento.
 
 ## Inventario della struttura
 
@@ -72,6 +90,8 @@ workbook; i titoli sono provvisori e verranno rifiniti nel file YAML della Fase 
 | | Fattibilità di esecuzione | 3 × `go_no_go`: tecnologia e competenze · tempi di esecuzione · sensatezza del contesto d'uso |
 | Piano di progetto | Piano di progetto | Piano (fasi, durate, risorse, dipendenze) · Strumenti e tecniche iniziali ¹ |
 
+| Go/No-Go della fase | Esito della Fase I | `phase_gate` calcolato dai 9 fattori |
+
 ¹ Nel PDF queste pagine non hanno un campo compilabile, ma il workbook chiede comunque i contenuti:
 nell'app sono domande `text`.
 
@@ -86,6 +106,7 @@ nell'app sono domande `text`.
 | Dati per il modello | Dati di training, validazione e test | Esigenze specifiche e come garantirne la sufficienza |
 | | Dati per modelli edge | Esigenze di dati da e verso i dispositivi edge |
 | | Modelli preaddestrati e di terze parti | Modelli utilizzabili, accesso, eventuale fine-tuning |
+| Go/No-Go della fase | Passaggio alla Fase III | `phase_gate`, 6 criteri (ritorno alla Fase I) |
 
 ### Fase III — Preparazione dei dati
 
@@ -95,6 +116,7 @@ nell'app sono domande `text`.
 | Pulizia e arricchimento | Pulizia dei dati | Metodi di preparazione e pipeline dei dati |
 | | Arricchimento e augmentation | Metodi di augmentation e modifiche alla pipeline |
 | Etichettatura | Etichettatura dei dati | Metodo, costi e loro crescita, modifiche alla pipeline |
+| Go/No-Go della fase | Passaggio alla Fase IV | `phase_gate`, 6 criteri (ritorno alla Fase II) |
 
 ### Fase IV — Sviluppo del modello
 
@@ -108,6 +130,7 @@ nell'app sono domande `text`.
 | Progetto di test | Progetto di test e validazione | Approccio contro overfitting e underfitting |
 | Training | Training del modello | Risultati e output condivisibili |
 | Iperparametri | Ottimizzazione degli iperparametri | Misure di fit e metodo di ottimizzazione |
+| Go/No-Go della fase | Passaggio alla Fase V | `phase_gate`, 5 criteri (ritorno alle Fasi III o II) |
 
 ### Fase V — Valutazione del modello
 
@@ -117,6 +140,7 @@ nell'app sono domande `text`.
 | | Misurazione dei KPI | KPI di business rispetto alla Fase I · KPI tecnologici rispetto alla Fase I |
 | | Approccio di iterazione | Come iterare e quali fasi rivedere |
 | | Revisione del processo | Approvazioni e revisioni prima della produzione |
+| Go/No-Go della fase | Passaggio alla Fase VI | `phase_gate`, 5 criteri (ritorno alle Fasi IV, III, II o I) |
 
 ### Fase VI — Messa in esercizio
 
@@ -129,8 +153,14 @@ nell'app sono domande `text`.
 | Prossima iterazione | Prossimi passi | Cosa fare nella prossima iterazione e con quali risorse |
 | Report di progetto | Report finale | *(nessuna domanda: è il documento generato dall'app)* |
 | | Revisione del progetto | Post-mortem: cosa è andato bene, cosa no, cosa migliorare |
+| Go/No-Go della fase | Passaggio alla prossima iterazione | `phase_gate`, 6 criteri (ritorno alle Fasi V o IV) |
 
-In totale ci sono circa 65 domande `text`, 9 `go_no_go` e 1 `multi_choice`.
+In totale ci sono 64 domande `text`, 9 `go_no_go`, 1 `multi_choice` e 6 `phase_gate` (template
+v1, `backend/app/workbook/templates/v1.yaml`).
+
+La Fase I ha molte più domande delle altre perché così è il workbook: occupa 40 pagine su 86 e ha
+57 campi compilabili, di cui 27 per i 9 fattori Go/No-Go. Dalla Fase II alla VI il numero di
+domande coincide con quello dei campi del PDF.
 
 ## Modello dei dati
 
@@ -142,7 +172,7 @@ projects        id, owner_id, name, client_name, description, created_at, archiv
 iterations      id, project_id, number, title, user_story, template_version,
                 status (draft | completed), created_at, updated_at
 answers         id, iteration_id, question_key, text, verdict (null | go | maybe | no_go),
-                choices (JSON, null), updated_at, updated_by
+                choices (JSON, null), return_to_phase (null | 1–5), updated_at, updated_by
                 UNIQUE (iteration_id, question_key)
 share_links     id, iteration_id, token_hash, created_by, created_at, expires_at, revoked_at
 ai_usage        id, user_id, created_at, provider, model, action (suggest | refine),
@@ -151,8 +181,10 @@ ai_usage        id, user_id, created_at, provider, model, action (suggest | refi
 
 Note:
 
+- `choices` contiene le opzioni scelte (`multi_choice`) oppure i criteri soddisfatti
+  (`phase_gate`); `return_to_phase` si usa solo per i `phase_gate` con verdetto diverso da GO.
 - La **definizione** del workbook (domande, testi) non sta nel DB ma in
-  `backend/app/workbook/template_v1.yaml`, versionato nel repository. Nel DB vanno solo le
+  `backend/app/workbook/templates/v1.yaml`, versionato nel repository. Nel DB vanno solo le
   risposte.
 - Una nuova iterazione può partire **vuota** oppure come **copia** delle risposte
   dell'iterazione precedente, coerente con l'indicazione del workbook di fare una copia per ogni

@@ -19,7 +19,8 @@ CPMAI, con un assistente AI opzionale.
 
 - **Mai copiare testi del workbook PMI** nel codice, nei template o nei test: si parafrasa. Il PDF
   sta in `~/Development/cpmai/` e non va mai aggiunto al repository.
-- Le chiavi delle domande (`p1.objectives.problem` ecc.) non si rinominano dopo il rilascio.
+- Le chiavi delle domande (`p1.objectives.business_objectives.problem` ecc.) non si rinominano
+  dopo il rilascio.
 - Ogni endpoint che legge o scrive dati di un progetto verifica che l'utente ne sia proprietario
   (oppure, in sola lettura, che il token di condivisione sia valido).
 - I test automatici non chiamano mai provider AI reali.
