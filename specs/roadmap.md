@@ -22,19 +22,20 @@ codice.
 
 ---
 
-## Fase 1: Definizione strutturata del workbook
+## Fase 1: Definizione strutturata del workbook (Completata)
 
 **Obiettivo:** tutta la struttura del workbook, parafrasata in italiano, caricabile e servita
 via API.
 
-- [ ] Schema Pydantic del template (fasi → gruppi → task → domande, tipi `text`, `go_no_go`,
+- [x] Schema Pydantic del template (fasi → gruppi → task → domande, tipi `text`, `go_no_go`,
       `multi_choice`)
-- [ ] `template_v1.yaml` completo per le 6 fasi, con testi parafrasati (vedi
+- [x] `templates/v1.yaml` completo per le 6 fasi, con testi parafrasati (vedi
       `specs/workbook-model.md`)
-- [ ] Loader con validazione: chiavi uniche, tipi validi, opzioni presenti per `multi_choice`
-- [ ] `GET /api/template` (e `/api/template/{version}`)
-- [ ] Test: il template si carica, ci sono 6 fasi, le chiavi sono uniche, ci sono 9 domande
+- [x] Loader con validazione: chiavi uniche, tipi validi, opzioni presenti per `multi_choice`
+- [x] `GET /api/template` (e `/api/template/{version}`)
+- [x] Test: il template si carica, ci sono 6 fasi, le chiavi sono uniche, ci sono 9 domande
       Go/No-Go
+- [x] Go/No-Go di fine fase (tipo `phase_gate`) in tutte le 6 fasi, con la fase a cui tornare
 
 ---
 
@@ -79,13 +80,16 @@ via API.
 
 ## Fase 5: Valutazione Go/No-Go
 
-**Obiettivo:** i 9 fattori con verdetto e motivazione, più un riepilogo.
+**Obiettivo:** i 9 fattori della Fase I e i Go/No-Go di fine fase, con la fase a cui tornare.
 
 - [ ] Componente Go/No-Go (GO / MAYBE / NO-GO + motivazione)
 - [ ] Riepilogo a matrice 3×3 (business / dati / esecuzione) con esito complessivo
-- [ ] Regola di esito: qualsiasi NO-GO porta a "No-Go"; nessun NO-GO ma almeno un MAYBE porta
-      a "Cautela"
-- [ ] Test sulla regola di esito
+- [ ] Regola di esito della Fase I: qualsiasi NO-GO porta a "No-Go"; nessun NO-GO ma almeno un
+      MAYBE porta a "Cautela"; l'utente conferma l'esito
+- [ ] Componente Go/No-Go di fase (Fasi II–VI): checklist dei criteri, verdetto, fase a cui
+      tornare suggerita dai criteri non soddisfatti, motivazione
+- [ ] Indicatore dello stato di ogni fase nella navigazione (GO / MAYBE / NO-GO / da valutare)
+- [ ] Test sulla regola di esito e sul suggerimento della fase di ritorno
 
 ---
 
