@@ -29,3 +29,8 @@ class ResizeObserverStub {
   disconnect() {}
 }
 window.ResizeObserver = ResizeObserverStub
+
+// Used by Mantine's autosizing Textarea to re-measure once web fonts load.
+Object.defineProperty(document, 'fonts', {
+  value: { addEventListener: () => {}, removeEventListener: () => {} },
+})

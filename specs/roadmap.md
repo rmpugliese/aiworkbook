@@ -39,36 +39,28 @@ via API.
 
 ---
 
-## Fase 2: Account utente
+## Fase 2: Progetti e iterazioni (Completata)
 
-**Obiettivo:** registrazione, login e logout con sessioni sicure.
+**Obiettivo:** gestire più progetti e le loro iterazioni. Per ora in modalità locale a utente
+singolo, senza login: l'app si usa solo sul proprio computer.
 
-- [ ] Modelli `users` e `sessions` con le relative migrazioni
-- [ ] `POST /api/auth/register`, `/login`, `/logout`, `GET /api/auth/me`
-- [ ] Hash Argon2, cookie di sessione `HttpOnly`, protezione CSRF
-- [ ] Rate limiting di base sul login
-- [ ] Pagine React di registrazione e login, rotte protette
-- [ ] Test sui flussi felici e sugli errori (password errata, email duplicata, sessione scaduta)
-
----
-
-## Fase 3: Progetti e iterazioni
-
-**Obiettivo:** ogni utente gestisce i propri progetti e le loro iterazioni.
-
-- [ ] Modelli `projects` e `iterations` con le relative migrazioni
-- [ ] API CRUD con controllo di proprietà (un utente non vede i progetti altrui)
-- [ ] Nuova iterazione vuota oppure copiata dalla precedente
-- [ ] Dashboard React: elenco dei progetti, dettaglio del progetto con le iterazioni
-- [ ] Test su isolamento tra utenti e copia di un'iterazione
+- [x] Modelli `projects` e `iterations` con le relative migrazioni (`owner_id` arriverà con gli
+      account, Fase 5)
+- [x] API CRUD di progetti e iterazioni
+- [x] Tabella `answers` (anticipata dalla Fase 3, serve alla copia delle iterazioni)
+- [x] Nuova iterazione vuota oppure copiata da una precedente
+- [x] Archiviazione ed eliminazione definitiva con conferma del nome
+- [x] Dashboard React: elenco dei progetti, dettaglio del progetto con le iterazioni
+- [x] Test su CRUD e copia di un'iterazione
+- [x] Nessun nuovo tentativo sugli errori 4xx lato frontend (le richieste ripetute bloccavano i reindirizzamenti)
 
 ---
 
-## Fase 4: Compilazione del workbook
+## Fase 3: Compilazione del workbook
 
 **Obiettivo:** l'utente compila le domande di un'iterazione, con salvataggio automatico.
 
-- [ ] Modello `answers` con migrazione; `GET` e `PUT` delle risposte di un'iterazione
+- [ ] `GET` e `PUT` delle risposte di un'iterazione (la tabella esiste dalla Fase 2)
 - [ ] Navigazione per fase e task (barra laterale), con la guida del task visibile
 - [ ] Editor delle domande `text` con salvataggio automatico (debounce) e stato "salvato /
       salvataggio in corso / errore"
@@ -78,7 +70,7 @@ via API.
 
 ---
 
-## Fase 5: Valutazione Go/No-Go
+## Fase 4: Valutazione Go/No-Go
 
 **Obiettivo:** i 9 fattori della Fase I e i Go/No-Go di fine fase, con la fase a cui tornare.
 
@@ -90,6 +82,23 @@ via API.
       tornare suggerita dai criteri non soddisfatti, motivazione
 - [ ] Indicatore dello stato di ogni fase nella navigazione (GO / MAYBE / NO-GO / da valutare)
 - [ ] Test sulla regola di esito e sul suggerimento della fase di ritorno
+
+---
+
+## Fase 5: Account utente
+
+**Obiettivo:** registrazione, login e logout con sessioni sicure; ogni utente vede solo i propri
+progetti. Da completare prima di qualsiasi uso fuori dal proprio computer.
+
+- [ ] Modelli `users` e `sessions` con le relative migrazioni
+- [ ] `POST /api/auth/register`, `/login`, `/logout`, `GET /api/auth/me`
+- [ ] Hash Argon2, cookie di sessione `HttpOnly`, protezione CSRF
+- [ ] Rate limiting di base sul login
+- [ ] `owner_id` sui progetti; migrazione che assegna i progetti esistenti al primo utente creato
+- [ ] Controllo di proprietà su tutte le API di progetti, iterazioni e risposte
+- [ ] Pagine React di registrazione e login, rotte protette
+- [ ] Test sui flussi (password errata, email duplicata, sessione scaduta) e sull'isolamento tra
+      utenti
 
 ---
 
