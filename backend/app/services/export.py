@@ -9,14 +9,14 @@ from app.workbook.loader import load_template
 
 
 def iteration_report(
-    db: Session, project_id: int, iteration_id: int, *, generated_at: datetime
+    db: Session, project_id: int, iteration_id: int, *, owner_id: int, generated_at: datetime
 ) -> Report:
-    project = get_project(db, project_id)
-    iteration = get_iteration(db, project_id, iteration_id)
+    project = get_project(db, project_id, owner_id=owner_id)
+    iteration = get_iteration(db, project_id, iteration_id, owner_id=owner_id)
     return build_report(
         project=project,
         iteration=iteration,
         template=load_template(iteration.template_version),
-        answers=list_answers(db, project_id, iteration_id),
+        answers=list_answers(db, project_id, iteration_id, owner_id=owner_id),
         generated_at=generated_at,
     )

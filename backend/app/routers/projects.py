@@ -7,6 +7,7 @@ from urllib.parse import quote
 from fastapi import APIRouter, Body, Depends, HTTPException, Query, Response, status
 from sqlalchemy.orm import Session
 
+from app.auth.web import CurrentUser
 from app.db import get_db
 from app.export.pdf import pdf_filename, render_pdf
 from app.models import Project
@@ -68,84 +69,97 @@ def _project_out(project: Project) -> ProjectOut:
 
 
 @router.get("")
-def list_projects(db: Db, archived: Annotated[bool, Query()] = False) -> list[ProjectSummary]:
+def list_projects(
+    db: Db, user: CurrentUser, archived: Annotated[bool, Query()] = False
+) -> list[ProjectSummary]:
     return [
-        _summary(project, count) for project, count in service.list_projects(db, archived=archived)
+        _summary(project, count)
+        for project, count in service.list_projects(db, owner_id=user.id, archived=archived)
     ]
 
 
 @router.post("", status_code=status.HTTP_201_CREATED)
-def create_project(db: Db, data: ProjectCreate) -> ProjectOut:
+def create_project(db: Db, user: CurrentUser, data: ProjectCreate) -> ProjectOut:
     with _service_errors():
-        return _project_out(service.create_project(db, data))
+        return _project_out(service.create_project(db, data, owner_id=user.id))
 
 
 @router.get("/{project_id}")
-def get_project(db: Db, project_id: int) -> ProjectOut:
+def get_project(db: Db, user: CurrentUser, project_id: int) -> ProjectOut:
     with _service_errors():
-        return _project_out(service.get_project(db, project_id))
+        return _project_out(service.get_project(db, project_id, owner_id=user.id))
 
 
 @router.patch("/{project_id}")
-def update_project(db: Db, project_id: int, data: ProjectUpdate) -> ProjectOut:
+def update_project(db: Db, user: CurrentUser, project_id: int, data: ProjectUpdate) -> ProjectOut:
     with _service_errors():
-        return _project_out(service.update_project(db, project_id, data))
+        return _project_out(service.update_project(db, project_id, data, owner_id=user.id))
 
 
 @router.post("/{project_id}/archive")
-def archive_project(db: Db, project_id: int) -> ProjectOut:
+def archive_project(db: Db, user: CurrentUser, project_id: int) -> ProjectOut:
     with _service_errors():
-        return _project_out(service.set_archived(db, project_id, archived=True))
+        return _project_out(service.set_archived(db, project_id, owner_id=user.id, archived=True))
 
 
 @router.post("/{project_id}/unarchive")
-def unarchive_project(db: Db, project_id: int) -> ProjectOut:
+def unarchive_project(db: Db, user: CurrentUser, project_id: int) -> ProjectOut:
     with _service_errors():
-        return _project_out(service.set_archived(db, project_id, archived=False))
+        return _project_out(service.set_archived(db, project_id, owner_id=user.id, archived=False))
 
 
 @router.delete("/{project_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_project(db: Db, project_id: int, data: Annotated[ProjectDelete, Body()]) -> None:
+def delete_project(
+    db: Db, user: CurrentUser, project_id: int, data: Annotated[ProjectDelete, Body()]
+) -> None:
     with _service_errors():
-        service.delete_project(db, project_id, confirm_name=data.confirm_name)
+        service.delete_project(db, project_id, owner_id=user.id, confirm_name=data.confirm_name)
 
 
 @router.post("/{project_id}/iterations", status_code=status.HTTP_201_CREATED)
-def create_iteration(db: Db, project_id: int, data: IterationCreate) -> IterationOut:
+def create_iteration(
+    db: Db, user: CurrentUser, project_id: int, data: IterationCreate
+) -> IterationOut:
     with _service_errors():
-        return IterationOut.model_validate(service.create_iteration(db, project_id, data))
+        return IterationOut.model_validate(
+            service.create_iteration(db, project_id, data, owner_id=user.id)
+        )
 
 
 @router.get("/{project_id}/iterations/{iteration_id}")
-def get_iteration(db: Db, project_id: int, iteration_id: int) -> IterationOut:
+def get_iteration(db: Db, user: CurrentUser, project_id: int, iteration_id: int) -> IterationOut:
     with _service_errors():
-        return IterationOut.model_validate(service.get_iteration(db, project_id, iteration_id))
+        return IterationOut.model_validate(
+            service.get_iteration(db, project_id, iteration_id, owner_id=user.id)
+        )
 
 
 @router.patch("/{project_id}/iterations/{iteration_id}")
 def update_iteration(
-    db: Db, project_id: int, iteration_id: int, data: IterationUpdate
+    db: Db, user: CurrentUser, project_id: int, iteration_id: int, data: IterationUpdate
 ) -> IterationOut:
     with _service_errors():
         return IterationOut.model_validate(
-            service.update_iteration(db, project_id, iteration_id, data)
+            service.update_iteration(db, project_id, iteration_id, data, owner_id=user.id)
         )
 
 
 @router.get("/{project_id}/iterations/{iteration_id}/answers")
-def list_answers(db: Db, project_id: int, iteration_id: int) -> list[AnswerOut]:
+def list_answers(db: Db, user: CurrentUser, project_id: int, iteration_id: int) -> list[AnswerOut]:
     with _service_errors():
-        answers = answers_service.list_answers(db, project_id, iteration_id)
+        answers = answers_service.list_answers(db, project_id, iteration_id, owner_id=user.id)
     return [AnswerOut.model_validate(answer) for answer in answers]
 
 
 @router.put("/{project_id}/iterations/{iteration_id}/answers/{question_key}")
 def save_answer(
-    db: Db, project_id: int, iteration_id: int, question_key: str, data: AnswerIn
+    db: Db, user: CurrentUser, project_id: int, iteration_id: int, question_key: str, data: AnswerIn
 ) -> AnswerOut:
     """Replaces one answer. An answer with every field empty is deleted."""
     with _service_errors():
-        answer = answers_service.save_answer(db, project_id, iteration_id, question_key, data)
+        answer = answers_service.save_answer(
+            db, project_id, iteration_id, question_key, data, owner_id=user.id
+        )
     if answer is None:
         return AnswerOut(
             question_key=question_key,
@@ -163,10 +177,14 @@ def save_answer(
     response_class=Response,
     responses={200: {"content": {"application/pdf": {}}, "description": "The iteration report"}},
 )
-def export_pdf(db: Db, project_id: int, iteration_id: int) -> Response:
+def export_pdf(db: Db, user: CurrentUser, project_id: int, iteration_id: int) -> Response:
     with _service_errors():
         report = export_service.iteration_report(
-            db, project_id, iteration_id, generated_at=datetime.now().astimezone()
+            db,
+            project_id,
+            iteration_id,
+            owner_id=user.id,
+            generated_at=datetime.now().astimezone(),
         )
     filename = pdf_filename(report)
     return Response(

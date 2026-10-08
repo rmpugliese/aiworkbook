@@ -3,6 +3,7 @@ import { Link, Outlet } from 'react-router'
 
 import { APP_NAME } from '../config'
 import { BackendStatus } from './BackendStatus'
+import { UserMenu } from './UserMenu'
 
 export function Layout() {
   return (
@@ -12,7 +13,10 @@ export function Layout() {
           <Anchor component={Link} to="/" underline="never" c="inherit">
             <Title order={3}>{APP_NAME}</Title>
           </Anchor>
-          <BackendStatus />
+          <Group gap="sm">
+            <BackendStatus />
+            <UserMenu />
+          </Group>
         </Group>
       </AppShell.Header>
 

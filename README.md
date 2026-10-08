@@ -45,6 +45,27 @@ make dev
 La configurazione del backend si legge da variabili d'ambiente con prefisso `APP_`: vedi
 `backend/.env.example`.
 
+## Account
+
+- **Registrazione**: in sviluppo le email non vengono spedite ma stampate nel log del backend
+  (nel terminale di `make dev`), con il link di conferma o di reset da aprire nel browser.
+- **Il primo account confermato** diventa amministratore e riceve i progetti creati prima che
+  esistessero gli account. Dal menu utente → "Amministrazione" si gestiscono gli account
+  (conferma manuale, reinvio del link, sospensione); il contenuto dei progetti altrui non è
+  visibile. Altri amministratori: `uv run python -m app.cli make-admin --email …`.
+- **Utenti da terminale**:
+  `cd backend && uv run python -m app.cli create-user --email tu@example.com --password … --verified`
+- **Accesso con Google** (facoltativo):
+  1. In [Google Cloud Console](https://console.cloud.google.com/) crea un progetto, configura la
+     schermata di consenso OAuth e crea delle credenziali "ID client OAuth" di tipo
+     "Applicazione web".
+  2. Come URI di reindirizzamento autorizzato inserisci
+     `http://localhost:5173/api/auth/google/callback` (in produzione: il dominio pubblico).
+  3. Metti `APP_GOOGLE_CLIENT_ID` e `APP_GOOGLE_CLIENT_SECRET` in `backend/.env` e riavvia: il
+     pulsante "Accedi con Google" compare da solo.
+- **Email in produzione**: `APP_EMAIL_BACKEND=smtp` e le variabili `APP_SMTP_*` di qualsiasi
+  fornitore SMTP.
+
 ## Struttura
 
 ```

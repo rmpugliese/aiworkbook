@@ -7,7 +7,26 @@ export type Call = { method: string; path: string; body: unknown }
  * Stubs `fetch` with handlers keyed by "METHOD /path?query". Unknown requests fail the test
  * loudly with a 501. Returns the recorded calls for assertions.
  */
-export function mockApi(handlers: Record<string, Handler | Response>): Call[] {
+export const USER = {
+  id: 1,
+  email: 'consulente@example.com',
+  display_name: 'Ada Consulente',
+  has_password: true,
+  google_linked: false,
+  is_admin: false,
+}
+
+/** Signed in, CSRF available, no Google: override any of these per test. */
+const AUTH_DEFAULTS: Record<string, Handler | Response> = {
+  'GET /api/auth/me': Response.json(USER),
+  'GET /api/auth/csrf': new Response(null, { status: 204 }),
+  'GET /api/auth/providers': Response.json({ google: false }),
+}
+
+export const SIGNED_OUT = Response.json({ detail: 'Accesso richiesto.' }, { status: 401 })
+
+export function mockApi(overrides: Record<string, Handler | Response>): Call[] {
+  const handlers = { ...AUTH_DEFAULTS, ...overrides }
   const calls: Call[] = []
   vi.stubGlobal(
     'fetch',

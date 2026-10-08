@@ -1,4 +1,4 @@
-import { QueryClient } from '@tanstack/react-query'
+import { MutationCache, QueryCache, QueryClient } from '@tanstack/react-query'
 
 import { ApiError } from './client'
 
@@ -10,6 +10,20 @@ export function shouldRetry(failureCount: number, error: Error): boolean {
   return failureCount < MAX_RETRIES
 }
 
+export const ME_KEY = ['me'] as const
+
 export function createQueryClient(): QueryClient {
-  return new QueryClient({ defaultOptions: { queries: { retry: shouldRetry } } })
+  // A 401 anywhere means the session is over: forget the user, and the router sends the
+  // visitor to the sign-in page (see RequireAuth).
+  const onError = (error: Error) => {
+    if (error instanceof ApiError && error.status === 401) {
+      queryClient.setQueryData(ME_KEY, null)
+    }
+  }
+  const queryClient: QueryClient = new QueryClient({
+    queryCache: new QueryCache({ onError }),
+    mutationCache: new MutationCache({ onError }),
+    defaultOptions: { queries: { retry: shouldRetry } },
+  })
+  return queryClient
 }

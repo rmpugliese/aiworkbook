@@ -7,9 +7,11 @@ import pytest
 from fastapi.testclient import TestClient
 from pypdf import PdfReader
 from pypdf.generic import DictionaryObject
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.export.pdf import pdf_filename, render_html
+from app.models import User
 from app.services.export import iteration_report
 from app.workbook.go_no_go import phase_one_outcome
 from app.workbook.loader import current_template
@@ -60,8 +62,14 @@ def ids(client: TestClient) -> tuple[int, int]:
     return project["id"], iteration_id
 
 
+def owner_id(db: Session) -> int:
+    user = db.scalar(select(User).where(User.email == "consulente@example.com"))
+    assert user is not None
+    return user.id
+
+
 def html_for(db: Session, ids: tuple[int, int]) -> str:
-    return render_html(iteration_report(db, *ids, generated_at=WHEN))
+    return render_html(iteration_report(db, *ids, owner_id=owner_id(db), generated_at=WHEN))
 
 
 def test_phase_one_outcome_follows_the_nine_factors() -> None:
@@ -77,7 +85,7 @@ def test_phase_one_outcome_follows_the_nine_factors() -> None:
 
 
 def test_report_presents_each_answer_type(db: Session, ids: tuple[int, int]) -> None:
-    report = iteration_report(db, *ids, generated_at=WHEN)
+    report = iteration_report(db, *ids, owner_id=owner_id(db), generated_at=WHEN)
     questions = {q.key: q for p in report.phases for t in p.tasks for q in t.questions}
 
     assert questions[TEXT].answer.text == "Ridurre gli abbandoni\nentro 12 mesi"
@@ -123,7 +131,7 @@ def test_stylesheet_is_not_escaped(db: Session, ids: tuple[int, int]) -> None:
 
 
 def test_filename_is_readable_and_safe(db: Session, ids: tuple[int, int]) -> None:
-    report = iteration_report(db, *ids, generated_at=WHEN)
+    report = iteration_report(db, *ids, owner_id=owner_id(db), generated_at=WHEN)
 
     assert pdf_filename(report) == "Churn ÀÉ - Iterazione 1 - 2026-10-08.pdf"
 

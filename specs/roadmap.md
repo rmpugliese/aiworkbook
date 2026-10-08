@@ -103,26 +103,28 @@ cliente.
 
 ---
 
-## Fase 6: Account utente
+## Fase 6: Account utente (Completata)
 
 **Obiettivo:** registrazione con conferma via email, login e logout con sessioni sicure, accesso
 con Google; ogni utente vede solo i propri progetti. Da completare prima di qualsiasi uso fuori
 dal proprio computer.
 
-- [ ] Modelli `users` e `sessions` con le relative migrazioni
-- [ ] `POST /api/auth/register`, `/login`, `/logout`, `GET /api/auth/me`
-- [ ] Hash Argon2, cookie di sessione `HttpOnly`, protezione CSRF
-- [ ] Conferma dell'indirizzo email con link a scadenza; reset della password
-- [ ] Invio delle email tramite un fornitore (da scegliere); in sviluppo le email si leggono nel
+- [x] Modelli `users` e `sessions` con le relative migrazioni
+- [x] `POST /api/auth/register`, `/login`, `/logout`, `GET /api/auth/me`
+- [x] Hash Argon2, cookie di sessione `HttpOnly`, protezione CSRF
+- [x] Conferma dell'indirizzo email con link a scadenza; reset della password
+- [x] Invio delle email tramite un fornitore (da scegliere); in sviluppo le email si leggono nel
       log
-- [ ] Accesso con Google (OAuth 2.0 / OpenID Connect), collegato all'account con la stessa email
+- [x] Accesso con Google (OAuth 2.0 / OpenID Connect), collegato all'account con la stessa email
       verificata
-- [ ] Rate limiting di base su login, registrazione e reinvio delle email
-- [ ] `owner_id` sui progetti; migrazione che assegna i progetti esistenti al primo utente creato
-- [ ] Controllo di proprietà su tutte le API di progetti, iterazioni, risposte ed export
-- [ ] Pagine React di registrazione, login, conferma email e reset password; rotte protette
-- [ ] Test sui flussi (password errata, email duplicata o non confermata, link scaduto, sessione
+- [x] Rate limiting di base su login, registrazione e reinvio delle email
+- [x] `owner_id` sui progetti; migrazione che assegna i progetti esistenti al primo utente creato
+- [x] Controllo di proprietà su tutte le API di progetti, iterazioni, risposte ed export
+- [x] Pagine React di registrazione, login, conferma email e reset password; rotte protette
+- [x] Test sui flussi (password errata, email duplicata o non confermata, link scaduto, sessione
       scaduta, login Google simulato) e sull'isolamento tra utenti
+- [x] Amministrazione degli account: primo utente amministratore, elenco utenti, conferma
+      manuale, sospensione e riattivazione (senza accesso ai progetti altrui)
 - [ ] Altri provider di accesso (Microsoft, LinkedIn…): da valutare in seguito
 
 ---

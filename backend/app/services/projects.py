@@ -1,4 +1,8 @@
-"""Project and iteration use cases. Single-user local mode until accounts land (roadmap phase 5)."""
+"""Project and iteration use cases, always scoped to the signed-in owner.
+
+Someone else's project is reported as missing (NotFoundError), never as forbidden, so its
+existence is not revealed.
+"""
 
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session, selectinload
@@ -10,7 +14,7 @@ from app.services.errors import ConflictError, InvalidRequestError, NotFoundErro
 from app.workbook.loader import current_template
 
 
-def list_projects(db: Session, *, archived: bool) -> list[tuple[Project, int]]:
+def list_projects(db: Session, *, owner_id: int, archived: bool) -> list[tuple[Project, int]]:
     """Projects with their iteration count, most recently updated first."""
     iteration_count = (
         select(func.count(Iteration.id))
@@ -23,23 +27,26 @@ def list_projects(db: Session, *, archived: bool) -> list[tuple[Project, int]]:
     )
     rows = db.execute(
         select(Project, iteration_count)
-        .where(archived_filter)
+        .where(Project.owner_id == owner_id, archived_filter)
         .order_by(Project.updated_at.desc(), Project.id.desc())
     ).all()
     return [(project, count) for project, count in rows]
 
 
-def get_project(db: Session, project_id: int) -> Project:
+def get_project(db: Session, project_id: int, *, owner_id: int) -> Project:
     project = db.scalar(
-        select(Project).where(Project.id == project_id).options(selectinload(Project.iterations))
+        select(Project)
+        .where(Project.id == project_id, Project.owner_id == owner_id)
+        .options(selectinload(Project.iterations))
     )
     if project is None:
         raise NotFoundError(f"project {project_id} not found")
     return project
 
 
-def create_project(db: Session, data: ProjectCreate) -> Project:
+def create_project(db: Session, data: ProjectCreate, *, owner_id: int) -> Project:
     project = Project(
+        owner_id=owner_id,
         name=data.name,
         client_name=data.client_name or None,
         description=data.description or None,
@@ -47,11 +54,11 @@ def create_project(db: Session, data: ProjectCreate) -> Project:
     project.iterations.append(_new_iteration(number=1, title="Iterazione 1", user_story=None))
     db.add(project)
     db.commit()
-    return get_project(db, project.id)
+    return get_project(db, project.id, owner_id=owner_id)
 
 
-def update_project(db: Session, project_id: int, data: ProjectUpdate) -> Project:
-    project = get_project(db, project_id)
+def update_project(db: Session, project_id: int, data: ProjectUpdate, *, owner_id: int) -> Project:
+    project = get_project(db, project_id, owner_id=owner_id)
     changes = data.model_dump(exclude_unset=True)
     if "name" in changes:
         if changes["name"] is None:
@@ -62,18 +69,18 @@ def update_project(db: Session, project_id: int, data: ProjectUpdate) -> Project
     if "description" in changes:
         project.description = changes["description"] or None
     db.commit()
-    return get_project(db, project_id)
+    return get_project(db, project_id, owner_id=owner_id)
 
 
-def set_archived(db: Session, project_id: int, *, archived: bool) -> Project:
-    project = get_project(db, project_id)
+def set_archived(db: Session, project_id: int, *, owner_id: int, archived: bool) -> Project:
+    project = get_project(db, project_id, owner_id=owner_id)
     project.archived_at = utcnow() if archived else None
     db.commit()
-    return get_project(db, project_id)
+    return get_project(db, project_id, owner_id=owner_id)
 
 
-def delete_project(db: Session, project_id: int, *, confirm_name: str) -> None:
-    project = get_project(db, project_id)
+def delete_project(db: Session, project_id: int, *, owner_id: int, confirm_name: str) -> None:
+    project = get_project(db, project_id, owner_id=owner_id)
     if project.archived_at is None:
         raise ConflictError("only archived projects can be deleted")
     if confirm_name.strip() != project.name:
@@ -82,17 +89,23 @@ def delete_project(db: Session, project_id: int, *, confirm_name: str) -> None:
     db.commit()
 
 
-def get_iteration(db: Session, project_id: int, iteration_id: int) -> Iteration:
+def get_iteration(db: Session, project_id: int, iteration_id: int, *, owner_id: int) -> Iteration:
     iteration = db.get(Iteration, iteration_id)
-    if iteration is None or iteration.project_id != project_id:
+    if (
+        iteration is None
+        or iteration.project_id != project_id
+        or iteration.project.owner_id != owner_id
+    ):
         raise NotFoundError(f"iteration {iteration_id} not found in project {project_id}")
     return iteration
 
 
-def create_iteration(db: Session, project_id: int, data: IterationCreate) -> Iteration:
-    project = get_project(db, project_id)
+def create_iteration(
+    db: Session, project_id: int, data: IterationCreate, *, owner_id: int
+) -> Iteration:
+    project = get_project(db, project_id, owner_id=owner_id)
     source = (
-        get_iteration(db, project_id, data.copy_from_iteration_id)
+        get_iteration(db, project_id, data.copy_from_iteration_id, owner_id=owner_id)
         if data.copy_from_iteration_id is not None
         else None
     )
@@ -120,9 +133,9 @@ def create_iteration(db: Session, project_id: int, data: IterationCreate) -> Ite
 
 
 def update_iteration(
-    db: Session, project_id: int, iteration_id: int, data: IterationUpdate
+    db: Session, project_id: int, iteration_id: int, data: IterationUpdate, *, owner_id: int
 ) -> Iteration:
-    iteration = get_iteration(db, project_id, iteration_id)
+    iteration = get_iteration(db, project_id, iteration_id, owner_id=owner_id)
     changes = data.model_dump(exclude_unset=True)
     if "title" in changes:
         if changes["title"] is None:

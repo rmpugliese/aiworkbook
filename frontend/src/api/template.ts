@@ -15,5 +15,7 @@ export function useTemplate(version: number) {
     queryFn: () => apiGet<Template>(`/api/template/${version}`),
     // A template version never changes.
     staleTime: Infinity,
+    // Callers may not know the version yet (it comes with the iteration).
+    enabled: version > 0,
   })
 }

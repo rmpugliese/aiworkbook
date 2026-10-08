@@ -32,6 +32,21 @@ export async function apiGet<T>(path: string): Promise<T> {
   return (await response.json()) as T
 }
 
+const CSRF_COOKIE = 'csrf_token'
+
+function readCsrfCookie(): string | undefined {
+  return document.cookie
+    .split('; ')
+    .find((cookie) => cookie.startsWith(`${CSRF_COOKIE}=`))
+    ?.slice(CSRF_COOKIE.length + 1)
+}
+
+/** The backend sets the CSRF cookie on request; every unsafe request echoes it in a header. */
+async function csrfToken(): Promise<string> {
+  if (!readCsrfCookie()) await fetch('/api/auth/csrf')
+  return readCsrfCookie() ?? ''
+}
+
 /** Sends a JSON request; resolves to undefined for 204 No Content. */
 export async function apiSend<T>(
   method: 'POST' | 'PUT' | 'PATCH' | 'DELETE',
@@ -40,7 +55,11 @@ export async function apiSend<T>(
 ): Promise<T> {
   const response = await fetch(path, {
     method,
-    headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      'X-CSRF-Token': await csrfToken(),
+    },
     body: body === undefined ? undefined : JSON.stringify(body),
   })
   if (!response.ok) {

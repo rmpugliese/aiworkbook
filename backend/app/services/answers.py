@@ -12,8 +12,8 @@ from app.workbook.loader import find_question
 from app.workbook.schema import GoNoGoQuestion, MultiChoiceQuestion, PhaseGateQuestion, Question
 
 
-def list_answers(db: Session, project_id: int, iteration_id: int) -> list[Answer]:
-    get_iteration(db, project_id, iteration_id)
+def list_answers(db: Session, project_id: int, iteration_id: int, *, owner_id: int) -> list[Answer]:
+    get_iteration(db, project_id, iteration_id, owner_id=owner_id)
     return list(
         db.scalars(
             select(Answer).where(Answer.iteration_id == iteration_id).order_by(Answer.question_key)
@@ -22,13 +22,19 @@ def list_answers(db: Session, project_id: int, iteration_id: int) -> list[Answer
 
 
 def save_answer(
-    db: Session, project_id: int, iteration_id: int, question_key: str, data: AnswerIn
+    db: Session,
+    project_id: int,
+    iteration_id: int,
+    question_key: str,
+    data: AnswerIn,
+    *,
+    owner_id: int,
 ) -> Answer | None:
     """Creates, replaces or (when every field is empty) deletes an answer.
 
     Returns the stored answer, or None if the answer is now empty.
     """
-    iteration = get_iteration(db, project_id, iteration_id)
+    iteration = get_iteration(db, project_id, iteration_id, owner_id=owner_id)
     found = find_question(iteration.template_version, question_key)
     if found is None:
         raise NotFoundError(
