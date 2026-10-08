@@ -1,5 +1,7 @@
 import { defineConfig, devices } from '@playwright/test'
 
+import { E2E_USER } from './e2e/user.ts'
+
 // End-to-end tests run their own backend (port 8011, throwaway SQLite file) and frontend
 // (port 5174), so they never touch the development database or the dev servers.
 const BACKEND_PORT = 8011
@@ -18,6 +20,7 @@ export default defineConfig({
     {
       command:
         'rm -f e2e.db && uv run alembic upgrade head && ' +
+        `uv run python -m app.cli create-user --email ${E2E_USER.email} --password ${E2E_USER.password} --verified && ` +
         `${PANGO}uv run fastapi run app/main.py --port ${BACKEND_PORT}`,
       cwd: '../backend',
       env: { ...process.env, APP_DATABASE_URL: 'sqlite:///./e2e.db', APP_ENV: 'test' },

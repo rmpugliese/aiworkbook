@@ -61,6 +61,13 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
+        if connection.dialect.name == "sqlite":
+            # Batch mode rebuilds a table (create, copy, drop the old one, rename). With foreign
+            # keys on, dropping the old table would cascade-delete every child row: the app turns
+            # them on for each connection, so they are turned off for migrations. The pragma is
+            # ignored inside a transaction, hence before begin_transaction().
+            connection.exec_driver_sql("PRAGMA foreign_keys=OFF")
+            connection.commit()
         context.configure(
             connection=connection, target_metadata=target_metadata, render_as_batch=True
         )

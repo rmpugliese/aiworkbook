@@ -23,6 +23,11 @@ class Project(Base):
         DateTime(timezone=True), default=utcnow, onupdate=utcnow
     )
     archived_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # None only for projects created in local single-user mode, before accounts existed: the
+    # first user to confirm an account takes them over.
+    owner_id: Mapped[int | None] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), index=True
+    )
 
     iterations: Mapped[list["Iteration"]] = relationship(
         back_populates="project",

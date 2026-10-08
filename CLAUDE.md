@@ -21,10 +21,9 @@ CPMAI, con un assistente AI opzionale.
   sta in `~/Development/cpmai/` e non va mai aggiunto al repository.
 - Le chiavi delle domande (`p1.objectives.business_objectives.problem` ecc.) non si rinominano
   dopo il rilascio.
-- Ogni endpoint che legge o scrive dati di un progetto verifica che l'utente ne sia proprietario
-  (oppure, in sola lettura, che il token di condivisione sia valido). Fino alla Fase 6 (account)
-  l'app è in modalità locale a utente singolo e non va esposta in rete: i nuovi endpoint vanno
-  comunque scritti in modo che aggiungere il controllo di proprietà sia semplice.
+- Ogni endpoint che legge o scrive dati di un progetto richiede l'utente (`CurrentUser`) e passa
+  `owner_id` ai servizi; le risorse altrui risultano 404. In sola lettura vale il token di
+  condivisione (Fase 7).
 - I test automatici non chiamano mai provider AI reali.
 - L'interfaccia è in italiano; il codice, gli identificatori e i commit sono in inglese.
 
