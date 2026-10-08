@@ -1,20 +1,10 @@
-from collections.abc import Iterator
 from typing import Any
 
-import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.db import get_db
 from app.models import Answer
-
-
-@pytest.fixture
-def db(client: TestClient) -> Iterator[Session]:
-    """A session on the same database the client uses, to seed and inspect answers."""
-    override = client.app.dependency_overrides[get_db]  # type: ignore[attr-defined]
-    yield from override()
 
 
 def create_project(client: TestClient) -> dict[str, Any]:

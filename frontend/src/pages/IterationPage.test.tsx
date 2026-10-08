@@ -154,3 +154,14 @@ describe('IterationPage', () => {
     expect(screen.getByRole('link', { name: 'Passaggio alla Fase III →' })).toBeInTheDocument()
   })
 })
+
+describe('IterationPage export', () => {
+  it('links the PDF report of the iteration', async () => {
+    apiWith()
+    renderRoutes(routes, '/projects/1/iterations/10')
+
+    const link = await screen.findByRole('link', { name: 'Scarica PDF' })
+    expect(link).toHaveAttribute('href', `${BASE}/export.pdf`)
+    expect(link).toHaveAttribute('download')
+  })
+})

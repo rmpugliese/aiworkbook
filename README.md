@@ -11,6 +11,10 @@ pubblico.
 
 - [uv](https://docs.astral.sh/uv/), che installa anche Python 3.13
 - Node.js 24 e npm
+- Pango, la libreria di sistema usata da WeasyPrint per generare i PDF:
+  - macOS Apple Silicon: `brew install pango` con Homebrew arm64 (in `/opt/homebrew`); il
+    `Makefile` la trova da solo
+  - Linux: `apt install libpango-1.0-0 libpangoft2-1.0-0` (o equivalente)
 - GNU make. Su macOS il `make` di sistema funziona solo dopo aver accettato la licenza di Xcode
   (`sudo xcodebuild -license`); in alternativa si usa `gmake` (MacPorts o Homebrew)
 

@@ -87,33 +87,43 @@ singolo, senza login: l'app si usa solo sul proprio computer.
 
 ---
 
-## Fase 5: Account utente
+## Fase 5: Esportazione PDF (Completata)
 
-**Obiettivo:** registrazione, login e logout con sessioni sicure; ogni utente vede solo i propri
-progetti. Da completare prima di qualsiasi uso fuori dal proprio computer.
+**Obiettivo:** generare dal backend un PDF che raccoglie tutta l'iterazione, da consegnare al
+cliente.
+
+- [x] Generazione HTML + CSS di stampa convertita in PDF con WeasyPrint
+- [x] Copertina (progetto, cliente, iterazione, data), indice, user story
+- [x] Riepilogo Go/No-Go con la matrice 3×3 dei fattori e l'esito di ogni fase
+- [x] Tutte le fasi con domande e risposte; le domande senza risposta compaiono come
+      "Non compilato"
+- [x] Endpoint di download e pulsante nell'interfaccia
+- [x] Test: il PDF si genera e contiene titoli e risposte attese
+- [ ] Export DOCX (in seguito, se serve: la stessa struttura con `python-docx`)
+
+---
+
+## Fase 6: Account utente
+
+**Obiettivo:** registrazione con conferma via email, login e logout con sessioni sicure, accesso
+con Google; ogni utente vede solo i propri progetti. Da completare prima di qualsiasi uso fuori
+dal proprio computer.
 
 - [ ] Modelli `users` e `sessions` con le relative migrazioni
 - [ ] `POST /api/auth/register`, `/login`, `/logout`, `GET /api/auth/me`
 - [ ] Hash Argon2, cookie di sessione `HttpOnly`, protezione CSRF
-- [ ] Rate limiting di base sul login
+- [ ] Conferma dell'indirizzo email con link a scadenza; reset della password
+- [ ] Invio delle email tramite un fornitore (da scegliere); in sviluppo le email si leggono nel
+      log
+- [ ] Accesso con Google (OAuth 2.0 / OpenID Connect), collegato all'account con la stessa email
+      verificata
+- [ ] Rate limiting di base su login, registrazione e reinvio delle email
 - [ ] `owner_id` sui progetti; migrazione che assegna i progetti esistenti al primo utente creato
-- [ ] Controllo di proprietà su tutte le API di progetti, iterazioni e risposte
-- [ ] Pagine React di registrazione e login, rotte protette
-- [ ] Test sui flussi (password errata, email duplicata, sessione scaduta) e sull'isolamento tra
-      utenti
-
----
-
-## Fase 6: Esportazione del documento
-
-**Obiettivo:** generare un documento leggibile da un'iterazione.
-
-- [ ] Export DOCX: copertina (progetto, cliente, iterazione, data), indice, fasi e risposte,
-      riepilogo Go/No-Go
-- [ ] Le domande senza risposta compaiono come "Non compilato"
-- [ ] Export PDF (decidere tra WeasyPrint e conversione da DOCX)
-- [ ] Pulsante di download nell'interfaccia
-- [ ] Test: il documento si genera e contiene titoli e risposte attese
+- [ ] Controllo di proprietà su tutte le API di progetti, iterazioni, risposte ed export
+- [ ] Pagine React di registrazione, login, conferma email e reset password; rotte protette
+- [ ] Test sui flussi (password errata, email duplicata o non confermata, link scaduto, sessione
+      scaduta, login Google simulato) e sull'isolamento tra utenti
+- [ ] Altri provider di accesso (Microsoft, LinkedIn…): da valutare in seguito
 
 ---
 
@@ -148,7 +158,6 @@ progetti. Da completare prima di qualsiasi uso fuori dal proprio computer.
 
 **Obiettivo:** rendere l'app sicura e conforme per utenti esterni.
 
-- [ ] Verifica dell'email e reset della password (fornitore email da scegliere)
 - [ ] Privacy policy, termini d'uso, consenso; export e cancellazione dei dati dell'utente (GDPR)
 - [ ] Revisione di sicurezza (OWASP), header di sicurezza, rate limiting globale
 - [ ] Scelta del nome dell'app e verifica dei testi rispetto alla politica sui contenuti

@@ -10,6 +10,11 @@ export type ProjectUpdate = Schemas['ProjectUpdate']
 export type IterationCreate = Schemas['IterationCreate']
 export type IterationUpdate = Schemas['IterationUpdate']
 
+/** The PDF report of an iteration, generated on the server. */
+export function exportPdfUrl(projectId: number, iterationId: number): string {
+  return `/api/projects/${projectId}/iterations/${iterationId}/export.pdf`
+}
+
 const keys = {
   all: ['projects'] as const,
   list: (archived: boolean) => ['projects', 'list', { archived }] as const,

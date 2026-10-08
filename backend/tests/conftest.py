@@ -38,3 +38,10 @@ def client() -> Iterator[TestClient]:
 @pytest.fixture
 def client_without_db() -> Iterator[TestClient]:
     yield from _client_for(create_engine("sqlite:////nonexistent-dir/unreachable.db"))
+
+
+@pytest.fixture
+def db(client: TestClient) -> Iterator[Session]:
+    """A session on the same database the client uses, to seed and inspect data."""
+    override = client.app.dependency_overrides[get_db]  # type: ignore[attr-defined]
+    yield from override()

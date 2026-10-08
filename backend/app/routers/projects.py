@@ -1,11 +1,14 @@
 from collections.abc import Iterator
 from contextlib import contextmanager
+from datetime import datetime
 from typing import Annotated
+from urllib.parse import quote
 
-from fastapi import APIRouter, Body, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Query, Response, status
 from sqlalchemy.orm import Session
 
 from app.db import get_db
+from app.export.pdf import pdf_filename, render_pdf
 from app.models import Project
 from app.schemas.answers import AnswerIn, AnswerOut
 from app.schemas.projects import (
@@ -19,6 +22,7 @@ from app.schemas.projects import (
     ProjectUpdate,
 )
 from app.services import answers as answers_service
+from app.services import export as export_service
 from app.services import projects as service
 from app.services.errors import ConflictError, InvalidRequestError, NotFoundError
 
@@ -152,3 +156,27 @@ def save_answer(
             updated_at=None,
         )
     return AnswerOut.model_validate(answer)
+
+
+@router.get(
+    "/{project_id}/iterations/{iteration_id}/export.pdf",
+    response_class=Response,
+    responses={200: {"content": {"application/pdf": {}}, "description": "The iteration report"}},
+)
+def export_pdf(db: Db, project_id: int, iteration_id: int) -> Response:
+    with _service_errors():
+        report = export_service.iteration_report(
+            db, project_id, iteration_id, generated_at=datetime.now().astimezone()
+        )
+    filename = pdf_filename(report)
+    return Response(
+        content=render_pdf(report),
+        media_type="application/pdf",
+        # RFC 6266: an ASCII fallback plus the UTF-8 name for accented project names.
+        headers={
+            "Content-Disposition": (
+                f'attachment; filename="{filename.encode("ascii", "replace").decode()}"; '
+                f"filename*=UTF-8''{quote(filename)}"
+            )
+        },
+    )

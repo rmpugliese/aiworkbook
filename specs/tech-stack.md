@@ -21,8 +21,9 @@ CORS, e cookie di sessione `SameSite=Lax`.
     `HttpOnly`, `Secure` (in produzione), `SameSite=Lax`
   - protezione CSRF sulle richieste che modificano dati (double-submit token in un header)
   - niente JWT nel `localStorage`
-- **Generazione documenti**: `python-docx` per il DOCX. Il PDF si sceglierà nella fase dedicata
-  (WeasyPrint oppure conversione da DOCX), valutando le dipendenze di sistema.
+- **Generazione documenti**: PDF con **WeasyPrint** da un template HTML (Jinja2, autoescape) e un
+  CSS di stampa in `app/export/templates/`. Richiede Pango a livello di sistema (Homebrew arm64 su
+  macOS, pacchetti `libpango` su Linux). DOCX con `python-docx`, se servirà.
 - **AI**: astrazione `LLMProvider` (Protocol) in `backend/app/ai/`
   - primo adapter: **Anthropic**, con l'SDK ufficiale `anthropic`
   - modello di default `claude-opus-5-5`, configurabile da env (`AI_MODEL`)

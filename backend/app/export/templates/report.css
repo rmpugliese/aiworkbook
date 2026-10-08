@@ -1,0 +1,68 @@
+@page {
+  size: A4;
+  margin: 22mm 18mm 22mm 18mm;
+  @top-left { content: string(project) " · " string(iteration); font-size: 8pt; color: #666; }
+  @bottom-left { content: "Compatibile con la metodologia CPMAI"; font-size: 8pt; color: #888; }
+  @bottom-right { content: "Pagina " counter(page) " di " counter(pages); font-size: 8pt; color: #666; }
+}
+@page :first {
+  @top-left { content: none; }
+  @bottom-left { content: none; }
+  @bottom-right { content: none; }
+}
+
+html { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 10pt; color: #1d1d1b; line-height: 1.45; }
+#running-project { string-set: project content(); }
+#running-iteration { string-set: iteration content(); }
+
+h1, h2, h3 { line-height: 1.2; }
+h2 { font-size: 17pt; margin: 0 0 4mm; color: #1d3c5a; }
+h3 { font-size: 12pt; margin: 7mm 0 2mm; color: #2f6f4f; break-after: avoid; }
+
+/* Cover */
+.cover { height: 240mm; display: flex; flex-direction: column; justify-content: center; break-after: page; }
+.app-name { font-size: 11pt; color: #666; letter-spacing: 0.04em; text-transform: uppercase; margin: 0; }
+.doc-title { font-size: 28pt; margin: 4mm 0 10mm; color: #1d3c5a; }
+.project-name { font-size: 20pt; font-weight: 600; margin: 0 0 8mm; }
+.cover-facts { display: grid; grid-template-columns: 30mm auto; row-gap: 2mm; margin: 0; }
+.cover-facts dt { color: #666; }
+.cover-facts dd { margin: 0; }
+.cover-note { margin-top: 20mm; color: #888; font-size: 9pt; }
+
+/* Table of contents */
+.toc { break-after: page; }
+.toc ol { list-style: none; padding: 0; }
+.toc li { margin: 2mm 0; }
+.toc a { color: inherit; text-decoration: none; }
+.toc a::after { content: leader(".") target-counter(attr(href), page); color: #666; }
+
+.chapter { break-before: page; }
+.summary { color: #555; margin-top: 0; }
+
+/* Questions */
+.question { margin: 0 0 4mm; padding: 3mm 4mm; border-left: 2px solid #d9d9d4; break-inside: avoid-page; }
+.prompt { font-weight: 600; margin: 0 0 1.5mm; }
+.answer-text { white-space: pre-wrap; margin: 1mm 0 0; }
+.missing { color: #999; font-style: italic; margin: 0; }
+.chosen, .criteria { margin: 1mm 0; padding-left: 5mm; }
+.criteria { list-style: none; padding-left: 0; }
+.criteria .unmet { color: #8a3b12; }
+.decision { margin: 0 0 1mm; }
+.return { color: #555; margin-left: 2mm; }
+
+/* Verdicts: the label is always written, so black-and-white prints stay readable. */
+.verdict { display: inline-block; white-space: nowrap; padding: 0.3mm 2mm; border-radius: 2mm; font-size: 8pt; font-weight: 700; border: 1px solid; }
+.verdict-go { background: #e3f4e8; color: #1f6b3a; border-color: #1f6b3a; }
+.verdict-maybe { background: #fdf3d6; color: #7a5a00; border-color: #7a5a00; }
+.verdict-no_go { background: #fbe3e1; color: #a02b20; border-color: #a02b20; }
+.verdict-none { background: #fff; color: #888; border-color: #bbb; font-weight: 400; }
+
+/* Go/No-Go summary */
+table { width: 100%; border-collapse: collapse; margin: 2mm 0 4mm; }
+th, td { text-align: left; vertical-align: top; padding: 2mm; border-bottom: 1px solid #e3e2dd; }
+th { font-size: 9pt; color: #555; }
+.matrix td { width: 33%; }
+.factor { margin-bottom: 2mm; }
+.factor span { display: block; margin-top: 0.5mm; font-size: 9pt; }
+.phases td { font-size: 9pt; }
+.outcomes { margin: 0 0 2mm; }

@@ -16,6 +16,7 @@ import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
 
 import {
+  exportPdfUrl,
   useCreateIteration,
   useDeleteProject,
   useProject,
@@ -115,6 +116,7 @@ function ProjectDetail({ project }: { project: Project }) {
               <Table.Th>Titolo</Table.Th>
               <Table.Th>Stato</Table.Th>
               <Table.Th>Ultima modifica</Table.Th>
+              <Table.Th />
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
@@ -138,6 +140,11 @@ function ProjectDetail({ project }: { project: Project }) {
                   </Badge>
                 </Table.Td>
                 <Table.Td>{formatDateTime(iteration.updated_at)}</Table.Td>
+                <Table.Td>
+                  <Anchor href={exportPdfUrl(project.id, iteration.id)} download size="sm">
+                    PDF
+                  </Anchor>
+                </Table.Td>
               </Table.Tr>
             ))}
           </Table.Tbody>
