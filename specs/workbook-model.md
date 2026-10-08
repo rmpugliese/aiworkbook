@@ -186,7 +186,7 @@ Note:
 - La **definizione** del workbook (domande, testi) non sta nel DB ma in
   `backend/app/workbook/templates/v1.yaml`, versionato nel repository. Nel DB vanno solo le
   risposte.
-- `projects.owner_id` arriva con gli account (Fase 5 della roadmap): fino ad allora l'app è in
+- `projects.owner_id` arriva con gli account (Fase 6 della roadmap): fino ad allora l'app è in
   modalità locale a utente singolo.
 - Una nuova iterazione può partire **vuota** oppure come **copia** delle risposte
   dell'iterazione precedente, coerente con l'indicazione del workbook di fare una copia per ogni

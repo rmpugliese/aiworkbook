@@ -22,7 +22,7 @@ CPMAI, con un assistente AI opzionale.
 - Le chiavi delle domande (`p1.objectives.business_objectives.problem` ecc.) non si rinominano
   dopo il rilascio.
 - Ogni endpoint che legge o scrive dati di un progetto verifica che l'utente ne sia proprietario
-  (oppure, in sola lettura, che il token di condivisione sia valido). Fino alla Fase 5 (account)
+  (oppure, in sola lettura, che il token di condivisione sia valido). Fino alla Fase 6 (account)
   l'app è in modalità locale a utente singolo e non va esposta in rete: i nuovi endpoint vanno
   comunque scritti in modo che aggiungere il controllo di proprietà sia semplice.
 - I test automatici non chiamano mai provider AI reali.
