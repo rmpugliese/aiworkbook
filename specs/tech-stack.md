@@ -80,6 +80,7 @@ perché il `make` di sistema richiede di accettare la licenza di Xcode.
 | Installa le dipendenze | `make install` |
 | Avvia backend (http://127.0.0.1:8001) e frontend (http://localhost:5173) | `make dev` |
 | Test (pytest + Vitest) | `make test` |
+| Test end-to-end (Playwright, Chromium) | `make e2e` |
 | Lint, format check e tipi | `make lint` |
 | Formatta il codice | `make format` |
 | Rigenera i tipi API del frontend | `make gen-api` |

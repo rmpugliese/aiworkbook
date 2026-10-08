@@ -56,17 +56,18 @@ singolo, senza login: l'app si usa solo sul proprio computer.
 
 ---
 
-## Fase 3: Compilazione del workbook
+## Fase 3: Compilazione del workbook (Completata)
 
 **Obiettivo:** l'utente compila le domande di un'iterazione, con salvataggio automatico.
 
-- [ ] `GET` e `PUT` delle risposte di un'iterazione (la tabella esiste dalla Fase 2)
-- [ ] Navigazione per fase e task (barra laterale), con la guida del task visibile
-- [ ] Editor delle domande `text` con salvataggio automatico (debounce) e stato "salvato /
+- [x] `GET` e `PUT` delle risposte di un'iterazione (la tabella esiste dalla Fase 2)
+- [x] Navigazione per fase e task (barra laterale), con la guida del task visibile
+- [x] Editor delle domande `text` con salvataggio automatico (debounce) e stato "salvato /
       salvataggio in corso / errore"
-- [ ] Domanda `multi_choice` per i pattern di AI
-- [ ] Indicatore di avanzamento per fase
-- [ ] Test end-to-end Playwright: compilare, ricaricare la pagina, ritrovare i dati
+- [x] Domanda `multi_choice` per i pattern di AI
+- [x] Go/No-Go in forma base (verdetto e motivazione), validazione delle risposte sul server
+- [x] Indicatore di avanzamento per fase
+- [x] Test end-to-end Playwright: compilare, ricaricare la pagina, ritrovare i dati
 
 ---
 

@@ -31,3 +31,7 @@ dist/
 
 # Generated OpenAPI dump used by `make gen-api`
 frontend/openapi.json
+
+# Playwright output
+frontend/test-results/
+frontend/playwright-report/

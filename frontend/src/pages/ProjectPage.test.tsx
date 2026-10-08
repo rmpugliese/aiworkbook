@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 
 import { routes } from '../routes'
-import { HEALTH_OK, iteration, mockApi, project } from '../test/api'
+import { HEALTH_OK, iteration, mockApi, project, TEMPLATE } from '../test/api'
 import { renderRoutes } from '../test/render'
 
 describe('ProjectPage', () => {
@@ -60,6 +60,8 @@ describe('ProjectPage', () => {
       'GET /api/projects/1': Response.json(detail),
       'POST /api/projects/1/iterations': Response.json(created, { status: 201 }),
       'GET /api/projects/1/iterations/12': Response.json(created),
+      'GET /api/template/1': Response.json(TEMPLATE),
+      'GET /api/projects/1/iterations/12/answers': Response.json([]),
     })
     const user = userEvent.setup()
     renderRoutes(routes, '/projects/1')
