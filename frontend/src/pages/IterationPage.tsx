@@ -22,6 +22,7 @@ import { useAnswers, useSaveAnswer, type AnswerIn } from '../api/answers'
 import { useIteration, useProject, useUpdateIteration, type Iteration } from '../api/projects'
 import { useTemplate } from '../api/template'
 import { formatDateTime } from '../format'
+import { GoNoGoSummary } from '../workbook/GoNoGoSummary'
 import { TaskView } from '../workbook/TaskView'
 import { WorkbookNav } from '../workbook/WorkbookNav'
 import { flattenTasks, phaseProgress } from '../workbook/structure'
@@ -87,6 +88,7 @@ export function IterationPage() {
   }
 
   const tasks = flattenTasks(template.data)
+  const showSummary = searchParams.get('task') === 'summary'
   const requested = tasks.findIndex((ref) => ref.path === searchParams.get('task'))
   const index = requested === -1 ? 0 : requested
   const current = tasks[index]
@@ -154,20 +156,25 @@ export function IterationPage() {
             <WorkbookNav
               template={template.data}
               answers={answers.data}
-              activePath={current.path}
+              activePath={showSummary ? 'summary' : current.path}
               linkTo={linkTo}
             />
           </ScrollArea.Autosize>
         </Grid.Col>
         <Grid.Col span={{ base: 12, md: 8 }}>
-          <TaskView
-            current={current}
-            previous={tasks[index - 1]}
-            next={tasks[index + 1]}
-            answers={answers.data}
-            save={save}
-            linkTo={linkTo}
-          />
+          {showSummary ? (
+            <GoNoGoSummary template={template.data} answers={answers.data} linkTo={linkTo} />
+          ) : (
+            <TaskView
+              current={current}
+              previous={tasks[index - 1]}
+              next={tasks[index + 1]}
+              answers={answers.data}
+              save={save}
+              linkTo={linkTo}
+              template={template.data}
+            />
+          )}
         </Grid.Col>
       </Grid>
     </Stack>

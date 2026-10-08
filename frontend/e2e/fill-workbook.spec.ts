@@ -48,3 +48,43 @@ test('answers survive a page reload', async ({ page }) => {
   )
   await expect(page.getByText('3 di 80 domande compilate')).toBeVisible()
 })
+
+test('a phase gate suggests where to go back and keeps the decision', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('button', { name: 'Nuovo progetto' }).click()
+  await page.getByLabel('Nome del progetto').fill('Prova Go/No-Go')
+  await page.getByRole('button', { name: 'Crea progetto' }).click()
+  await page.getByRole('link', { name: 'Iterazione 1' }).click()
+
+  // Phase entries in the index are expandable buttons whose name includes the progress.
+  await page.getByRole('button', { name: /^Fase II · Comprensione dei dati/ }).click()
+  await page.getByRole('link', { name: 'Passaggio alla Fase III' }).click()
+
+  const gate = 'Il progetto può passare alla Fase III, Preparazione dei dati?'
+  const region = page.getByRole('region', { name: gate })
+  // Everything but the access to data sources is in place.
+  for (const checkbox of await region.getByRole('checkbox').all()) await checkbox.check()
+  await region
+    .getByRole('checkbox', { name: /fonti, responsabili e modalità di accesso/ })
+    .uncheck()
+  await expect(region.getByRole('alert', { name: /Suggerimento/ })).toContainText('NO-GO')
+
+  await region.locator('label', { hasText: /^NO-GO$/ }).click()
+  await expect(region.getByRole('combobox', { name: 'Fase a cui tornare' })).toHaveValue(
+    'Fase I · Comprensione del business',
+  )
+  await region
+    .getByRole('textbox', { name: /Note e motivazione/ })
+    .fill('Accesso ai CRM da chiedere')
+  await waitForSaved(page, gate)
+
+  await page.reload()
+  await expect(region.getByRole('combobox', { name: 'Fase a cui tornare' })).toHaveValue(
+    'Fase I · Comprensione del business',
+  )
+
+  await page.getByRole('link', { name: 'Riepilogo Go/No-Go' }).click()
+  const row = page.getByRole('row', { name: /Fase II · Comprensione dei dati/ })
+  await expect(row).toContainText('NO-GO')
+  await expect(row).toContainText('Accesso ai CRM da chiedere')
+})

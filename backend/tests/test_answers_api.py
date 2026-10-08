@@ -83,8 +83,10 @@ def test_unknown_question_returns_404(client: TestClient, base: str) -> None:
         (PATTERNS, {"choices": ["predictive", "predictive"]}),
         (PATTERNS, {"return_to_phase": 1}),
         (GATE_3, {"choices": ["data_needs_known"]}),  # a phase II criterion
-        (GATE_3, {"return_to_phase": 3}),
-        (GATE_1, {"return_to_phase": 1}),
+        (GATE_3, {"verdict": "no_go", "return_to_phase": 3}),
+        (GATE_3, {"verdict": "go", "return_to_phase": 2}),
+        (GATE_3, {"return_to_phase": 2}),
+        (GATE_1, {"verdict": "no_go", "return_to_phase": 1}),
         (TEXT, {"text": "x", "extra": 1}),
     ],
 )

@@ -71,18 +71,19 @@ singolo, senza login: l'app si usa solo sul proprio computer.
 
 ---
 
-## Fase 4: Valutazione Go/No-Go
+## Fase 4: Valutazione Go/No-Go (Completata)
 
 **Obiettivo:** i 9 fattori della Fase I e i Go/No-Go di fine fase, con la fase a cui tornare.
 
-- [ ] Componente Go/No-Go (GO / MAYBE / NO-GO + motivazione)
-- [ ] Riepilogo a matrice 3×3 (business / dati / esecuzione) con esito complessivo
-- [ ] Regola di esito della Fase I: qualsiasi NO-GO porta a "No-Go"; nessun NO-GO ma almeno un
+- [x] Componente Go/No-Go (GO / MAYBE / NO-GO + motivazione)
+- [x] Riepilogo a matrice 3×3 (business / dati / esecuzione) con esito complessivo
+- [x] Regola di esito della Fase I: qualsiasi NO-GO porta a "No-Go"; nessun NO-GO ma almeno un
       MAYBE porta a "Cautela"; l'utente conferma l'esito
-- [ ] Componente Go/No-Go di fase (Fasi II–VI): checklist dei criteri, verdetto, fase a cui
+- [x] Componente Go/No-Go di fase (Fasi II–VI): checklist dei criteri, verdetto, fase a cui
       tornare suggerita dai criteri non soddisfatti, motivazione
-- [ ] Indicatore dello stato di ogni fase nella navigazione (GO / MAYBE / NO-GO / da valutare)
-- [ ] Test sulla regola di esito e sul suggerimento della fase di ritorno
+- [x] Indicatore dello stato di ogni fase nella navigazione (GO / MAYBE / NO-GO / da valutare)
+- [x] Test sulla regola di esito e sul suggerimento della fase di ritorno
+- [x] Riepilogo Go/No-Go dell'iterazione; scostamento dal suggerimento ammesso con motivazione
 
 ---
 

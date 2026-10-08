@@ -151,6 +151,6 @@ describe('IterationPage', () => {
     expect(screen.getByRole('textbox', { name: /Note e motivazione/ })).toHaveValue(
       'Dati incompleti',
     )
-    expect(screen.queryByRole('link', { name: /→/ })).toBeNull()
+    expect(screen.getByRole('link', { name: 'Passaggio alla Fase III →' })).toBeInTheDocument()
   })
 })

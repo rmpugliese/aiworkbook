@@ -155,6 +155,30 @@ export const TEMPLATE = {
             },
           ],
         },
+        {
+          key: 'gate',
+          title: 'Go/No-Go della fase',
+          summary: null,
+          tasks: [
+            {
+              key: 'decision',
+              title: 'Passaggio alla Fase III',
+              guidance: 'Guida passaggio.',
+              questions: [
+                {
+                  key: 'p2.gate.decision.outcome',
+                  type: 'phase_gate',
+                  prompt: 'Si passa alla Fase III?',
+                  help: 'Aiuto passaggio.',
+                  criteria: [
+                    { key: 'sources', label: 'Fonti individuate', return_to: 1 },
+                    { key: 'quality', label: 'Qualità nota', return_to: null },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
       ],
     },
   ],

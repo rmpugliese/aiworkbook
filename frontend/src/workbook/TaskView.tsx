@@ -2,6 +2,7 @@ import { Button, Group, Stack, Text, Title } from '@mantine/core'
 import { Link } from 'react-router'
 
 import type { Answer, AnswerIn } from '../api/answers'
+import type { Template } from '../api/template'
 import { QuestionField } from './QuestionField'
 import { phaseLabel, type TaskRef } from './structure'
 
@@ -12,9 +13,10 @@ type Props = {
   answers: Map<string, Answer>
   save: (key: string, data: AnswerIn) => Promise<unknown>
   linkTo: (path: string) => string
+  template: Template
 }
 
-export function TaskView({ current, previous, next, answers, save, linkTo }: Props) {
+export function TaskView({ current, previous, next, answers, save, linkTo, template }: Props) {
   const { phase, group, task } = current
 
   return (
@@ -37,8 +39,10 @@ export function TaskView({ current, previous, next, answers, save, linkTo }: Pro
         <QuestionField
           key={`${current.path}/${question.key}`}
           question={question}
-          answer={answers.get(question.key)}
+          answers={answers}
           save={save}
+          template={template}
+          linkTo={linkTo}
         />
       ))}
 
