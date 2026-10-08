@@ -87,18 +87,18 @@ singolo, senza login: l'app si usa solo sul proprio computer.
 
 ---
 
-## Fase 5: Esportazione PDF
+## Fase 5: Esportazione PDF (Completata)
 
 **Obiettivo:** generare dal backend un PDF che raccoglie tutta l'iterazione, da consegnare al
 cliente.
 
-- [ ] Generazione HTML + CSS di stampa convertita in PDF con WeasyPrint
-- [ ] Copertina (progetto, cliente, iterazione, data), indice, user story
-- [ ] Riepilogo Go/No-Go con la matrice 3×3 dei fattori e l'esito di ogni fase
-- [ ] Tutte le fasi con domande e risposte; le domande senza risposta compaiono come
+- [x] Generazione HTML + CSS di stampa convertita in PDF con WeasyPrint
+- [x] Copertina (progetto, cliente, iterazione, data), indice, user story
+- [x] Riepilogo Go/No-Go con la matrice 3×3 dei fattori e l'esito di ogni fase
+- [x] Tutte le fasi con domande e risposte; le domande senza risposta compaiono come
       "Non compilato"
-- [ ] Endpoint di download e pulsante nell'interfaccia
-- [ ] Test: il PDF si genera e contiene titoli e risposte attese
+- [x] Endpoint di download e pulsante nell'interfaccia
+- [x] Test: il PDF si genera e contiene titoli e risposte attese
 - [ ] Export DOCX (in seguito, se serve: la stessa struttura con `python-docx`)
 
 ---

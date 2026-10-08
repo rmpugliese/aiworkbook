@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <title>{{ r.project_name }} · {{ r.iteration_number }}. {{ r.iteration_title }}</title>
+  {#- Our own stylesheet: trusted, and entities are not decoded inside <style>. #}
+  <style>{{ css | safe }}</style>
+</head>
+<body>
+{%- macro verdict(v) -%}
+  {%- if v -%}<span class="verdict verdict-{{ v }}">{{ VERDICT_LABEL[v] }}</span>
+  {%- else -%}<span class="verdict verdict-none">Da valutare</span>{%- endif -%}
+{%- endmacro %}
+
+<section class="cover">
+  <p class="app-name">{{ app_name }}</p>
+  <h1 class="doc-title">{{ r.template_title }}</h1>
+  <p class="project-name" id="running-project">{{ r.project_name }}</p>
+  <dl class="cover-facts">
+    <dt>Cliente</dt><dd>{{ r.client_name or "Non indicato" }}</dd>
+    <dt>Iterazione</dt><dd id="running-iteration">{{ r.iteration_number }}. {{ r.iteration_title }}</dd>
+    <dt>Stato</dt><dd>{{ r.iteration_status }}</dd>
+    <dt>Data</dt><dd>{{ generated_on }}</dd>
+    <dt>Template</dt><dd>v{{ r.template_version }}</dd>
+  </dl>
+  <p class="cover-note">Compatibile con la metodologia CPMAI</p>
+</section>
+
+<nav class="toc">
+  <h2>Indice</h2>
+  <ol>
+    <li><a href="#user-story">User story</a></li>
+    <li><a href="#go-no-go">Riepilogo Go/No-Go</a></li>
+    {%- for phase in r.phases %}
+    <li><a href="#{{ phase.anchor }}">Fase {{ phase.roman }} · {{ phase.title }}</a></li>
+    {%- endfor %}
+  </ol>
+</nav>
+
+<section class="chapter" id="user-story">
+  <h2>User story</h2>
+  {%- if r.user_story %}
+  <p class="answer-text">{{ r.user_story }}</p>
+  {%- else %}
+  <p class="missing">Non indicata</p>
+  {%- endif %}
+</section>
+
+<section class="chapter" id="go-no-go">
+  <h2>Riepilogo Go/No-Go</h2>
+  <h3>AI Go/No-Go della Fase I</h3>
+  <p class="outcomes">
+    Esito calcolato dai 9 fattori:
+    {% if r.phase_one.verdict -%}
+      {{ verdict(r.phase_one.verdict) }}
+    {%- else -%}
+      <span class="missing">da completare ({{ r.phase_one.answered }} di {{ r.phase_one.total }})</span>
+    {%- endif %}
+    · Esito deciso: {{ verdict(r.phase_one_decided) }}
+  </p>
+  <table class="matrix">
+    <thead><tr>{% for label, _ in r.factor_groups %}<th>{{ label }}</th>{% endfor %}</tr></thead>
+    <tbody><tr>
+      {%- for _, factors in r.factor_groups %}
+      <td>
+        {%- for factor in factors %}
+        <div class="factor">{{ verdict(factor.verdict) }} <span>{{ factor.prompt }}</span></div>
+        {%- endfor %}
+      </td>
+      {%- endfor %}
+    </tr></tbody>
+  </table>
+
+  <h3>Esito delle fasi</h3>
+  <table class="phases">
+    <thead><tr><th>Fase</th><th>Esito</th><th>Fase di ritorno</th><th>Motivazione</th></tr></thead>
+    <tbody>
+      {%- for phase in r.phases %}
+      <tr>
+        <td>Fase {{ phase.roman }} · {{ phase.title }}</td>
+        <td>{{ verdict(phase.status) }}</td>
+        <td>{{ phase.return_to or "—" }}</td>
+        <td class="answer-text">{{ phase.reason or "—" }}</td>
+      </tr>
+      {%- endfor %}
+    </tbody>
+  </table>
+</section>
+
+{%- for phase in r.phases %}
+<section class="chapter phase" id="{{ phase.anchor }}">
+  <h2>Fase {{ phase.roman }} · {{ phase.title }}</h2>
+  <p class="summary">{{ phase.summary }}</p>
+  {%- for task in phase.tasks %}
+  <h3>{{ task.title }}</h3>
+  {%- for q in task.questions %}
+  <div class="question">
+    <p class="prompt">{{ q.prompt }}</p>
+    {%- set a = q.answer %}
+    {%- if a.empty %}
+    <p class="missing">Non compilato</p>
+    {%- else %}
+      {%- if q.type in ("go_no_go", "phase_gate") %}
+      <p class="decision">{{ verdict(a.verdict) }}{% if a.return_to %} <span class="return">Si torna a: {{ a.return_to }}</span>{% endif %}</p>
+      {%- endif %}
+      {%- if q.type == "multi_choice" %}
+        {%- if a.chosen %}
+        <ul class="chosen">{% for label in a.chosen %}<li>{{ label }}</li>{% endfor %}</ul>
+        {%- else %}
+        <p class="missing">Nessuna opzione scelta</p>
+        {%- endif %}
+      {%- endif %}
+      {%- if q.type == "phase_gate" and (a.chosen or a.unmet) %}
+      <ul class="criteria">
+        {%- for label in a.chosen %}<li class="met">✓ {{ label }}</li>{% endfor %}
+        {%- for label in a.unmet %}<li class="unmet">✗ {{ label }}</li>{% endfor %}
+      </ul>
+      {%- endif %}
+      {%- if a.text %}
+      <p class="answer-text">{{ a.text }}</p>
+      {%- elif q.type == "text" %}
+      <p class="missing">Non compilato</p>
+      {%- endif %}
+    {%- endif %}
+  </div>
+  {%- endfor %}
+  {%- endfor %}
+</section>
+{%- endfor %}
+</body>
+</html>

@@ -1,6 +1,13 @@
 .PHONY: install dev dev-backend dev-frontend test e2e lint format gen-api migrate
 
-BACKEND := cd backend &&
+# WeasyPrint loads Pango at runtime. On Apple Silicon it comes from Homebrew in /opt/homebrew
+# (an Intel install in /usr/local or MacPorts has the wrong architecture). macOS strips DYLD_*
+# variables from the environment of /bin/sh, so the variable is set on the command itself.
+ifeq ($(shell uname -s),Darwin)
+PANGO := DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/lib
+endif
+
+BACKEND := cd backend && $(PANGO)
 FRONTEND := cd frontend &&
 
 install:

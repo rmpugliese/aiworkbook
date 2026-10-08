@@ -4,6 +4,8 @@ import { defineConfig, devices } from '@playwright/test'
 // (port 5174), so they never touch the development database or the dev servers.
 const BACKEND_PORT = 8011
 const FRONTEND_PORT = 5174
+// Same as the Makefile: Pango for WeasyPrint, set on the command because macOS strips DYLD_*.
+const PANGO = process.platform === 'darwin' ? 'DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/lib ' : ''
 
 export default defineConfig({
   testDir: './e2e',
@@ -16,15 +18,15 @@ export default defineConfig({
     {
       command:
         'rm -f e2e.db && uv run alembic upgrade head && ' +
-        `uv run fastapi run app/main.py --port ${BACKEND_PORT}`,
+        `${PANGO}uv run fastapi run app/main.py --port ${BACKEND_PORT}`,
       cwd: '../backend',
-      env: { APP_DATABASE_URL: 'sqlite:///./e2e.db', APP_ENV: 'test' },
+      env: { ...process.env, APP_DATABASE_URL: 'sqlite:///./e2e.db', APP_ENV: 'test' },
       url: `http://127.0.0.1:${BACKEND_PORT}/api/health`,
       reuseExistingServer: false,
     },
     {
       command: `npm run dev -- --port ${FRONTEND_PORT} --strictPort`,
-      env: { API_PROXY_TARGET: `http://127.0.0.1:${BACKEND_PORT}` },
+      env: { ...process.env, API_PROXY_TARGET: `http://127.0.0.1:${BACKEND_PORT}` },
       url: `http://localhost:${FRONTEND_PORT}`,
       reuseExistingServer: false,
     },

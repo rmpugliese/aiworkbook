@@ -19,7 +19,13 @@ import { useCallback, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router'
 
 import { useAnswers, useSaveAnswer, type AnswerIn } from '../api/answers'
-import { useIteration, useProject, useUpdateIteration, type Iteration } from '../api/projects'
+import {
+  exportPdfUrl,
+  useIteration,
+  useProject,
+  useUpdateIteration,
+  type Iteration,
+} from '../api/projects'
 import { useTemplate } from '../api/template'
 import { formatDateTime } from '../format'
 import { GoNoGoSummary } from '../workbook/GoNoGoSummary'
@@ -122,7 +128,15 @@ export function IterationPage() {
             Ultima modifica: {formatDateTime(iteration.data.updated_at)}
           </Text>
         </Stack>
-        <Stack gap={4} w={220}>
+        <Stack gap={4} w={220} align="stretch">
+          <Button
+            component="a"
+            href={exportPdfUrl(projectId, iterationId)}
+            variant="light"
+            download
+          >
+            Scarica PDF
+          </Button>
           <Text size="sm" ta="right">
             {answered} di {total} domande compilate
           </Text>
