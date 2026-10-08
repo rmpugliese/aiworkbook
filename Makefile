@@ -1,11 +1,11 @@
-.PHONY: install dev dev-backend dev-frontend test lint format gen-api migrate
+.PHONY: install dev dev-backend dev-frontend test e2e lint format gen-api migrate
 
 BACKEND := cd backend &&
 FRONTEND := cd frontend &&
 
 install:
 	$(BACKEND) uv sync
-	$(FRONTEND) npm install
+	$(FRONTEND) npm install && npx playwright install chromium
 
 # Runs backend (http://127.0.0.1:8001) and frontend (http://localhost:5173) in parallel.
 dev:
@@ -20,6 +20,10 @@ dev-frontend:
 test:
 	$(BACKEND) uv run pytest
 	$(FRONTEND) npm test
+
+# End-to-end tests on their own servers and throwaway database (see frontend/playwright.config.ts).
+e2e:
+	$(FRONTEND) npm run e2e
 
 lint:
 	$(BACKEND) uv run ruff check . && uv run ruff format --check . && uv run mypy app tests

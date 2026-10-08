@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.db import get_db
 from app.models import Project
+from app.schemas.answers import AnswerIn, AnswerOut
 from app.schemas.projects import (
     IterationCreate,
     IterationOut,
@@ -17,6 +18,7 @@ from app.schemas.projects import (
     ProjectSummary,
     ProjectUpdate,
 )
+from app.services import answers as answers_service
 from app.services import projects as service
 from app.services.errors import ConflictError, InvalidRequestError, NotFoundError
 
@@ -124,3 +126,29 @@ def update_iteration(
         return IterationOut.model_validate(
             service.update_iteration(db, project_id, iteration_id, data)
         )
+
+
+@router.get("/{project_id}/iterations/{iteration_id}/answers")
+def list_answers(db: Db, project_id: int, iteration_id: int) -> list[AnswerOut]:
+    with _service_errors():
+        answers = answers_service.list_answers(db, project_id, iteration_id)
+    return [AnswerOut.model_validate(answer) for answer in answers]
+
+
+@router.put("/{project_id}/iterations/{iteration_id}/answers/{question_key}")
+def save_answer(
+    db: Db, project_id: int, iteration_id: int, question_key: str, data: AnswerIn
+) -> AnswerOut:
+    """Replaces one answer. An answer with every field empty is deleted."""
+    with _service_errors():
+        answer = answers_service.save_answer(db, project_id, iteration_id, question_key, data)
+    if answer is None:
+        return AnswerOut(
+            question_key=question_key,
+            text=None,
+            verdict=None,
+            choices=None,
+            return_to_phase=None,
+            updated_at=None,
+        )
+    return AnswerOut.model_validate(answer)

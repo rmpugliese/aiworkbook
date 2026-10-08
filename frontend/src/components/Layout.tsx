@@ -17,7 +17,7 @@ export function Layout() {
       </AppShell.Header>
 
       <AppShell.Main>
-        <Container size="lg">
+        <Container size="xl">
           <Outlet />
         </Container>
       </AppShell.Main>

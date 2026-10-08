@@ -32,6 +32,7 @@ make dev
 | `make install` | Installa le dipendenze di backend (uv) e frontend (npm) |
 | `make dev` | Avvia backend e frontend in parallelo |
 | `make test` | pytest e Vitest |
+| `make e2e` | Test end-to-end con Playwright (Chromium), su server e database dedicati |
 | `make lint` | ruff, mypy, oxlint, Prettier (controllo) e TypeScript |
 | `make format` | Formatta backend e frontend |
 | `make gen-api` | Rigenera `frontend/src/api/schema.ts` dallo schema OpenAPI del backend |

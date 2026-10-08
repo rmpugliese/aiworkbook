@@ -161,10 +161,76 @@ export interface paths {
         patch: operations["update_iteration_api_projects__project_id__iterations__iteration_id__patch"];
         trace?: never;
     };
+    "/api/projects/{project_id}/iterations/{iteration_id}/answers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Answers */
+        get: operations["list_answers_api_projects__project_id__iterations__iteration_id__answers_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/projects/{project_id}/iterations/{iteration_id}/answers/{question_key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Save Answer
+         * @description Replaces one answer. An answer with every field empty is deleted.
+         */
+        put: operations["save_answer_api_projects__project_id__iterations__iteration_id__answers__question_key__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /**
+         * AnswerIn
+         * @description A full replacement of one answer. Empty fields are null (or an empty list).
+         */
+        AnswerIn: {
+            /** Text */
+            text?: string | null;
+            /** Verdict */
+            verdict?: ("go" | "maybe" | "no_go") | null;
+            /** Choices */
+            choices?: string[] | null;
+            /** Return To Phase */
+            return_to_phase?: number | null;
+        };
+        /** AnswerOut */
+        AnswerOut: {
+            /** Question Key */
+            question_key: string;
+            /** Text */
+            text: string | null;
+            /** Verdict */
+            verdict: ("go" | "maybe" | "no_go") | null;
+            /** Choices */
+            choices: string[] | null;
+            /** Return To Phase */
+            return_to_phase: number | null;
+            /** Updated At */
+            updated_at: string | null;
+        };
         /** ChoiceOption */
         ChoiceOption: {
             /** Key */
@@ -846,6 +912,75 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["IterationOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_answers_api_projects__project_id__iterations__iteration_id__answers_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: number;
+                iteration_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnswerOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    save_answer_api_projects__project_id__iterations__iteration_id__answers__question_key__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: number;
+                iteration_id: number;
+                question_key: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AnswerIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnswerOut"];
                 };
             };
             /** @description Validation Error */
