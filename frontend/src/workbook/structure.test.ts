@@ -26,6 +26,7 @@ describe('workbook structure', () => {
       '1.objectives.patterns',
       '1.gate.decision',
       '2.quality.verify',
+      '2.gate.decision',
     ])
   })
 
@@ -46,7 +47,7 @@ describe('workbook structure', () => {
     ])
 
     expect(phaseProgress(template.phases[0], answers)).toEqual({ answered: 2, total: 3 })
-    expect(phaseProgress(template.phases[1], answers)).toEqual({ answered: 0, total: 1 })
+    expect(phaseProgress(template.phases[1], answers)).toEqual({ answered: 0, total: 2 })
   })
 
   it('labels phases with roman numerals', () => {

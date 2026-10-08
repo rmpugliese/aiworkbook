@@ -87,6 +87,8 @@ def _validate(question: Question, phase_number: int, data: AnswerIn) -> AnswerIn
             raise InvalidRequestError(f"{question.type} questions do not take a return phase")
         if not 1 <= data.return_to_phase < phase_number:
             raise InvalidRequestError(f"phase {phase_number} can only return to an earlier phase")
+        if data.verdict not in ("maybe", "no_go"):
+            raise InvalidRequestError("a return phase needs a MAYBE or NO-GO verdict")
 
     return AnswerIn(
         text=text, verdict=data.verdict, choices=choices, return_to_phase=data.return_to_phase
