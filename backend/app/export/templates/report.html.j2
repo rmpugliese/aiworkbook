@@ -65,7 +65,7 @@
 <section class="chapter" id="user-story">
   <h2>User story</h2>
   {%- if r.user_story %}
-  <p class="answer-text">{{ r.user_story }}</p>
+  <div class="md">{{ r.user_story | markdown }}</div>
   {%- else %}
   <p class="missing">Non indicata</p>
   {%- endif %}
@@ -108,7 +108,7 @@
         <td>Fase {{ phase.roman }} · {{ phase.title }}</td>
         <td>{{ verdict(phase.status) }}</td>
         <td>{{ phase.return_to or "—" }}</td>
-        <td class="answer-text">{{ phase.reason or "—" }}</td>
+        <td class="md">{% if phase.reason %}{{ phase.reason | markdown }}{% else %}—{% endif %}</td>
       </tr>
       {%- endfor %}
     </tbody>
@@ -146,7 +146,7 @@
       </ul>
       {%- endif %}
       {%- if a.text %}
-      <p class="answer-text">{{ a.text }}</p>
+      <div class="md">{{ a.text | markdown }}</div>
       {%- elif q.type == "text" %}
       <p class="missing">Non compilato</p>
       {%- endif %}

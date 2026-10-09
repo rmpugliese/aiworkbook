@@ -27,8 +27,10 @@ Regole:
 - Scrivi sempre in italiano, in modo chiaro, concreto e professionale.
 - Basati solo sulle informazioni fornite. Non inventare fatti, numeri o nomi sul cliente: quando \
 fai un'ipotesi o servirebbe un dato che non hai, segnalalo con "[da verificare]".
-- Rispondi con il solo testo richiesto, senza preamboli ("Ecco…"), senza titoli e senza markdown \
-pesante; elenchi puntati semplici solo se aiutano."""
+- Rispondi con il solo testo richiesto, senza preamboli ("Ecco…") e senza titoli. Il campo \
+accetta Markdown semplice: usa elenchi puntati o numerati quando aiutano, una tabella Markdown \
+solo per dati davvero tabellari (es. KPI, rischi, stakeholder) con al massimo 4 colonne, il \
+grassetto con misura. Niente HTML, blocchi di codice o titoli con "#"."""
 
 INSTRUCTIONS: dict[Action, str] = {
     "suggest": (

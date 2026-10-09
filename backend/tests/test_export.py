@@ -109,7 +109,7 @@ def test_html_has_every_section_and_marks_missing_answers(
         assert heading in html
     for roman in ["I", "II", "III", "IV", "V", "VI"]:
         assert f"Fase {roman} ·" in html
-    assert "Ridurre gli abbandoni\nentro 12 mesi" in html
+    assert "Ridurre gli abbandoni<br />\nentro 12 mesi" in html  # a single line break stays
     assert "Non compilato" in html
     assert "da completare (1 di 9)" in html
     assert "Si torna a: Fase II · Comprensione dei dati" in html

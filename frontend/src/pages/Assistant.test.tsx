@@ -73,6 +73,7 @@ describe('AI assistant', () => {
     renderRoutes(routes, '/projects/1/iterations/10')
     const field = await screen.findByRole('textbox', { name: 'Quale problema risolvete?' })
     await user().type(field, 'Bozza')
+    expect(field).toHaveValue('Bozza')
     await act(() => vi.advanceTimersByTimeAsync(1100))
 
     await user().click(screen.getByRole('button', { name: 'Assistente' }))
@@ -80,7 +81,9 @@ describe('AI assistant', () => {
 
     const panel = await screen.findByLabelText("Proposta dell'assistente")
     expect(await within(panel).findByText('Ridurre gli abbandoni.')).toBeInTheDocument()
-    expect(field).toHaveValue('Bozza') // nothing applied yet
+    // Leaving the field for the menu shows it formatted; nothing has been applied yet.
+    const view = screen.getByRole('button', { name: 'Modifica: Quale problema risolvete?' })
+    expect(view).toHaveTextContent(/^Bozza$/)
     expect(calls.find((c) => c.path === `${BASE}/assist`)?.body).toEqual({
       question_key: TEXT_KEY,
       action: 'suggest',
@@ -89,21 +92,34 @@ describe('AI assistant', () => {
     })
 
     await user().click(within(panel).getByRole('button', { name: 'Aggiungi in fondo' }))
-    expect(field).toHaveValue('Bozza\n\nRidurre gli abbandoni.')
+    expect(within(view).getByText('Ridurre gli abbandoni.').tagName).toBe('P') // own paragraph
+    await user().click(view)
+    expect(screen.getByRole('textbox', { name: 'Quale problema risolvete?' })).toHaveValue(
+      'Bozza\n\nRidurre gli abbandoni.',
+    )
     await act(() => vi.advanceTimersByTimeAsync(1100))
     const saved = calls.filter((c) => c.method === 'PUT').at(-1)?.body as { text: string }
     expect(saved.text).toBe('Bozza\n\nRidurre gli abbandoni.')
   })
 
   it('shows a review without offering to apply it', async () => {
-    iterationApi(() => stream(['delta', { text: '- Manca una misura.' }], ['done', {}]))
+    iterationApi(() =>
+      stream(
+        ['delta', { text: '- Manca una misura.\n- ' }],
+        ['delta', { text: '**KPI** assenti' }],
+        ['done', {}],
+      ),
+    )
     renderRoutes(routes, '/projects/1/iterations/10')
 
     await user().click(await screen.findByRole('button', { name: 'Assistente' }))
     await user().click(await screen.findByRole('menuitem', { name: 'Critica e domande' }))
 
     const panel = await screen.findByLabelText("Proposta dell'assistente")
-    expect(await within(panel).findByText('- Manca una misura.')).toBeInTheDocument()
+    // Formatted: a list with bold text, not raw Markdown.
+    expect(await within(panel).findByText('Manca una misura.')).toBeInTheDocument()
+    expect(within(panel).getAllByRole('listitem')).toHaveLength(2)
+    expect(within(panel).getByText('KPI').tagName).toBe('STRONG')
     expect(within(panel).queryByRole('button', { name: 'Sostituisci' })).toBeNull()
     expect(within(panel).getByRole('button', { name: 'Chiudi' })).toBeInTheDocument()
   })
