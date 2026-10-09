@@ -24,7 +24,7 @@ def upgrade() -> None:
     op.create_table(
         "ai_settings",
         sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("enabled", sa.Boolean(), server_default=sa.text("0"), nullable=False),
+        sa.Column("enabled", sa.Boolean(), server_default=sa.false(), nullable=False),
         sa.Column("base_url", sa.String(length=500), nullable=False),
         sa.Column("model", sa.String(length=200), nullable=False),
         sa.Column("api_key_encrypted", sa.Text(), nullable=True),

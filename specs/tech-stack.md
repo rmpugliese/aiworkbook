@@ -91,14 +91,22 @@ perché il `make` di sistema richiede di accettare la licenza di Xcode.
 
 Il backend usa la porta **8001** perché la 8000 è occupata da un altro progetto locale.
 
-## Deploy (da decidere nella fase di rilascio pubblico)
+## Produzione
 
-Un container (backend che serve anche la build del frontend) più un PostgreSQL gestito. Candidati:
-Fly.io, Render, Railway, oppure una VPS europea (preferibile per il GDPR).
+- **Un container** (`Dockerfile`): il backend serve API, pagine condivise e la build del frontend
+  (`APP_FRONTEND_DIST`), una sola origine. Uvicorn con `--proxy-headers`, senza log di accesso.
+- **`deploy/docker-compose.yml`**: app, PostgreSQL 17, Caddy (HTTPS automatico), backup
+  notturno con `pg_dump`, pulizia giornaliera (`app.cli cleanup`). Su una VPS europea; guida in
+  `DEPLOY.md`.
+- **PostgreSQL** con `psycopg[binary]`; `make test-postgres` e la CI eseguono i test anche lì.
+- **Sicurezza** (`app/http.py`): intestazioni (CSP, HSTS in produzione…), limite globale per IP,
+  log JSON per richiesta con id e token oscurati, errori 500 generici. In produzione l'avvio è
+  rifiutato se la configurazione è incompleta.
+- **CI**: `.github/workflows/ci.yml` (lint, test su SQLite e PostgreSQL, migrazioni, audit delle
+  dipendenze, e2e, build dell'immagine), attiva quando il codice sarà su GitHub.
 
 ## Lacune note
 
-- Senza Docker in locale, i test su PostgreSQL arriveranno con la CI (GitHub Actions con un
-  servizio postgres).
-- Email transazionali (verifica account, reset password): fornitore da scegliere nella fase di
-  rilascio pubblico.
+- Docker non è installato su questo Mac: l'immagine si costruisce la prima volta sul server o in
+  CI. PostgreSQL 17 è installato con Homebrew solo per i test locali.
+- Fornitore SMTP di produzione da scegliere al momento del deploy.

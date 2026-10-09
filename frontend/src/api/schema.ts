@@ -66,11 +66,46 @@ export interface paths {
         get: operations["me_api_auth_me_get"];
         put?: never;
         post?: never;
-        delete?: never;
+        /** Delete My Account */
+        delete: operations["delete_my_account_api_auth_me_delete"];
         options?: never;
         head?: never;
         /** Update Profile */
         patch: operations["update_profile_api_auth_me_patch"];
+        trace?: never;
+    };
+    "/api/auth/me/accept-terms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Accept Terms */
+        post: operations["accept_terms_api_auth_me_accept_terms_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/me/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Export My Data */
+        get: operations["export_my_data_api_auth_me_export_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/auth/me/logo": {
@@ -844,6 +879,11 @@ export interface components {
             /** Label */
             label: string;
         };
+        /** DeleteAccountIn */
+        DeleteAccountIn: {
+            /** Confirm Email */
+            confirm_email: string;
+        };
         /** EmailIn */
         EmailIn: {
             /**
@@ -1125,6 +1165,11 @@ export interface components {
             password: string;
             /** Display Name */
             display_name?: string | null;
+            /**
+             * Accept Terms
+             * @constant
+             */
+            accept_terms: true;
         };
         /**
          * ShareLinkCreated
@@ -1257,6 +1302,8 @@ export interface components {
             is_admin: boolean;
             /** Brand Color */
             brand_color: string | null;
+            /** Terms Current */
+            terms_current: boolean;
             /** Logo Url */
             logo_url: string | null;
         };
@@ -1384,6 +1431,39 @@ export interface operations {
             };
         };
     };
+    delete_my_account_api_auth_me_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                session?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DeleteAccountIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     update_profile_api_auth_me_patch: {
         parameters: {
             query?: never;
@@ -1406,6 +1486,68 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UserOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    accept_terms_api_auth_me_accept_terms_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    export_my_data_api_auth_me_export_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description All the user's data */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
             /** @description Validation Error */

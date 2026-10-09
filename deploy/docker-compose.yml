@@ -1,0 +1,83 @@
+# Production on a single server: the app, PostgreSQL, Caddy (HTTPS) and a nightly backup.
+# Usage: see DEPLOY.md. Run from this directory with an .env file next to it.
+name: workbook
+
+services:
+  app:
+    build:
+      context: ..
+    image: ai-project-workbook:latest
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      APP_DATABASE_URL: postgresql+psycopg://workbook:${POSTGRES_PASSWORD}@db:5432/workbook
+    depends_on:
+      db:
+        condition: service_healthy
+    # No published port: only Caddy reaches the app.
+    expose:
+      - "8000"
+
+  db:
+    image: postgres:17-bookworm
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: workbook
+      POSTGRES_USER: workbook
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U workbook -d workbook"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      APP_DOMAIN: ${APP_DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - app
+
+  backup:
+    image: postgres:17-bookworm
+    restart: unless-stopped
+    environment:
+      PGHOST: db
+      PGUSER: workbook
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      PGDATABASE: workbook
+      BACKUP_KEEP_DAYS: ${BACKUP_KEEP_DAYS:-14}
+    volumes:
+      - ./backup.sh:/backup.sh:ro
+      - ./backups:/backups
+    entrypoint: ["sh", "/backup.sh"]
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # Daily retention clean-up (expired sessions, spent email links, AI logs over a year old).
+  cleanup:
+    image: ai-project-workbook:latest
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      APP_DATABASE_URL: postgresql+psycopg://workbook:${POSTGRES_PASSWORD}@db:5432/workbook
+    entrypoint: ["sh", "-c", "while true; do python -m app.cli cleanup; sleep 86400; done"]
+    depends_on:
+      - app
+
+volumes:
+  db-data:
+  caddy-data:
+  caddy-config:

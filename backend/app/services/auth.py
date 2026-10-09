@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session as DbSession
 from app import email
 from app.auth.security import hash_password, new_token, token_hash, verify_password
 from app.config import get_settings
+from app.legal import TERMS_VERSION
 from app.models import EmailToken, Project, Session, User
 from app.models.project import utcnow
 from app.services.errors import ConflictError, InvalidRequestError
@@ -86,6 +87,13 @@ def _user_by_email(db: DbSession, address: str) -> User | None:
 # --- Sign-up and confirmation -----------------------------------------------------------
 
 
+def accept_terms(db: DbSession, user: User) -> User:
+    user.terms_accepted_at = utcnow()
+    user.terms_version = TERMS_VERSION
+    db.commit()
+    return user
+
+
 def register(db: DbSession, address: str, password: str, display_name: str | None) -> None:
     """Same outcome whether or not the address is taken: the email tells the owner."""
     existing = _user_by_email(db, address)
@@ -96,6 +104,9 @@ def register(db: DbSession, address: str, password: str, display_name: str | Non
         email=normalize_email(address),
         password_hash=hash_password(password),
         display_name=(display_name or "").strip() or None,
+        # The request schema only accepts a sign-up that accepts the terms.
+        terms_accepted_at=utcnow(),
+        terms_version=TERMS_VERSION,
     )
     db.add(user)
     db.flush()

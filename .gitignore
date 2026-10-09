@@ -36,3 +36,7 @@ frontend/openapi.json
 # Playwright output
 frontend/test-results/
 frontend/playwright-report/
+
+# Deploy: secrets and database dumps stay on the server
+deploy/.env
+deploy/backups/

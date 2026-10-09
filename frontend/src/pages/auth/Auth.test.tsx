@@ -76,6 +76,9 @@ describe('authentication', () => {
     await user.type(password, 'corta')
     expect(screen.getByRole('button', { name: 'Registrati' })).toBeDisabled()
     await user.type(password, '-ma-ora-lunga')
+    // The terms must be accepted before signing up.
+    expect(screen.getByRole('button', { name: 'Registrati' })).toBeDisabled()
+    await user.click(screen.getByRole('checkbox', { name: /Accetto i termini d'uso/ }))
     await user.click(screen.getByRole('button', { name: 'Registrati' }))
 
     expect(
@@ -86,6 +89,7 @@ describe('authentication', () => {
       email: 'nuova@example.com',
       password: 'corta-ma-ora-lunga',
       display_name: null,
+      accept_terms: true,
     })
   })
 

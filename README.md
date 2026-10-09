@@ -41,6 +41,8 @@ make dev
 | `make format` | Formatta backend e frontend |
 | `make gen-api` | Rigenera `frontend/src/api/schema.ts` dallo schema OpenAPI del backend |
 | `make migrate` | Applica le migrazioni Alembic al database di sviluppo |
+| `make test-postgres` | Test del backend su PostgreSQL (database vuoto `cpmai_test`) |
+| `make build` | Costruisce l'immagine Docker di produzione |
 
 La configurazione del backend si legge da variabili d'ambiente con prefisso `APP_`: vedi
 `backend/.env.example`.
@@ -94,6 +96,17 @@ Dal menu utente, "Profilo e marchio": nome visualizzato, logo (PNG, JPEG o SVG f
 colore principale. Il marchio compare nell'intestazione dell'app, sulla copertina e nei titoli dei
 PDF e nelle pagine condivise con i clienti dei propri progetti. Il colore deve avere un contrasto
 di almeno 4,5:1 con il bianco; gli SVG con script o risorse esterne vengono rifiutati.
+
+## Privacy e dati
+
+Alla registrazione si accettano termini d'uso e informativa (pagine `/terms` e `/privacy`, bozze
+da far rivedere da un legale). Dal profilo ogni utente scarica tutti i propri dati in JSON ed
+elimina l'account. `python -m app.cli cleanup` rimuove sessioni scadute, link email usati e il
+registro AI oltre i 12 mesi.
+
+## Pubblicazione
+
+Container Docker con PostgreSQL, Caddy (HTTPS) e backup notturno: vedi [DEPLOY.md](DEPLOY.md).
 
 ## Struttura
 

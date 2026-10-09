@@ -50,12 +50,14 @@ def ensure_csrf_cookie(request: Request, response: Response) -> None:
 
 
 def current_user(
+    request: Request,
     db: Annotated[DbSession, Depends(get_db)],
     session: Annotated[str | None, Cookie(alias=SESSION_COOKIE)] = None,
 ) -> User:
     user = auth_service.user_for_session(db, session) if session else None
     if user is None:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Accesso richiesto.")
+    request.state.user_id = user.id  # for the request log
     return user
 
 

@@ -1,9 +1,34 @@
-import { Alert, Anchor, Button, PasswordInput, Stack, Text, TextInput } from '@mantine/core'
+import {
+  Alert,
+  Anchor,
+  Button,
+  Checkbox,
+  PasswordInput,
+  Stack,
+  Text,
+  TextInput,
+} from '@mantine/core'
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router'
 
 import { MIN_PASSWORD_LENGTH, useRegister } from '../../api/auth'
 import { AuthCard } from './AuthCard'
+
+/** "I accept the terms and have read the privacy notice", with both links opening in a new tab. */
+export function TermsLabel() {
+  return (
+    <>
+      Accetto i{' '}
+      <Anchor href="/terms" target="_blank" inherit>
+        termini d'uso
+      </Anchor>{' '}
+      e ho letto l'
+      <Anchor href="/privacy" target="_blank" inherit>
+        informativa sulla privacy
+      </Anchor>
+    </>
+  )
+}
 
 export function RegisterPage() {
   const register = useRegister()
@@ -11,12 +36,13 @@ export function RegisterPage() {
   const [displayName, setDisplayName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [accepted, setAccepted] = useState(false)
   const tooShort = password.length > 0 && password.length < MIN_PASSWORD_LENGTH
 
   function submit(event: FormEvent) {
     event.preventDefault()
     register.mutate(
-      { email, password, display_name: displayName.trim() || null },
+      { email, password, display_name: displayName.trim() || null, accept_terms: true },
       { onSuccess: () => navigate(`/check-email?email=${encodeURIComponent(email)}`) },
     )
   }
@@ -49,11 +75,16 @@ export function RegisterPage() {
             error={tooShort ? `Servono almeno ${MIN_PASSWORD_LENGTH} caratteri` : undefined}
             onChange={(event) => setPassword(event.currentTarget.value)}
           />
+          <Checkbox
+            checked={accepted}
+            onChange={(event) => setAccepted(event.currentTarget.checked)}
+            label={<TermsLabel />}
+          />
           {register.error && <Alert color="red">{register.error.message}</Alert>}
           <Button
             type="submit"
             loading={register.isPending}
-            disabled={password.length < MIN_PASSWORD_LENGTH}
+            disabled={password.length < MIN_PASSWORD_LENGTH || !accepted}
           >
             Registrati
           </Button>

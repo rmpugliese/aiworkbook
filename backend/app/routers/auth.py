@@ -1,3 +1,4 @@
+import json
 from typing import Annotated, Any
 
 from authlib.integrations.base_client import OAuthError
@@ -25,8 +26,11 @@ from app.auth.web import (
 )
 from app.config import get_settings
 from app.db import get_db
+from app.legal import TERMS_VERSION
 from app.models import User
+from app.models.project import utcnow
 from app.schemas.auth import (
+    DeleteAccountIn,
     EmailIn,
     LoginIn,
     MessageOut,
@@ -37,8 +41,8 @@ from app.schemas.auth import (
     TokenIn,
     UserOut,
 )
+from app.services import account, branding
 from app.services import auth as service
-from app.services import branding
 from app.services.errors import ConflictError, InvalidRequestError
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
@@ -59,6 +63,7 @@ def _user_out(user: User) -> UserOut:
         google_linked=user.google_sub is not None,
         is_admin=user.is_admin,
         brand_color=user.brand_color,
+        terms_current=user.terms_version == TERMS_VERSION,
         logo_url=(
             f"/api/auth/me/logo?v={int(user.logo_updated_at.timestamp())}"
             if user.logo_updated_at
@@ -79,6 +84,40 @@ def _limit_email_requests(request: Request) -> None:
 @router.get("/me")
 def me(user: CurrentUser) -> UserOut:
     return _user_out(user)
+
+
+@router.post("/me/accept-terms")
+def accept_terms(db: Db, user: CurrentUser) -> UserOut:
+    return _user_out(service.accept_terms(db, user))
+
+
+@router.get(
+    "/me/export",
+    response_class=Response,
+    responses={200: {"content": {"application/json": {}}, "description": "All the user's data"}},
+)
+def export_my_data(db: Db, user: CurrentUser) -> Response:
+    data = account.export_data(db, user)
+    filename = f"ai-project-workbook-dati-{utcnow():%Y-%m-%d}.json"
+    return Response(
+        content=json.dumps(data, ensure_ascii=False, indent=2, default=str),
+        media_type="application/json",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Cache-Control": "no-store",
+        },
+    )
+
+
+@router.delete("/me", status_code=status.HTTP_204_NO_CONTENT)
+def delete_my_account(db: Db, user: CurrentUser, data: DeleteAccountIn, response: Response) -> None:
+    try:
+        account.delete_account(db, user, confirm_email=data.confirm_email)
+    except InvalidRequestError as error:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(error)) from error
+    except ConflictError as error:
+        raise HTTPException(status.HTTP_409_CONFLICT, str(error)) from error
+    clear_session_cookie(response)
 
 
 @router.patch("/me")

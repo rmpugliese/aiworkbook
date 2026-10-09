@@ -2,6 +2,7 @@ import { Alert, Loader } from '@mantine/core'
 import { Navigate, Outlet, useLocation } from 'react-router'
 
 import { useMe } from '../api/auth'
+import { AcceptTermsPage } from '../pages/auth/AcceptTermsPage'
 
 /** Renders its child routes for a signed-in user; otherwise sends the visitor to sign in. */
 export function RequireAuth() {
@@ -20,5 +21,6 @@ export function RequireAuth() {
     const next = encodeURIComponent(location.pathname + location.search)
     return <Navigate to={`/login?next=${next}`} replace />
   }
+  if (!me.data.terms_current) return <AcceptTermsPage />
   return <Outlet />
 }

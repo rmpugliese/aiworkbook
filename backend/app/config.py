@@ -30,6 +30,10 @@ class Settings(BaseSettings):
     google_client_id: str | None = None
     google_client_secret: str | None = None
 
+    # The frontend build (frontend/dist) served by the backend in production, so the app has a
+    # single origin. Unset in development, where Vite serves the frontend.
+    frontend_dist: str | None = None
+
     @property
     def secure_cookies(self) -> bool:
         return self.env == "production"
@@ -39,9 +43,20 @@ class Settings(BaseSettings):
         return bool(self.google_client_id and self.google_client_secret)
 
     @model_validator(mode="after")
-    def _production_needs_a_secret(self) -> Self:
-        if self.env == "production" and self.secret_key == DEV_SECRET_KEY:
-            raise ValueError("APP_SECRET_KEY must be set in production")
+    def _production_is_complete(self) -> Self:
+        if self.env != "production":
+            return self
+        problems = []
+        if self.secret_key == DEV_SECRET_KEY or len(self.secret_key) < 32:
+            problems.append("APP_SECRET_KEY must be a random value of at least 32 characters")
+        if not self.public_url.startswith("https://"):
+            problems.append("APP_PUBLIC_URL must be the public https:// address")
+        if self.database_url.startswith("sqlite"):
+            problems.append("APP_DATABASE_URL must point to PostgreSQL")
+        if self.email_backend != "smtp":
+            problems.append("APP_EMAIL_BACKEND must be smtp, or confirmation emails never arrive")
+        if problems:
+            raise ValueError("Production configuration incomplete: " + "; ".join(problems))
         return self
 
 

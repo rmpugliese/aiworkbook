@@ -1,0 +1,13 @@
+# HTTPS certificates are obtained and renewed automatically for the domain.
+{$APP_DOMAIN} {
+	encode zstd gzip
+	reverse_proxy app:8000
+	# Uploaded logos are at most 1 MB; leave room for the multipart envelope.
+	request_body {
+		max_size 2MB
+	}
+	log {
+		# Caddy's access log would show shared-link tokens: the app keeps its own, masked log.
+		output discard
+	}
+}

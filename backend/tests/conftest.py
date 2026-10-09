@@ -18,11 +18,14 @@ from app.auth import rate_limit  # noqa: E402
 from app.auth.security import hash_password  # noqa: E402
 from app.auth.web import CSRF_COOKIE, CSRF_HEADER  # noqa: E402
 from app.db import Base, get_db  # noqa: E402
+from app.legal import TERMS_VERSION  # noqa: E402
 from app.main import create_app  # noqa: E402
 from app.models import User  # noqa: E402
 from app.models.project import utcnow  # noqa: E402
 
 PASSWORD = "una-password-lunga"
+# e.g. postgresql+psycopg://localhost/cpmai_test: runs the suite on that database instead of SQLite.
+TEST_DATABASE_URL = os.environ.get("APP_TEST_DATABASE_URL")
 
 
 @pytest.fixture(autouse=True)
@@ -32,17 +35,25 @@ def _clean_state() -> Iterator[None]:
     rate_limit.email_requests.reset()
     rate_limit.shared_pages.reset()
     rate_limit.shared_pdfs.reset()
+    rate_limit.api_requests.reset()
     yield
 
 
 @pytest.fixture
 def engine() -> Iterator[Engine]:
-    # In-memory SQLite on a single shared connection, so every session sees the same database.
-    engine = create_engine(
-        "sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool
-    )
+    if TEST_DATABASE_URL:
+        # A real server (PostgreSQL in CI or locally): fresh tables for every test.
+        engine = create_engine(TEST_DATABASE_URL)
+        Base.metadata.drop_all(engine)
+    else:
+        # In-memory SQLite on a single shared connection, so every session sees the same data.
+        engine = create_engine(
+            "sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool
+        )
     Base.metadata.create_all(engine)
     yield engine
+    if TEST_DATABASE_URL:
+        Base.metadata.drop_all(engine)
     engine.dispose()
 
 
@@ -85,6 +96,8 @@ def make_user(
         password_hash=hash_password(PASSWORD),
         email_verified_at=utcnow() if verified else None,
         is_admin=admin,
+        terms_accepted_at=utcnow(),
+        terms_version=TERMS_VERSION,
     )
     db.add(user)
     db.commit()
