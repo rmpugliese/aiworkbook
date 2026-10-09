@@ -97,7 +97,7 @@ describe('IterationPage', () => {
     const field = await screen.findByRole('textbox', { name: 'Quale problema risolvete?' })
 
     await user().type(field, 'Al volo')
-    await user().click(screen.getByRole('link', { name: 'Pattern →' }))
+    await user().click(screen.getByRole('link', { name: 'Task successivo: Pattern' }))
 
     expect(await screen.findByRole('heading', { name: 'Pattern', level: 2 })).toBeInTheDocument()
     expect(calls.filter((c) => c.method === 'PUT').map((c) => c.body)).toEqual([
@@ -114,7 +114,7 @@ describe('IterationPage', () => {
 
     await user().click(await screen.findByLabelText('Analisi predittiva'))
     await act(() => vi.advanceTimersByTimeAsync(1100))
-    await user().click(screen.getByRole('link', { name: 'Esito della Fase I →' }))
+    await user().click(screen.getByRole('link', { name: 'Task successivo: Esito della Fase I' }))
     await user().click(await screen.findByText('NO-GO'))
     await act(() => vi.advanceTimersByTimeAsync(1100))
 
@@ -151,7 +151,9 @@ describe('IterationPage', () => {
     expect(screen.getByRole('textbox', { name: /Note e motivazione/ })).toHaveValue(
       'Dati incompleti',
     )
-    expect(screen.getByRole('link', { name: 'Passaggio alla Fase III →' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('link', { name: 'Task successivo: Passaggio alla Fase III' }),
+    ).toBeInTheDocument()
   })
 })
 

@@ -1,0 +1,19 @@
+body {
+  background: var(--mantine-color-gray-0);
+  color: var(--mantine-color-dark-7);
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: 'cv11', 'ss01';
+}
+
+/* Cards that open something: a gentle lift on hover. */
+.card-link {
+  transition:
+    box-shadow 150ms ease,
+    border-color 150ms ease,
+    transform 150ms ease;
+}
+.card-link:hover {
+  border-color: var(--mantine-color-brand-3);
+  box-shadow: var(--mantine-shadow-sm);
+  transform: translateY(-1px);
+}

@@ -160,7 +160,19 @@ campi, solo quando l'utente lo chiede.
 
 ---
 
-## Fase 9: Preparazione al rilascio pubblico
+## Fase 9: Marchio del consulente ed estetica (Completata)
+
+**Obiettivo:** l'app ha un aspetto professionale e i documenti portano il marchio del consulente.
+
+- [x] Profilo utente con logo e colore principale
+- [x] Logo e colore su copertina del PDF, pagina condivisa e intestazione dell'app
+- [x] Tema grafico: font Inter, icone, palette sobria, pagine riviste
+- [x] Test: validazione del logo (tipo, dimensione, SVG sicuro), contrasto del colore, report con
+      e senza marchio
+
+---
+
+## Fase 10: Preparazione al rilascio pubblico
 
 **Obiettivo:** rendere l'app sicura e conforme per utenti esterni.
 

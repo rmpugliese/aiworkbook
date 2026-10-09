@@ -8,6 +8,7 @@ import {
   Grid,
   Group,
   Loader,
+  Paper,
   Progress,
   ScrollArea,
   Stack,
@@ -15,6 +16,7 @@ import {
   Textarea,
   Title,
 } from '@mantine/core'
+import { IconChevronRight, IconDownload, IconShare } from '@tabler/icons-react'
 import { useCallback, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router'
 
@@ -112,47 +114,68 @@ export function IterationPage() {
 
   return (
     <Stack gap="md" py="lg">
-      <Breadcrumbs>
-        <Anchor component={Link} to="/">
+      <Breadcrumbs separator={<IconChevronRight size={14} />}>
+        <Anchor component={Link} to="/" size="sm">
           Progetti
         </Anchor>
-        <Anchor component={Link} to={`/projects/${projectId}`}>
+        <Anchor component={Link} to={`/projects/${projectId}`} size="sm">
           {project.data.name}
         </Anchor>
-        <Text>{iteration.data.title}</Text>
+        <Text size="sm" c="dimmed">
+          {iteration.data.title}
+        </Text>
       </Breadcrumbs>
 
-      <Group justify="space-between" align="flex-end">
-        <Stack gap={4}>
+      <Group justify="space-between" align="flex-end" gap="md">
+        <Stack gap={4} style={{ flex: 1, minWidth: 0 }}>
           <Group gap="sm">
             <Title order={1}>
               {iteration.data.number}. {iteration.data.title}
             </Title>
-            <Badge variant="light">Template v{iteration.data.template_version}</Badge>
+            <Badge color="gray">Template v{iteration.data.template_version}</Badge>
           </Group>
           <Text size="sm" c="dimmed">
             Ultima modifica: {formatDateTime(iteration.data.updated_at)}
           </Text>
         </Stack>
-        <Stack gap={4} w={220} align="stretch">
-          <Group gap="xs" grow>
-            <Button
-              component="a"
-              href={exportPdfUrl(projectId, iterationId)}
-              variant="light"
-              download
-            >
-              Scarica PDF
-            </Button>
-            <Button variant="light" onClick={() => setSharing(true)}>
-              Condividi
-            </Button>
-          </Group>
-          <Text size="sm" ta="right">
-            {answered} di {total} domande compilate
-          </Text>
-          <Progress value={total ? (answered / total) * 100 : 0} aria-label="Avanzamento" />
-        </Stack>
+        <Paper withBorder p="sm" w={{ base: '100%', xs: 300 }}>
+          <Stack gap={8}>
+            <Group justify="space-between" gap="xs">
+              <Text size="sm" fw={500}>
+                Avanzamento
+              </Text>
+              <Text size="sm" c="dimmed">
+                {answered} di {total} domande compilate
+              </Text>
+            </Group>
+            <Progress
+              value={total ? (answered / total) * 100 : 0}
+              aria-label="Avanzamento"
+              size="sm"
+              radius="xl"
+            />
+            <Group gap="xs" grow>
+              <Button
+                component="a"
+                href={exportPdfUrl(projectId, iterationId)}
+                variant="light"
+                size="xs"
+                leftSection={<IconDownload size={14} />}
+                download
+              >
+                Scarica PDF
+              </Button>
+              <Button
+                variant="light"
+                size="xs"
+                leftSection={<IconShare size={14} />}
+                onClick={() => setSharing(true)}
+              >
+                Condividi
+              </Button>
+            </Group>
+          </Stack>
+        </Paper>
       </Group>
 
       {sharing && (
@@ -164,7 +187,12 @@ export function IterationPage() {
         />
       )}
 
-      <Accordion variant="contained" defaultValue={iteration.data.user_story ? null : 'story'}>
+      <Accordion
+        variant="contained"
+        bg="white"
+        radius="md"
+        defaultValue={iteration.data.user_story ? null : 'story'}
+      >
         <Accordion.Item value="story">
           <Accordion.Control>
             User story
@@ -186,14 +214,16 @@ export function IterationPage() {
 
       <Grid gap="xl">
         <Grid.Col span={{ base: 12, md: 4 }}>
-          <ScrollArea.Autosize mah="calc(100vh - 140px)" style={{ position: 'sticky', top: 76 }}>
-            <WorkbookNav
-              template={template.data}
-              answers={answers.data}
-              activePath={showSummary ? 'summary' : current.path}
-              linkTo={linkTo}
-            />
-          </ScrollArea.Autosize>
+          <Paper withBorder p={6} style={{ position: 'sticky', top: 80, overflow: 'hidden' }}>
+            <ScrollArea.Autosize mah="calc(100vh - 150px)" type="auto" offsetScrollbars>
+              <WorkbookNav
+                template={template.data}
+                answers={answers.data}
+                activePath={showSummary ? 'summary' : current.path}
+                linkTo={linkTo}
+              />
+            </ScrollArea.Autosize>
+          </Paper>
         </Grid.Col>
         <Grid.Col span={{ base: 12, md: 8 }}>
           {showSummary ? (

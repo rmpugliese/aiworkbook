@@ -63,7 +63,9 @@ backend/
 - **Tipi API generati** dallo schema OpenAPI del backend (`openapi-typescript`): il contratto API
   non si duplica a mano
 - **UI**: **Mantine**, una libreria di componenti completa (form, modali, stepper, notifiche) con
-  supporto i18n, così non si costruisce un design system da zero
+  supporto i18n, così non si costruisce un design system da zero. Tema in `src/theme.ts`: font
+  **Inter** (`@fontsource-variable/inter`, servito dall'app), icone **Tabler**
+  (`@tabler/icons-react`), colore primario preso dal marchio dell'utente
 - **Editor dei campi**: per ora textarea con autosize; un editor ricco (Markdown) si valuterà in
   una fase successiva
 - **Test**: **Vitest** e **Testing Library**; **Playwright** per i test end-to-end a partire dalla

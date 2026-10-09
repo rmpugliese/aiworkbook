@@ -133,7 +133,7 @@ export function AISettingsCard() {
   const settings = useAISettings()
 
   return (
-    <Card withBorder padding="lg">
+    <Card>
       <Group justify="space-between" mb="md">
         <Title order={3}>Assistente AI</Title>
         {settings.data?.location && (

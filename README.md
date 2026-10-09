@@ -88,6 +88,13 @@ suo hash); si può revocare in qualsiasi momento. Archiviare il progetto sospend
 Le pagine condivise (`/s/<token>`) le genera il backend: in sviluppo Vite le inoltra come `/api`.
 `APP_PUBLIC_URL` determina l'indirizzo dei link.
 
+## Marchio del consulente
+
+Dal menu utente, "Profilo e marchio": nome visualizzato, logo (PNG, JPEG o SVG fino a 1 MB) e
+colore principale. Il marchio compare nell'intestazione dell'app, sulla copertina e nei titoli dei
+PDF e nelle pagine condivise con i clienti dei propri progetti. Il colore deve avere un contrasto
+di almeno 4,5:1 con il bianco; gli SVG con script o risorse esterne vengono rifiutati.
+
 ## Struttura
 
 ```

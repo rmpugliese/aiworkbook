@@ -69,6 +69,26 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
+        /** Update Profile */
+        patch: operations["update_profile_api_auth_me_patch"];
+        trace?: never;
+    };
+    "/api/auth/me/logo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Logo */
+        get: operations["get_logo_api_auth_me_logo_get"];
+        /** Upload Logo */
+        put: operations["upload_logo_api_auth_me_logo_put"];
+        post?: never;
+        /** Delete Logo */
+        delete: operations["delete_logo_api_auth_me_logo_delete"];
+        options?: never;
+        head?: never;
         patch?: never;
         trace?: never;
     };
@@ -812,6 +832,11 @@ export interface components {
             /** Verdict */
             verdict?: ("go" | "maybe" | "no_go") | null;
         };
+        /** Body_upload_logo_api_auth_me_logo_put */
+        Body_upload_logo_api_auth_me_logo_put: {
+            /** File */
+            file: string;
+        };
         /** ChoiceOption */
         ChoiceOption: {
             /** Key */
@@ -994,6 +1019,16 @@ export interface components {
             type: "phase_gate";
             /** Criteria */
             criteria: components["schemas"]["GateCriterion"][];
+        };
+        /**
+         * ProfileIn
+         * @description Only the fields sent are changed; an empty value clears the field.
+         */
+        ProfileIn: {
+            /** Display Name */
+            display_name?: string | null;
+            /** Brand Color */
+            brand_color?: string | null;
         };
         /** ProjectCreate */
         ProjectCreate: {
@@ -1220,6 +1255,10 @@ export interface components {
             google_linked: boolean;
             /** Is Admin */
             is_admin: boolean;
+            /** Brand Color */
+            brand_color: string | null;
+            /** Logo Url */
+            logo_url: string | null;
         };
         /** ValidationError */
         ValidationError: {
@@ -1315,6 +1354,138 @@ export interface operations {
         };
     };
     me_api_auth_me_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_profile_api_auth_me_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                session?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProfileIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_logo_api_auth_me_logo_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The user's logo */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/*": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    upload_logo_api_auth_me_logo_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                session?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_upload_logo_api_auth_me_logo_put"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_logo_api_auth_me_logo_delete: {
         parameters: {
             query?: never;
             header?: never;

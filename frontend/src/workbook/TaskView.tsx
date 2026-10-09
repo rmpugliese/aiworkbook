@@ -1,4 +1,5 @@
 import { Button, Group, Stack, Text, Title } from '@mantine/core'
+import { IconArrowLeft, IconArrowRight } from '@tabler/icons-react'
 import { Link } from 'react-router'
 
 import type { Answer, AnswerIn } from '../api/answers'
@@ -33,12 +34,14 @@ export function TaskView({
   return (
     <Stack gap="md">
       <Stack gap={2}>
-        <Text size="sm" c="dimmed">
+        <Text size="xs" c="brand" fw={600} tt="uppercase" style={{ letterSpacing: '0.04em' }}>
           {phaseLabel(phase)} · {group.title}
         </Text>
         <Title order={2}>{task.title}</Title>
       </Stack>
-      <Text style={{ whiteSpace: 'pre-wrap' }}>{task.guidance}</Text>
+      <Text c="dark.4" style={{ whiteSpace: 'pre-wrap' }}>
+        {task.guidance}
+      </Text>
 
       {task.questions.length === 0 && (
         <Text c="dimmed" fs="italic">
@@ -60,15 +63,26 @@ export function TaskView({
 
       <Group justify="space-between" mt="md">
         {previous ? (
-          <Button component={Link} to={linkTo(previous.path)} variant="default">
-            ← {previous.task.title}
+          <Button
+            component={Link}
+            to={linkTo(previous.path)}
+            aria-label={`Task precedente: ${previous.task.title}`}
+            variant="default"
+            leftSection={<IconArrowLeft size={16} />}
+          >
+            {previous.task.title}
           </Button>
         ) : (
           <span />
         )}
         {next && (
-          <Button component={Link} to={linkTo(next.path)}>
-            {next.task.title} →
+          <Button
+            component={Link}
+            to={linkTo(next.path)}
+            aria-label={`Task successivo: ${next.task.title}`}
+            rightSection={<IconArrowRight size={16} />}
+          >
+            {next.task.title}
           </Button>
         )}
       </Group>

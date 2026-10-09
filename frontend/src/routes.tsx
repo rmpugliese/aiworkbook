@@ -12,6 +12,7 @@ import { LoginPage } from './pages/auth/LoginPage'
 import { RegisterPage } from './pages/auth/RegisterPage'
 import { AdminUsersPage } from './pages/AdminUsersPage'
 import { IterationPage } from './pages/IterationPage'
+import { ProfilePage } from './pages/ProfilePage'
 import { ProjectPage } from './pages/ProjectPage'
 import { ProjectsPage } from './pages/ProjectsPage'
 
@@ -32,6 +33,7 @@ export const routes: RouteObject[] = [
           { path: 'projects/:projectId', element: <ProjectPage /> },
           { path: 'projects/:projectId/iterations/:iterationId', element: <IterationPage /> },
           { path: 'admin', element: <AdminUsersPage /> },
+          { path: 'profile', element: <ProfilePage /> },
         ],
       },
     ],

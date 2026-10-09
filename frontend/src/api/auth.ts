@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
 
-import { ApiError, apiGet, apiSend, type Schemas } from './client'
+import { ApiError, apiGet, apiSend, csrfToken, errorFrom, type Schemas } from './client'
 import { ME_KEY } from './queryClient'
 
 export type User = Schemas['UserOut']
@@ -92,6 +92,41 @@ export function useResetPassword() {
     mutationFn: (data: { token: string; password: string }) =>
       apiSend<void>('POST', '/api/auth/password-reset/confirm', data),
   })
+}
+
+export type ProfileIn = Schemas['ProfileIn']
+
+/** Profile changes return the updated user, which replaces the cached one (and the theme). */
+function useProfileMutation<TVariables>(fn: (variables: TVariables) => Promise<User>) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: fn,
+    onSuccess: (user) => queryClient.setQueryData(ME_KEY, user),
+  })
+}
+
+export function useUpdateProfile() {
+  return useProfileMutation((data: ProfileIn) => apiSend<User>('PATCH', '/api/auth/me', data))
+}
+
+export function useUploadLogo() {
+  return useProfileMutation(async (file: File) => {
+    const body = new FormData()
+    body.append('file', file)
+    const path = '/api/auth/me/logo'
+    // No Content-Type: the browser sets the multipart boundary itself.
+    const response = await fetch(path, {
+      method: 'PUT',
+      headers: { Accept: 'application/json', 'X-CSRF-Token': await csrfToken() },
+      body,
+    })
+    if (!response.ok) throw await errorFrom(response, 'PUT', path)
+    return (await response.json()) as User
+  })
+}
+
+export function useDeleteLogo() {
+  return useProfileMutation(() => apiSend<User>('DELETE', '/api/auth/me/logo'))
 }
 
 export const GOOGLE_LOGIN_URL = '/api/auth/google/login'

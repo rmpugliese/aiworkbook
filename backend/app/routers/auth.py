@@ -2,7 +2,16 @@ from typing import Annotated, Any
 
 from authlib.integrations.base_client import OAuthError
 from authlib.integrations.starlette_client import OAuth
-from fastapi import APIRouter, Cookie, Depends, HTTPException, Request, Response, status
+from fastapi import (
+    APIRouter,
+    Cookie,
+    Depends,
+    HTTPException,
+    Request,
+    Response,
+    UploadFile,
+    status,
+)
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session as DbSession
 
@@ -22,12 +31,14 @@ from app.schemas.auth import (
     LoginIn,
     MessageOut,
     PasswordResetIn,
+    ProfileIn,
     ProvidersOut,
     RegisterIn,
     TokenIn,
     UserOut,
 )
 from app.services import auth as service
+from app.services import branding
 from app.services.errors import ConflictError, InvalidRequestError
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
@@ -47,6 +58,12 @@ def _user_out(user: User) -> UserOut:
         has_password=user.password_hash is not None,
         google_linked=user.google_sub is not None,
         is_admin=user.is_admin,
+        brand_color=user.brand_color,
+        logo_url=(
+            f"/api/auth/me/logo?v={int(user.logo_updated_at.timestamp())}"
+            if user.logo_updated_at
+            else None
+        ),
     )
 
 
@@ -62,6 +79,58 @@ def _limit_email_requests(request: Request) -> None:
 @router.get("/me")
 def me(user: CurrentUser) -> UserOut:
     return _user_out(user)
+
+
+@router.patch("/me")
+def update_profile(db: Db, user: CurrentUser, data: ProfileIn) -> UserOut:
+    try:
+        branding.update_profile(
+            db,
+            user,
+            fields=data.model_fields_set,
+            display_name=data.display_name,
+            brand_color=data.brand_color,
+        )
+    except InvalidRequestError as error:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(error)) from error
+    return _user_out(user)
+
+
+@router.put("/me/logo")
+async def upload_logo(db: Db, user: CurrentUser, file: UploadFile) -> UserOut:
+    # Read one byte more than allowed: enough to know the file is too large.
+    data = await file.read(branding.MAX_LOGO_BYTES + 1)
+    try:
+        branding.set_logo(db, user, data)
+    except InvalidRequestError as error:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(error)) from error
+    return _user_out(user)
+
+
+@router.delete("/me/logo")
+def delete_logo(db: Db, user: CurrentUser) -> UserOut:
+    branding.clear_logo(db, user)
+    return _user_out(user)
+
+
+@router.get(
+    "/me/logo",
+    response_class=Response,
+    responses={200: {"content": {"image/*": {}}, "description": "The user's logo"}},
+)
+def get_logo(user: CurrentUser) -> Response:
+    if user.logo is None or user.logo_content_type is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Nessun logo.")
+    return Response(
+        content=user.logo,
+        media_type=user.logo_content_type,
+        headers={
+            # Opened directly, an SVG still cannot run scripts or load anything.
+            "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; sandbox",
+            "X-Content-Type-Options": "nosniff",
+            "Cache-Control": "private, max-age=31536000, immutable",
+        },
+    )
 
 
 @router.get("/csrf", status_code=status.HTTP_204_NO_CONTENT)

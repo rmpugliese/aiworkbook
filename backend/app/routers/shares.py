@@ -26,6 +26,7 @@ from app.export.report import Report, build_report
 from app.models import ShareLink
 from app.schemas.shares import ShareLinkCreated, ShareLinkIn, ShareLinkOut
 from app.services import sharing as service
+from app.services.branding import project_branding
 from app.services.errors import ConflictError, NotFoundError
 from app.services.sharing import SharedIteration
 from app.workbook.loader import load_template
@@ -111,7 +112,8 @@ _PUBLIC_HEADERS = {
     "Referrer-Policy": "no-referrer",
     "Cache-Control": "no-store",
     "Content-Security-Policy": (
-        "default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'; "
+        "default-src 'none'; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; "
+        "form-action 'none'; "
         "frame-ancestors 'none'"
     ),
     "X-Frame-Options": "DENY",
@@ -134,13 +136,14 @@ def _not_found() -> HTMLResponse:
     return HTMLResponse(render_not_found(), status.HTTP_404_NOT_FOUND, headers=_PUBLIC_HEADERS)
 
 
-def _report(shared: SharedIteration) -> Report:
+def _report(db: Session, shared: SharedIteration) -> Report:
     return build_report(
         project=shared.project,
         iteration=shared.iteration,
         template=load_template(shared.iteration.template_version),
         answers=shared.answers,
         generated_at=datetime.now().astimezone(),
+        branding=project_branding(db, shared.project),
     )
 
 
@@ -160,7 +163,7 @@ def shared_page(db: Db, request: Request, token: str) -> HTMLResponse:
         pdf_url=f"/s/{quote(token)}/pdf",
         updated_on=_last_update(shared).astimezone().strftime("%d/%m/%Y %H:%M"),
     )
-    return HTMLResponse(render_html(_report(shared), shared=page), headers=_PUBLIC_HEADERS)
+    return HTMLResponse(render_html(_report(db, shared), shared=page), headers=_PUBLIC_HEADERS)
 
 
 @public_router.get("/{token}/pdf", response_model=None)
@@ -170,7 +173,7 @@ def shared_pdf(db: Db, request: Request, token: str) -> Response:
         shared = service.resolve(db, token)
     except NotFoundError:
         return _not_found()
-    report = _report(shared)
+    report = _report(db, shared)
     return Response(
         content=render_pdf(report),
         media_type="application/pdf",

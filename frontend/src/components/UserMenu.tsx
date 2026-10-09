@@ -1,7 +1,19 @@
-import { Button, Menu, Text } from '@mantine/core'
+import { Avatar, Group, Menu, Text, UnstyledButton } from '@mantine/core'
+import { IconChevronDown, IconLogout, IconShieldLock, IconUserCircle } from '@tabler/icons-react'
 import { Link, useNavigate } from 'react-router'
 
 import { useLogout, useMe } from '../api/auth'
+
+function initials(label: string): string {
+  const words = label
+    .replace(/@.*/, '')
+    .split(/[\s._-]+/)
+    .filter(Boolean)
+  return words
+    .slice(0, 2)
+    .map((word) => word[0].toUpperCase())
+    .join('')
+}
 
 export function UserMenu() {
   const me = useMe()
@@ -12,22 +24,37 @@ export function UserMenu() {
   const label = me.data.display_name ?? me.data.email
 
   return (
-    <Menu position="bottom-end" withinPortal>
+    <Menu position="bottom-end" withinPortal width={240}>
       <Menu.Target>
-        <Button variant="subtle" size="compact-sm">
-          {label}
-        </Button>
+        <UnstyledButton aria-label={`Menu di ${label}`}>
+          <Group gap="xs" wrap="nowrap">
+            <Avatar color="brand" radius="xl" size={32}>
+              {initials(label)}
+            </Avatar>
+            <Text size="sm" fw={500} visibleFrom="sm" maw={200} truncate>
+              {label}
+            </Text>
+            <IconChevronDown size={14} stroke={1.8} />
+          </Group>
+        </UnstyledButton>
       </Menu.Target>
       <Menu.Dropdown>
         <Menu.Label>
-          <Text size="xs">{me.data.email}</Text>
+          <Text size="xs" truncate>
+            {me.data.email}
+          </Text>
         </Menu.Label>
+        <Menu.Item component={Link} to="/profile" leftSection={<IconUserCircle size={16} />}>
+          Profilo e marchio
+        </Menu.Item>
         {me.data.is_admin && (
-          <Menu.Item component={Link} to="/admin">
+          <Menu.Item component={Link} to="/admin" leftSection={<IconShieldLock size={16} />}>
             Amministrazione
           </Menu.Item>
         )}
+        <Menu.Divider />
         <Menu.Item
+          leftSection={<IconLogout size={16} />}
           onClick={() => logout.mutate(undefined, { onSettled: () => navigate('/login') })}
         >
           Esci
