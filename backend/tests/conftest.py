@@ -30,6 +30,8 @@ def _clean_state() -> Iterator[None]:
     email.outbox.clear()
     rate_limit.failed_logins.reset()
     rate_limit.email_requests.reset()
+    rate_limit.shared_pages.reset()
+    rate_limit.shared_pdfs.reset()
     yield
 
 

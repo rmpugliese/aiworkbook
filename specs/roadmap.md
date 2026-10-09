@@ -148,14 +148,14 @@ campi, solo quando l'utente lo chiede.
 
 ---
 
-## Fase 8: Condivisione in sola lettura
+## Fase 8: Condivisione in sola lettura (Completata)
 
 **Obiettivo:** il consulente condivide un'iterazione con il cliente.
 
-- [ ] Modello `share_links`; creazione, elenco e revoca dei link
-- [ ] Pagina pubblica `/s/{token}` in sola lettura, senza login, con download del documento
-- [ ] Scadenza opzionale; link revocato o scaduto restituisce 404
-- [ ] Test: il link non permette modifiche, un link revocato non funziona, il token non è
+- [x] Modello `share_links`; creazione, elenco e revoca dei link
+- [x] Pagina pubblica `/s/{token}` in sola lettura, senza login, con download del documento
+- [x] Scadenza opzionale; link revocato o scaduto restituisce 404
+- [x] Test: il link non permette modifiche, un link revocato non funziona, il token non è
       indovinabile
 
 ---

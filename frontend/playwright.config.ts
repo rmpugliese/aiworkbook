@@ -23,7 +23,13 @@ export default defineConfig({
         `uv run python -m app.cli create-user --email ${E2E_USER.email} --password ${E2E_USER.password} --verified && ` +
         `${PANGO}uv run fastapi run app/main.py --port ${BACKEND_PORT}`,
       cwd: '../backend',
-      env: { ...process.env, APP_DATABASE_URL: 'sqlite:///./e2e.db', APP_ENV: 'test' },
+      env: {
+        ...process.env,
+        APP_DATABASE_URL: 'sqlite:///./e2e.db',
+        APP_ENV: 'test',
+        // Share links point at the e2e frontend, not at the dev server.
+        APP_PUBLIC_URL: `http://localhost:${FRONTEND_PORT}`,
+      },
       url: `http://127.0.0.1:${BACKEND_PORT}/api/health`,
       reuseExistingServer: false,
     },
