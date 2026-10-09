@@ -12,6 +12,10 @@ function Harness({ initial }: { initial: string }) {
     <MantineProvider>
       <MarkdownField ariaLabel="Risposta" value={value} onChange={setValue} />
       <button type="button">Altrove</button>
+      {/* Like the assistant's "Sostituisci": the text changes from outside the field. */}
+      <button type="button" onClick={() => setValue('- **uno**\n- due')}>
+        Sostituisci
+      </button>
       <output data-testid="value">{value}</output>
     </MantineProvider>
   )
@@ -53,6 +57,17 @@ describe('MarkdownField', () => {
       '- Rischi\n\n| Colonna 1 | Colonna 2 | Colonna 3 |\n| --- | --- | --- |\n|  |  |  |',
     )
     expect(screen.getByRole('textbox', { name: 'Risposta' })).toBeInTheDocument()
+  })
+
+  it('shows text applied from outside formatted, even if the field was empty', async () => {
+    render(<Harness initial="" />)
+    expect(screen.getByRole('textbox', { name: 'Risposta' })).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Sostituisci' }))
+
+    const view = screen.getByRole('button', { name: 'Modifica: Risposta' })
+    expect(view.querySelectorAll('li')).toHaveLength(2)
+    expect(view.querySelector('strong')?.textContent).toBe('uno')
+    expect(screen.queryByRole('textbox', { name: 'Risposta' })).toBeNull()
   })
 
   it('never renders HTML or javascript links', () => {

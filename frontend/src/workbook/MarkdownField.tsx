@@ -18,7 +18,7 @@ import {
   IconPencil,
   IconTable,
 } from '@tabler/icons-react'
-import { useRef, useState, type FocusEvent, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type FocusEvent, type ReactNode } from 'react'
 
 import { Markdown } from './Markdown'
 import { applyFormat, type FormatAction } from './markdownEditing'
@@ -93,6 +93,15 @@ export function MarkdownField({
   const [editing, setEditing] = useState(() => !value.trim())
   const [focusOnEdit, setFocusOnEdit] = useState(false)
   const textarea = useRef<HTMLTextAreaElement>(null)
+  const editor = useRef<HTMLDivElement>(null)
+
+  // Text that arrives from outside while nobody is typing here (the assistant's "Sostituisci"
+  // or "Aggiungi in fondo") is shown formatted straight away.
+  useEffect(() => {
+    const focused = editor.current?.contains(document.activeElement)
+    if (editing && value.trim() && !focused) setEditing(false)
+    // Only a change of text triggers this: entering edit mode must not leave it again.
+  }, [value])
 
   function format(action: FormatAction) {
     const element = textarea.current
@@ -120,7 +129,7 @@ export function MarkdownField({
   return (
     <Input.Wrapper label={label} description={description} error={error}>
       {editing ? (
-        <Box onBlur={leave}>
+        <Box onBlur={leave} ref={editor}>
           <Group
             gap={2}
             justify="space-between"
