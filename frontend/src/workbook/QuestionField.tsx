@@ -4,6 +4,7 @@ import type { Answer } from '../api/answers'
 import type { Question, Template } from '../api/template'
 import { QuestionCard, SaveIndicator, VerdictControl } from './AnswerControls'
 import { useAnswerDraft, type SaveAnswer } from './useAnswerDraft'
+import { AssistantPanel, type AssistantContext } from './AssistantPanel'
 import { PhaseGateField } from './PhaseGateField'
 
 type Props = {
@@ -12,10 +13,12 @@ type Props = {
   save: SaveAnswer
   template: Template
   linkTo: (path: string) => string
+  /** Set when the assistant is available and enabled for this project. */
+  assistant?: AssistantContext
 }
 
 /** One workbook question, saved automatically. Remount to reset its draft. */
-export function QuestionField({ question, answers, save, template, linkTo }: Props) {
+export function QuestionField({ question, answers, save, template, linkTo, assistant }: Props) {
   if (question.type === 'phase_gate') {
     return (
       <PhaseGateField
@@ -24,10 +27,18 @@ export function QuestionField({ question, answers, save, template, linkTo }: Pro
         save={save}
         template={template}
         linkTo={linkTo}
+        assistant={assistant}
       />
     )
   }
-  return <BasicQuestionField question={question} answer={answers.get(question.key)} save={save} />
+  return (
+    <BasicQuestionField
+      question={question}
+      answer={answers.get(question.key)}
+      save={save}
+      assistant={assistant}
+    />
+  )
 }
 
 type BasicQuestion = Exclude<Question, { type: 'phase_gate' }>
@@ -36,10 +47,12 @@ function BasicQuestionField({
   question,
   answer,
   save,
+  assistant,
 }: {
   question: BasicQuestion
   answer: Answer | undefined
   save: SaveAnswer
+  assistant?: AssistantContext
 }) {
   const { draft, update, status, retry } = useAnswerDraft(question, answer, save)
 
@@ -83,6 +96,15 @@ function BasicQuestionField({
         value={draft.text}
         onChange={(event) => update({ text: event.currentTarget.value })}
       />
+      {assistant && (
+        <AssistantPanel
+          assistant={assistant}
+          questionKey={question.key}
+          text={draft.text}
+          verdict={draft.verdict}
+          onApply={(text) => update({ text })}
+        />
+      )}
       <SaveIndicator status={status} onRetry={retry} />
     </QuestionCard>
   )

@@ -1,6 +1,7 @@
 import { Alert, Badge, Button, Group, Loader, Stack, Table, Text, Title } from '@mantine/core'
 
 import { useAdminAction, useAdminUsers, type AdminAction, type AdminUser } from '../api/admin'
+import { AISettingsCard } from '../components/AISettingsCard'
 import { useMe } from '../api/auth'
 import { formatDate, formatDateTime } from '../format'
 
@@ -36,6 +37,9 @@ export function AdminUsersPage() {
         </Text>
       </Stack>
 
+      <AISettingsCard />
+
+      <Title order={3}>Utenti</Title>
       {action.isError && <Alert color="red">{action.error.message}</Alert>}
       {users.isPending && <Loader />}
       {users.isError && <Alert color="red">{users.error.message}</Alert>}

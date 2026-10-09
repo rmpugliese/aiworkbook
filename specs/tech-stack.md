@@ -25,13 +25,13 @@ CORS, e cookie di sessione `SameSite=Lax`.
   CSS di stampa in `app/export/templates/`. Richiede Pango a livello di sistema (Homebrew arm64 su
   macOS, pacchetti `libpango` su Linux). DOCX con `python-docx`, se servirà.
 - **AI**: astrazione `LLMProvider` (Protocol) in `backend/app/ai/`
-  - primo adapter: **Anthropic**, con l'SDK ufficiale `anthropic`
-  - modello di default `claude-opus-5-5`, configurabile da env (`AI_MODEL`)
+  - adapter per endpoint **compatibili con l'API OpenAI** (`/chat/completions`) con `httpx`:
+    copre server locali (Ollama, LM Studio, vLLM) e remoti (OpenRouter, Mistral, OpenAI…)
+  - endpoint, modello e API key configurati dall'amministratore; chiave cifrata nel DB (Fernet,
+    `cryptography`, chiave derivata da `APP_SECRET_KEY`)
   - risposte in streaming verso il frontend (Server-Sent Events)
-  - fallback lato server in caso di rifiuto attivato di default (parametro `fallbacks`)
-  - altri provider (OpenAI, modelli locali) si aggiungono implementando lo stesso Protocol, senza
-    toccare il resto del codice
-  - le chiavi API stanno solo sul server; quote d'uso per utente registrate in DB
+  - altri protocolli si aggiungono implementando lo stesso Protocol
+  - consenso per progetto; registro delle richieste e limite orario per utente
 - **Test**: **pytest**, con `httpx` / `TestClient` di FastAPI; DB SQLite in memoria per ogni test
 - **Qualità**: **ruff** (lint e format), **mypy** in modalità strict sul package `app`
 

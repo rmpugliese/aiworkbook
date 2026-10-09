@@ -18,6 +18,7 @@ import {
 import { useCallback, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router'
 
+import { useAIStatus } from '../api/ai'
 import { useAnswers, useSaveAnswer, type AnswerIn } from '../api/answers'
 import {
   exportPdfUrl,
@@ -70,6 +71,7 @@ export function IterationPage() {
   const [searchParams] = useSearchParams()
 
   const project = useProject(projectId)
+  const aiStatus = useAIStatus()
   const iteration = useIteration(projectId, iterationId)
   const template = useTemplate(iteration.data?.template_version ?? 0)
   const answers = useAnswers(projectId, iterationId)
@@ -93,6 +95,8 @@ export function IterationPage() {
     return <Loader my="xl" />
   }
 
+  const assistant =
+    aiStatus.data?.available && project.data.ai_enabled_at ? { projectId, iterationId } : undefined
   const tasks = flattenTasks(template.data)
   const showSummary = searchParams.get('task') === 'summary'
   const requested = tasks.findIndex((ref) => ref.path === searchParams.get('task'))
@@ -187,6 +191,7 @@ export function IterationPage() {
               save={save}
               linkTo={linkTo}
               template={template.data}
+              assistant={assistant}
             />
           )}
         </Grid.Col>

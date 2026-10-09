@@ -129,7 +129,26 @@ dal proprio computer.
 
 ---
 
-## Fase 7: Condivisione in sola lettura
+## Fase 7: Assistente AI (Completata)
+
+**Obiettivo:** un modello linguistico, locale o remoto, aiuta a compilare e a migliorare i singoli
+campi, solo quando l'utente lo chiede.
+
+- [x] Adapter per endpoint compatibili con l'API OpenAI (Ollama, LM Studio, vLLM, OpenRouter,
+      Mistral, OpenAI…): URL base, API key, modello; risposte in streaming
+- [x] Configurazione dall'amministratore, con chiave cifrata nel database e prova di connessione
+- [x] Consenso per progetto: l'assistente è spento finché il proprietario non lo attiva, con
+      l'indicazione di dove finiscono i dati (endpoint locale o remoto)
+- [x] Azioni sul campo: **Suggerisci** una bozza, **Migliora** il testo, **Critica** con lacune e
+      domande; contesto dal template, dalla user story e dalle risposte già date
+- [x] Interfaccia: proposta in anteprima, Sostituisci / Aggiungi / Scarta (nessuna
+      sovrascrittura automatica)
+- [x] Registro delle richieste e limite orario per utente
+- [x] Provider finto nei test; nessuna chiamata reale nei test automatici
+
+---
+
+## Fase 8: Condivisione in sola lettura
 
 **Obiettivo:** il consulente condivide un'iterazione con il cliente.
 
@@ -138,21 +157,6 @@ dal proprio computer.
 - [ ] Scadenza opzionale; link revocato o scaduto restituisce 404
 - [ ] Test: il link non permette modifiche, un link revocato non funziona, il token non è
       indovinabile
-
----
-
-## Fase 8: Assistente AI
-
-**Obiettivo:** aiuto alla compilazione su richiesta dell'utente.
-
-- [ ] Protocol `LLMProvider` e adapter Anthropic (SDK ufficiale, streaming, fallback lato server)
-- [ ] Azione **Suggerisci**: bozza basata sulla guida del task e sulle risposte già date nel
-      progetto
-- [ ] Azione **Rifinisci**: migliora un testo scritto dall'utente, mantenendone il contenuto
-- [ ] Interfaccia: anteprima della proposta, confronto con il testo attuale, Accetta / Scarta
-      (nessuna sovrascrittura automatica)
-- [ ] Registrazione in `ai_usage` e quota giornaliera per utente
-- [ ] Provider finto per i test; nessuna chiamata reale nei test automatici
 
 ---
 

@@ -11,7 +11,11 @@ export class ApiError extends Error {
   }
 }
 
-async function errorFrom(response: Response, method: string, path: string): Promise<ApiError> {
+export async function errorFrom(
+  response: Response,
+  method: string,
+  path: string,
+): Promise<ApiError> {
   let message = `${method} ${path} failed with ${response.status}`
   try {
     const body: unknown = await response.json()
@@ -42,7 +46,7 @@ function readCsrfCookie(): string | undefined {
 }
 
 /** The backend sets the CSRF cookie on request; every unsafe request echoes it in a header. */
-async function csrfToken(): Promise<string> {
+export async function csrfToken(): Promise<string> {
   if (!readCsrfCookie()) await fetch('/api/auth/csrf')
   return readCsrfCookie() ?? ''
 }
