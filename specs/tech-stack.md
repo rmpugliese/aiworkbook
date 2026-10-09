@@ -66,8 +66,9 @@ backend/
   supporto i18n, così non si costruisce un design system da zero. Tema in `src/theme.ts`: font
   **Inter** (`@fontsource-variable/inter`, servito dall'app), icone **Tabler**
   (`@tabler/icons-react`), colore primario preso dal marchio dell'utente
-- **Editor dei campi**: per ora textarea con autosize; un editor ricco (Markdown) si valuterà in
-  una fase successiva
+- **Campi in Markdown**: lettura impaginata con `react-markdown` + `remark-gfm` (tabelle, niente
+  HTML), modifica come testo con una barra di formattazione; nel PDF e nella pagina condivisa
+  `markdown-it-py` con HTML disattivato. Un a capo singolo resta un a capo
 - **Test**: **Vitest** e **Testing Library**; **Playwright** per i test end-to-end a partire dalla
   fase di compilazione
 - **Qualità**: **oxlint** (il linter predefinito del template Vite), Prettier e `tsc -b` come

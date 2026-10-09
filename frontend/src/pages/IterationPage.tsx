@@ -13,7 +13,6 @@ import {
   ScrollArea,
   Stack,
   Text,
-  Textarea,
   Title,
 } from '@mantine/core'
 import { IconChevronRight, IconDownload, IconShare } from '@tabler/icons-react'
@@ -33,6 +32,7 @@ import { useTemplate } from '../api/template'
 import { ShareModal } from '../components/ShareModal'
 import { formatDateTime } from '../format'
 import { GoNoGoSummary } from '../workbook/GoNoGoSummary'
+import { MarkdownField } from '../workbook/MarkdownField'
 import { TaskView } from '../workbook/TaskView'
 import { WorkbookNav } from '../workbook/WorkbookNav'
 import { flattenTasks, phaseProgress } from '../workbook/structure'
@@ -44,13 +44,13 @@ function UserStoryEditor({ projectId, iteration }: { projectId: number; iteratio
 
   return (
     <Stack gap="xs">
-      <Textarea
+      <MarkdownField
         label="User story dell'iterazione"
+        ariaLabel="User story dell'iterazione"
         description="Il riferimento di tutte le fasi del workbook per questa iterazione."
-        autosize
         minRows={2}
         value={value}
-        onChange={(event) => setValue(event.currentTarget.value)}
+        onChange={setValue}
       />
       {update.isError && <Alert color="red">{update.error.message}</Alert>}
       <Group justify="flex-end">

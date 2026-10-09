@@ -187,6 +187,17 @@ campi, solo quando l'utente lo chiede.
 
 ---
 
+## Fase 11: Campi in Markdown (Completata)
+
+**Obiettivo:** risposte con elenchi e tabelle, leggibili nell'app, nel PDF e nella pagina condivisa.
+
+- [x] Campi in Markdown con lettura impaginata e barra di formattazione
+- [x] Markdown nel PDF e nella pagina condivisa, senza HTML
+- [x] Assistente AI in Markdown semplice
+- [x] Test: tabelle e a capo, HTML neutralizzato, editor e proposta dell'assistente
+
+---
+
 ## Più avanti (non pianificato)
 
 - Storico delle revisioni delle risposte

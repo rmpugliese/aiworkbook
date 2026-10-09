@@ -80,6 +80,10 @@ La configurazione del backend si legge da variabili d'ambiente con prefisso `APP
 3. Su ogni campo, il menu "Assistente": Suggerisci una bozza, Migliora il testo, Critica e
    domande. Nulla viene applicato senza "Sostituisci" o "Aggiungi in fondo".
 
+Le risposte si scrivono in Markdown (elenchi, tabelle, grassetto) con una barra di
+formattazione; un campo compilato si legge impaginato e si apre con un clic. PDF e pagina
+condivisa mostrano la stessa impaginazione.
+
 ## Condivisione con il cliente
 
 Nella pagina dell'iterazione, "Condividi" crea un link in sola lettura per un destinatario, con

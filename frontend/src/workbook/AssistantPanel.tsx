@@ -1,7 +1,7 @@
 import { Alert, Button, Group, Loader, Menu, Paper, Stack, Text } from '@mantine/core'
 
 import { useAssist, type AssistAction } from '../api/ai'
-import { plainText } from './plainText'
+import { Markdown } from './Markdown'
 
 export type AssistantContext = { projectId: number; iterationId: number }
 
@@ -24,7 +24,7 @@ type Props = {
 export function AssistantPanel({ assistant, questionKey, text, verdict, onApply }: Props) {
   const { state, run, stop, reset } = useAssist(assistant.projectId, assistant.iterationId)
   const ask = (action: AssistAction) => run({ questionKey, action, text, verdict })
-  const proposal = state.status === 'idle' ? '' : plainText(state.text).trim()
+  const proposal = state.status === 'idle' ? '' : state.text.trim()
   const appliable = state.status === 'done' && state.action !== 'review' && proposal
 
   return (
@@ -60,11 +60,7 @@ export function AssistantPanel({ assistant, questionKey, text, verdict, onApply 
               </Text>
               {state.status === 'streaming' && <Loader size="xs" />}
             </Group>
-            {proposal && (
-              <Text size="sm" style={{ whiteSpace: 'pre-wrap' }}>
-                {proposal}
-              </Text>
-            )}
+            {proposal && <Markdown text={proposal} />}
             {state.status === 'error' && <Alert color="red">{state.message}</Alert>}
             <Group gap="xs" justify="flex-end">
               {state.status === 'streaming' && (

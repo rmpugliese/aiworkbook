@@ -1,10 +1,11 @@
-import { Checkbox, Stack, Textarea } from '@mantine/core'
+import { Checkbox, Stack } from '@mantine/core'
 
 import type { Answer } from '../api/answers'
 import type { Question, Template } from '../api/template'
 import { QuestionCard, SaveIndicator, VerdictControl } from './AnswerControls'
 import { useAnswerDraft, type SaveAnswer } from './useAnswerDraft'
 import { AssistantPanel, type AssistantContext } from './AssistantPanel'
+import { MarkdownField } from './MarkdownField'
 import { PhaseGateField } from './PhaseGateField'
 
 type Props = {
@@ -80,8 +81,8 @@ function BasicQuestionField({
         />
       )}
 
-      <Textarea
-        aria-label={
+      <MarkdownField
+        ariaLabel={
           question.type === 'text' ? question.prompt : `Note e motivazione: ${question.prompt}`
         }
         placeholder={
@@ -91,10 +92,9 @@ function BasicQuestionField({
               ? 'Note (facoltative)…'
               : 'Motivazione…'
         }
-        autosize
         minRows={question.type === 'text' ? 4 : 2}
         value={draft.text}
-        onChange={(event) => update({ text: event.currentTarget.value })}
+        onChange={(text) => update({ text })}
       />
       {assistant && (
         <AssistantPanel

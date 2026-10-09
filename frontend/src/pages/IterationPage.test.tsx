@@ -148,6 +148,10 @@ describe('IterationPage', () => {
     renderRoutes(routes, '/projects/1/iterations/10?task=2.quality.verify')
 
     expect(await screen.findByRole('heading', { name: 'Verifica qualità' })).toBeInTheDocument()
+    // A stored answer opens formatted; a click edits it.
+    const view = screen.getByRole('button', { name: /Modifica: Note e motivazione/ })
+    expect(view).toHaveTextContent('Dati incompleti')
+    await user().click(view)
     expect(screen.getByRole('textbox', { name: /Note e motivazione/ })).toHaveValue(
       'Dati incompleti',
     )

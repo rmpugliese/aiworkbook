@@ -44,6 +44,23 @@ h3 { font-size: 12pt; margin: 7mm 0 2mm; color: #2f6f4f; break-after: avoid; }
 .question { margin: 0 0 4mm; padding: 3mm 4mm; border-left: 2px solid #d9d9d4; break-inside: avoid-page; }
 .prompt { font-weight: 600; margin: 0 0 1.5mm; }
 .answer-text { white-space: pre-wrap; margin: 1mm 0 0; }
+
+/* Answers in Markdown. Tables stay within the A4 width: smaller text, wrapping cells. */
+.md { margin: 1mm 0 0; overflow-wrap: anywhere; }
+.md > :first-child { margin-top: 0; }
+.md > :last-child { margin-bottom: 0; }
+.md p { margin: 0 0 2mm; }
+.md ul, .md ol { margin: 0 0 2mm; padding-left: 6mm; }
+.md li { margin: 0.5mm 0; }
+.md h1, .md h2, .md h3, .md h4, .md h5, .md h6 { font-size: 10.5pt; color: inherit; margin: 3mm 0 1.5mm; break-after: avoid; }
+.md table { width: 100%; table-layout: auto; margin: 1mm 0 3mm; font-size: 8.5pt; break-inside: auto; }
+.md th, .md td { border: 1px solid #d9d9d4; padding: 1.2mm 1.8mm; vertical-align: top; }
+.md th { background: #f4f4f1; color: #1d1d1b; font-size: 8.5pt; }
+.md tr { break-inside: avoid; }
+.md code { font-family: "DejaVu Sans Mono", Menlo, monospace; font-size: 8.5pt; background: #f4f4f1; padding: 0 1mm; border-radius: 1mm; }
+.md pre { white-space: pre-wrap; background: #f4f4f1; padding: 2mm; border-radius: 1mm; }
+.md blockquote { margin: 0 0 2mm; padding-left: 3mm; border-left: 2px solid #d9d9d4; color: #555; }
+.md a { color: inherit; }
 .missing { color: #999; font-style: italic; margin: 0; }
 .chosen, .criteria { margin: 1mm 0; padding-left: 5mm; }
 .criteria { list-style: none; padding-left: 0; }
@@ -90,4 +107,7 @@ th { font-size: 9pt; color: #555; }
   .verdict { font-size: 12px; }
   .table-wrap { overflow-x: auto; }
   .matrix, .phases { min-width: 560px; }
+  .md table { display: block; overflow-x: auto; font-size: 14px; }
+  .md th, .md td { padding: 6px 10px; }
+  .md code { font-size: 14px; }
 }

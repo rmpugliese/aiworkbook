@@ -8,6 +8,7 @@ from urllib.parse import quote
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
+from app.export.markdown import render_markdown
 from app.export.report import VERDICT_LABEL, Report
 
 TEMPLATES_DIR = Path(__file__).parent / "templates"
@@ -16,13 +17,16 @@ APP_NAME = "AI Project Workbook"
 
 @cache
 def _environment() -> Environment:
-    # Autoescape: answers are user input and must never become markup.
-    return Environment(
+    # Autoescape: answers are user input and must never become markup, except through the
+    # Markdown filter, which escapes any HTML they contain.
+    environment = Environment(
         loader=FileSystemLoader(TEMPLATES_DIR),
         autoescape=select_autoescape(["html", "j2"]),
         trim_blocks=True,
         lstrip_blocks=True,
     )
+    environment.filters["markdown"] = render_markdown
+    return environment
 
 
 @dataclass(frozen=True)

@@ -1,4 +1,4 @@
-import { Alert, Checkbox, Select, Stack, Text, Textarea } from '@mantine/core'
+import { Alert, Checkbox, Select, Stack, Text } from '@mantine/core'
 
 import type { Answer, Verdict } from '../api/answers'
 import type { Template } from '../api/template'
@@ -6,6 +6,7 @@ import { QuestionCard, SaveIndicator, VerdictControl } from './AnswerControls'
 import { useAnswerDraft, type SaveAnswer } from './useAnswerDraft'
 import { AssistantPanel, type AssistantContext } from './AssistantPanel'
 import { FactorMatrix } from './FactorMatrix'
+import { MarkdownField } from './MarkdownField'
 import {
   factorMatrix,
   gateSuggestion,
@@ -158,15 +159,14 @@ export function PhaseGateField({ question, answers, save, template, linkTo, assi
         </Alert>
       )}
 
-      <Textarea
+      <MarkdownField
         label="Motivazione"
-        aria-label={`Note e motivazione: ${question.prompt}`}
+        ariaLabel={`Note e motivazione: ${question.prompt}`}
         placeholder="Motivazione…"
-        autosize
         minRows={2}
         value={draft.text}
         error={needsReason ? 'Serve una motivazione per lo scostamento' : undefined}
-        onChange={(event) => update({ text: event.currentTarget.value })}
+        onChange={(text) => update({ text })}
       />
       {assistant && (
         <AssistantPanel

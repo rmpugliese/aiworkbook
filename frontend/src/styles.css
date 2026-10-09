@@ -17,3 +17,50 @@ body {
   box-shadow: var(--mantine-shadow-sm);
   transform: translateY(-1px);
 }
+
+/* A Markdown answer shown formatted: looks like the field it opens into. */
+.markdown-view {
+  position: relative;
+  padding: 8px 32px 8px 12px;
+  border: 1px solid var(--mantine-color-gray-4);
+  border-radius: var(--mantine-radius-md);
+  background: var(--mantine-color-white);
+  cursor: text;
+  transition: border-color 120ms ease;
+}
+.markdown-view:hover,
+.markdown-view:focus-visible {
+  border-color: var(--mantine-color-brand-5);
+  outline: none;
+}
+.markdown-view-pencil {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: var(--mantine-color-gray-5);
+}
+.markdown-view:hover .markdown-view-pencil {
+  color: var(--mantine-color-brand-6);
+}
+
+/* Formatted answers: compact, within a field rather than an article. */
+.markdown {
+  font-size: var(--mantine-font-size-sm);
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+.markdown > :first-child {
+  margin-top: 0;
+}
+.markdown > :last-child {
+  margin-bottom: 0;
+}
+.markdown p,
+.markdown ul,
+.markdown ol {
+  margin-block: 0 0.5em;
+}
+.markdown table {
+  font-size: var(--mantine-font-size-xs);
+  margin-block: 0.25em 0.75em;
+}
