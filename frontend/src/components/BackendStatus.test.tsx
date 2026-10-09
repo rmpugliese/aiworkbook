@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
 import { mockApi } from '../test/api'
@@ -10,13 +10,14 @@ function renderStatus() {
 }
 
 describe('BackendStatus', () => {
-  it('shows the backend as online when the health check succeeds', async () => {
-    mockApi({
+  it('stays silent when the backend is healthy', async () => {
+    const calls = mockApi({
       'GET /api/health': Response.json({ status: 'ok', version: '0.1.0', database: 'ok' }),
     })
     renderStatus()
 
-    expect(await screen.findByText('Backend online')).toBeInTheDocument()
+    await waitFor(() => expect(calls.some((c) => c.path === '/api/health')).toBe(true))
+    expect(screen.queryByText(/Backend/)).toBeNull()
   })
 
   it('warns when the database is unreachable', async () => {

@@ -33,9 +33,9 @@ export function SaveIndicator({ status, onRetry }: { status: SaveStatus; onRetry
 /** The bordered frame of a question: prompt, help, then the question's own controls. */
 export function QuestionCard({ question, children }: { question: Question; children: ReactNode }) {
   return (
-    <Paper withBorder p="md" component="section" aria-labelledby={`q-${question.key}`}>
+    <Paper withBorder p="lg" component="section" aria-labelledby={`q-${question.key}`}>
       <Stack gap="sm">
-        <Text fw={600} id={`q-${question.key}`}>
+        <Text fw={600} size="md" id={`q-${question.key}`}>
           {question.prompt}
         </Text>
         <Text size="sm" c="dimmed">

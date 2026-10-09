@@ -9,6 +9,15 @@
   <title>{{ r.project_name }} · {{ r.iteration_number }}. {{ r.iteration_title }}</title>
   {#- Our own stylesheet: trusted, and entities are not decoded inside <style>. #}
   <style>{{ css | safe }}</style>
+  {%- if r.branding.color %}
+  {#- A validated #rrggbb value: safe inside the stylesheet. #}
+  <style>
+    h2, .doc-title { color: {{ r.branding.color }}; }
+    .share-bar { background: {{ r.branding.color }}; }
+    .share-bar .button { color: {{ r.branding.color }}; }
+    .toc a { color: {{ r.branding.color }}; }
+  </style>
+  {%- endif %}
 </head>
 <body>
 {%- if shared %}
@@ -26,6 +35,9 @@
 {%- endmacro %}
 
 <section class="cover">
+  {%- if r.branding.logo %}
+  <img class="brand-logo" src="{{ r.branding.logo }}" alt="Logo">
+  {%- endif %}
   <p class="app-name">{{ app_name }}</p>
   <h1 class="doc-title">{{ r.template_title }}</h1>
   <p class="project-name" id="running-project">{{ r.project_name }}</p>

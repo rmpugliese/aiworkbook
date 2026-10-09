@@ -14,6 +14,8 @@ export const USER = {
   has_password: true,
   google_linked: false,
   is_admin: false,
+  brand_color: null,
+  logo_url: null,
 }
 
 /** Signed in, CSRF available, no Google: override any of these per test. */

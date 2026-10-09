@@ -21,6 +21,7 @@ h3 { font-size: 12pt; margin: 7mm 0 2mm; color: #2f6f4f; break-after: avoid; }
 
 /* Cover */
 .cover { height: 240mm; display: flex; flex-direction: column; justify-content: center; break-after: page; }
+.brand-logo { display: block; height: 22mm; width: auto; max-width: 90mm; object-fit: contain; object-position: left; margin-bottom: 14mm; }
 .app-name { font-size: 11pt; color: #666; letter-spacing: 0.04em; text-transform: uppercase; margin: 0; }
 .doc-title { font-size: 28pt; margin: 4mm 0 10mm; color: #1d3c5a; }
 .project-name { font-size: 20pt; font-weight: 600; margin: 0 0 8mm; }

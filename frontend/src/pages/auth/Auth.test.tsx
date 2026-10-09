@@ -30,7 +30,7 @@ describe('authentication', () => {
 
     expect(await screen.findByRole('heading', { name: 'Churn', level: 1 })).toBeInTheDocument()
     // The header stays mounted across the sign-in and must show the user too.
-    expect(screen.getByRole('button', { name: 'Ada Consulente' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Menu di Ada Consulente' })).toBeInTheDocument()
     expect(calls.find((c) => c.method === 'POST')?.body).toEqual({
       email: 'consulente@example.com',
       password: 'una-password',
@@ -137,7 +137,7 @@ describe('authentication', () => {
     const user = userEvent.setup()
     renderRoutes(routes, '/')
 
-    await user.click(await screen.findByRole('button', { name: 'Ada Consulente' }))
+    await user.click(await screen.findByRole('button', { name: 'Menu di Ada Consulente' }))
     await user.click(await screen.findByRole('menuitem', { name: 'Esci' }))
 
     expect(await screen.findByRole('heading', { name: 'Accedi' })).toBeInTheDocument()

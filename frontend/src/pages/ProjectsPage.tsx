@@ -3,64 +3,141 @@ import {
   Badge,
   Button,
   Card,
+  Divider,
   Group,
   Loader,
+  SegmentedControl,
   SimpleGrid,
   Stack,
-  Switch,
   Text,
+  ThemeIcon,
   Title,
 } from '@mantine/core'
+import {
+  IconArchive,
+  IconBuilding,
+  IconClock,
+  IconFolder,
+  IconPlus,
+  IconStack2,
+} from '@tabler/icons-react'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 
 import { useCreateProject, useProjects, type ProjectSummary } from '../api/projects'
+import { PageHeader } from '../components/PageHeader'
 import { ProjectFormModal } from '../components/ProjectFormModal'
-import { formatDateTime, iterationLabel } from '../format'
+import { formatDate, iterationLabel } from '../format'
 
 function ProjectCard({ project }: { project: ProjectSummary }) {
   return (
-    <Card component={Link} to={`/projects/${project.id}`} withBorder padding="lg">
-      <Group justify="space-between" align="flex-start" wrap="nowrap">
-        <Text fw={600}>{project.name}</Text>
-        {project.archived_at && <Badge color="gray">Archiviato</Badge>}
-      </Group>
-      <Text size="sm" c="dimmed">
-        {project.client_name ?? 'Nessun cliente indicato'}
-      </Text>
-      <Text size="sm" mt="sm">
-        {iterationLabel(project.iteration_count)} · modificato il{' '}
-        {formatDateTime(project.updated_at)}
-      </Text>
+    <Card component={Link} to={`/projects/${project.id}`} className="card-link">
+      <Stack gap="sm" h="100%">
+        <Group justify="space-between" align="flex-start" wrap="nowrap">
+          <Group gap="sm" wrap="nowrap" style={{ minWidth: 0 }}>
+            <ThemeIcon variant="light" size={38} radius="md">
+              <IconFolder size={20} stroke={1.7} />
+            </ThemeIcon>
+            <div style={{ minWidth: 0 }}>
+              <Text fw={600} lineClamp={2}>
+                {project.name}
+              </Text>
+              <Group gap={4} c="dimmed" wrap="nowrap">
+                <IconBuilding size={14} stroke={1.7} />
+                <Text size="sm" truncate>
+                  {project.client_name ?? 'Nessun cliente indicato'}
+                </Text>
+              </Group>
+            </div>
+          </Group>
+          {project.archived_at && (
+            <Badge color="gray" leftSection={<IconArchive size={12} />}>
+              Archiviato
+            </Badge>
+          )}
+        </Group>
+        {project.description && (
+          <Text size="sm" c="dimmed" lineClamp={2}>
+            {project.description}
+          </Text>
+        )}
+        <Divider mt="auto" />
+        <Group gap="lg" c="dimmed">
+          <Group gap={6}>
+            <IconStack2 size={15} stroke={1.7} />
+            <Text size="xs">{iterationLabel(project.iteration_count)}</Text>
+          </Group>
+          <Group gap={6}>
+            <IconClock size={15} stroke={1.7} />
+            <Text size="xs">Modificato il {formatDate(project.updated_at)}</Text>
+          </Group>
+        </Group>
+      </Stack>
+    </Card>
+  )
+}
+
+function EmptyState({ archived, onCreate }: { archived: boolean; onCreate: () => void }) {
+  return (
+    <Card py={48}>
+      <Stack align="center" gap="sm" ta="center">
+        <ThemeIcon variant="light" size={56} radius="xl">
+          {archived ? (
+            <IconArchive size={28} stroke={1.5} />
+          ) : (
+            <IconFolder size={28} stroke={1.5} />
+          )}
+        </ThemeIcon>
+        <Title order={3}>{archived ? 'Nessun progetto archiviato' : 'Nessun progetto'}</Title>
+        <Text c="dimmed" maw={420}>
+          {archived
+            ? 'I progetti che archivi compaiono qui e si possono ripristinare in qualsiasi momento.'
+            : 'Non hai ancora progetti. Crea il primo per iniziare a compilare il workbook.'}
+        </Text>
+        {!archived && (
+          <Button mt="xs" leftSection={<IconPlus size={16} />} onClick={onCreate}>
+            Crea il primo progetto
+          </Button>
+        )}
+      </Stack>
     </Card>
   )
 }
 
 export function ProjectsPage() {
-  const [showArchived, setShowArchived] = useState(false)
+  const [view, setView] = useState<'active' | 'archived'>('active')
   const [creating, setCreating] = useState(false)
+  const showArchived = view === 'archived'
   const projects = useProjects(showArchived)
   const createProject = useCreateProject()
   const navigate = useNavigate()
 
+  function startCreating() {
+    createProject.reset()
+    setCreating(true)
+  }
+
   return (
     <Stack gap="lg" py="xl">
-      <Group justify="space-between">
-        <Title order={1}>Progetti</Title>
-        <Button
-          onClick={() => {
-            createProject.reset()
-            setCreating(true)
-          }}
-        >
-          Nuovo progetto
-        </Button>
-      </Group>
+      <PageHeader
+        title="Progetti"
+        subtitle="I tuoi progetti di intelligenza artificiale, un workbook per ogni iterazione."
+        actions={
+          <Button leftSection={<IconPlus size={16} />} onClick={startCreating}>
+            Nuovo progetto
+          </Button>
+        }
+      />
 
-      <Switch
-        label="Mostra archiviati"
-        checked={showArchived}
-        onChange={(event) => setShowArchived(event.currentTarget.checked)}
+      <SegmentedControl
+        w="fit-content"
+        value={view}
+        onChange={(value) => setView(value as 'active' | 'archived')}
+        data={[
+          { value: 'active', label: 'Attivi' },
+          { value: 'archived', label: 'Archiviati' },
+        ]}
+        aria-label="Progetti da mostrare"
       />
 
       {projects.isPending && <Loader />}
@@ -70,14 +147,10 @@ export function ProjectsPage() {
         </Alert>
       )}
       {projects.data?.length === 0 && (
-        <Text c="dimmed">
-          {showArchived
-            ? 'Nessun progetto archiviato.'
-            : 'Non hai ancora progetti. Crea il primo per iniziare a compilare il workbook.'}
-        </Text>
+        <EmptyState archived={showArchived} onCreate={startCreating} />
       )}
       {projects.data && projects.data.length > 0 && (
-        <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
+        <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
           {projects.data.map((project) => (
             <ProjectCard key={project.id} project={project} />
           ))}

@@ -1,4 +1,5 @@
 import { Badge, Group, NavLink, Stack, Text } from '@mantine/core'
+import { IconCircleCheckFilled, IconGauge } from '@tabler/icons-react'
 import { useEffect, useRef } from 'react'
 import { Link } from 'react-router'
 
@@ -29,6 +30,7 @@ export function WorkbookNav({ template, answers, activePath, linkTo }: Props) {
         component={Link}
         to={linkTo('summary')}
         label="Riepilogo Go/No-Go"
+        leftSection={<IconGauge size={18} stroke={1.7} />}
         active={activePath === 'summary'}
         fw={500}
       />
@@ -82,9 +84,11 @@ export function WorkbookNav({ template, answers, activePath, linkTo }: Props) {
                       active={path === activePath}
                       rightSection={
                         done ? (
-                          <Text size="xs" c="green" aria-label="completato">
-                            ✓
-                          </Text>
+                          <IconCircleCheckFilled
+                            size={16}
+                            color="var(--mantine-color-green-6)"
+                            aria-label="completato"
+                          />
                         ) : total > 0 && answered > 0 ? (
                           <Text size="xs" c="dimmed">
                             {answered}/{total}

@@ -65,7 +65,7 @@ describe('AdminUsersPage', () => {
     const user = userEvent.setup()
     renderRoutes(routes, '/')
 
-    await user.click(await screen.findByRole('button', { name: 'Ada Consulente' }))
+    await user.click(await screen.findByRole('button', { name: 'Menu di Ada Consulente' }))
     expect(await screen.findByRole('menuitem', { name: 'Esci' })).toBeInTheDocument()
     expect(screen.queryByRole('menuitem', { name: 'Amministrazione' })).toBeNull()
   })

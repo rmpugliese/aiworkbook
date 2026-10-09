@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.export.report import Report, build_report
 from app.services.answers import list_answers
+from app.services.branding import project_branding
 from app.services.projects import get_iteration, get_project
 from app.workbook.loader import load_template
 
@@ -19,4 +20,5 @@ def iteration_report(
         template=load_template(iteration.template_version),
         answers=list_answers(db, project_id, iteration_id, owner_id=owner_id),
         generated_at=generated_at,
+        branding=project_branding(db, project),
     )

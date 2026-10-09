@@ -51,9 +51,12 @@ def render_not_found() -> str:
 
 def render_pdf(report: Report) -> bytes:
     # Imported here: WeasyPrint needs system libraries (Pango) that only PDF generation uses.
-    from weasyprint import HTML
+    from weasyprint import HTML, URLFetcher
 
-    pdf: bytes = HTML(string=render_html(report)).write_pdf()
+    # Everything the report needs is inline (CSS, logo as a data: URI): never go online or read
+    # local files, whatever a user-supplied image might reference.
+    offline = URLFetcher(allowed_protocols=["data"])
+    pdf: bytes = HTML(string=render_html(report), url_fetcher=offline).write_pdf()
     return pdf
 
 

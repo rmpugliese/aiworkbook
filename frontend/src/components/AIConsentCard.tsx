@@ -13,7 +13,7 @@ export function AIConsentCard({ project }: { project: Project }) {
 
   if (!status.data?.available) {
     return (
-      <Card withBorder padding="lg">
+      <Card>
         <Title order={4}>Assistente AI</Title>
         <Text size="sm" c="dimmed">
           L'assistente non è configurato: l'amministratore può collegarlo a un modello locale o
@@ -25,7 +25,7 @@ export function AIConsentCard({ project }: { project: Project }) {
   const { model, host, location } = status.data
 
   return (
-    <Card withBorder padding="lg">
+    <Card>
       <Group justify="space-between" align="flex-start">
         <Stack gap={4}>
           <Group gap="xs">

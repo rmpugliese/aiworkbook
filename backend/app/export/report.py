@@ -63,6 +63,14 @@ class FactorView:
 
 
 @dataclass(frozen=True)
+class Branding:
+    """The project owner's brand: a logo as a data: URI and a main colour, both optional."""
+
+    logo: str | None = None
+    color: str | None = None
+
+
+@dataclass(frozen=True)
 class Report:
     project_name: str
     client_name: str | None
@@ -76,6 +84,7 @@ class Report:
     factor_groups: list[tuple[str, list[FactorView]]]
     phase_one: PhaseOneOutcome
     phases: list[PhaseView]
+    branding: Branding = Branding()
 
     @property
     def phase_one_decided(self) -> Verdict | None:
@@ -88,6 +97,7 @@ def build_report(
     template: Template,
     answers: list[Answer],
     generated_at: datetime,
+    branding: Branding | None = None,
 ) -> Report:
     by_key = {answer.question_key: answer for answer in answers}
     phase_titles = {
@@ -150,6 +160,7 @@ def build_report(
         factor_groups=factor_groups,
         phase_one=phase_one_outcome(template, {k: a.verdict for k, a in by_key.items()}),
         phases=phases,
+        branding=branding or Branding(),
     )
 
 
