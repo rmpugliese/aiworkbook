@@ -9,6 +9,8 @@ import {
   VerifyEmailPage,
 } from './pages/auth/EmailPages'
 import { LoginPage } from './pages/auth/LoginPage'
+import { PrivacyPage } from './pages/legal/PrivacyPage'
+import { TermsPage } from './pages/legal/TermsPage'
 import { RegisterPage } from './pages/auth/RegisterPage'
 import { AdminUsersPage } from './pages/AdminUsersPage'
 import { IterationPage } from './pages/IterationPage'
@@ -26,6 +28,8 @@ export const routes: RouteObject[] = [
       { path: 'verify-email', element: <VerifyEmailPage /> },
       { path: 'forgot-password', element: <ForgotPasswordPage /> },
       { path: 'reset-password', element: <ResetPasswordPage /> },
+      { path: 'privacy', element: <PrivacyPage /> },
+      { path: 'terms', element: <TermsPage /> },
       {
         element: <RequireAuth />,
         children: [

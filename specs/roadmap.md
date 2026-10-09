@@ -172,15 +172,18 @@ campi, solo quando l'utente lo chiede.
 
 ---
 
-## Fase 10: Preparazione al rilascio pubblico
+## Fase 10: Preparazione al rilascio pubblico (Pronta per il deploy)
 
 **Obiettivo:** rendere l'app sicura e conforme per utenti esterni.
 
-- [ ] Privacy policy, termini d'uso, consenso; export e cancellazione dei dati dell'utente (GDPR)
-- [ ] Revisione di sicurezza (OWASP), header di sicurezza, rate limiting globale
-- [ ] Scelta del nome dell'app e verifica dei testi rispetto alla politica sui contenuti
-- [ ] Deploy su PostgreSQL, CI su GitHub Actions, backup
-- [ ] Monitoraggio degli errori
+- [x] Privacy policy, termini d'uso, consenso; export e cancellazione dei dati dell'utente (GDPR)
+      — bozze da far rivedere da un legale
+- [x] Revisione di sicurezza (OWASP), header di sicurezza, rate limiting globale
+- [x] Scelta del nome dell'app e verifica dei testi rispetto alla politica sui contenuti
+- [x] PostgreSQL, container, CI su GitHub Actions, backup — pronti; il deploy sul server resta
+      da fare
+- [x] Monitoraggio degli errori (log JSON, healthcheck)
+- [ ] Deploy su una VPS europea, dominio, SMTP, credenziali Google reali, revisione legale
 
 ---
 

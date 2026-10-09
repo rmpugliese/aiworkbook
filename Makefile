@@ -1,4 +1,4 @@
-.PHONY: install dev dev-backend dev-frontend test e2e lint format gen-api migrate
+.PHONY: install dev dev-backend dev-frontend test test-postgres e2e lint format gen-api migrate build
 
 # WeasyPrint loads Pango at runtime. On Apple Silicon it comes from Homebrew in /opt/homebrew
 # (an Intel install in /usr/local or MacPorts has the wrong architecture). macOS strips DYLD_*
@@ -28,6 +28,12 @@ test:
 	$(BACKEND) uv run pytest
 	$(FRONTEND) npm test
 
+# The backend tests on PostgreSQL. Needs a running server and an empty database, e.g.
+# createdb cpmai_test; override with PG_TEST_URL=postgresql+psycopg://user:pass@host/db.
+PG_TEST_URL ?= postgresql+psycopg://localhost/cpmai_test
+test-postgres:
+	$(BACKEND) APP_TEST_DATABASE_URL=$(PG_TEST_URL) uv run pytest
+
 # End-to-end tests on their own servers and throwaway database (see frontend/playwright.config.ts).
 e2e:
 	$(FRONTEND) npm run e2e
@@ -47,3 +53,7 @@ gen-api:
 
 migrate:
 	$(BACKEND) uv run alembic upgrade head
+
+# The production image (needs Docker): see DEPLOY.md.
+build:
+	docker build -t ai-project-workbook:latest .

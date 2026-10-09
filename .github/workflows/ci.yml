@@ -1,0 +1,93 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: cpmai_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U ci" --health-interval 5s --health-timeout 5s --health-retries 10
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - name: System libraries for WeasyPrint
+        run: sudo apt-get update && sudo apt-get install -y libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.9.16"
+      - run: uv sync --frozen
+      - name: Lint and types
+        run: uv run ruff check . && uv run ruff format --check . && uv run mypy app tests
+      - name: Tests on SQLite
+        run: uv run pytest
+      - name: Tests on PostgreSQL
+        run: uv run pytest
+        env:
+          APP_TEST_DATABASE_URL: postgresql+psycopg://ci:ci@localhost:5432/cpmai_test
+      - name: Migrations on PostgreSQL, up and down
+        env:
+          APP_DATABASE_URL: postgresql+psycopg://ci:ci@localhost:5432/cpmai_test
+        run: |
+          uv run alembic upgrade head
+          uv run alembic check
+          uv run alembic downgrade base
+      - name: Dependency audit
+        run: |
+          uv export --frozen --no-dev --format requirements-txt --no-hashes -o /tmp/requirements.txt
+          uvx pip-audit -r /tmp/requirements.txt --disable-pip --no-deps
+
+  frontend:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run lint && npm run typecheck && npm run format:check
+      - run: npm test
+      - run: npm audit --omit=dev
+      - run: npm run build
+
+  e2e:
+    runs-on: ubuntu-24.04
+    needs: [backend, frontend]
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.9.16"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: cd backend && uv sync --frozen
+      - run: cd frontend && npm ci && npx playwright install --with-deps chromium
+      - run: cd frontend && npm run e2e
+
+  image:
+    runs-on: ubuntu-24.04
+    needs: [backend, frontend]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the production image
+        run: docker build -t ai-project-workbook:ci .

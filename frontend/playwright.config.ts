@@ -20,7 +20,7 @@ export default defineConfig({
     {
       command:
         'rm -f e2e.db && uv run alembic upgrade head && ' +
-        `uv run python -m app.cli create-user --email ${E2E_USER.email} --password ${E2E_USER.password} --verified && ` +
+        `uv run python -m app.cli create-user --email ${E2E_USER.email} --password ${E2E_USER.password} --verified --accept-terms && ` +
         `${PANGO}uv run fastapi run app/main.py --port ${BACKEND_PORT}`,
       cwd: '../backend',
       env: {

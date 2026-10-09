@@ -68,8 +68,12 @@ export function useLogout() {
 
 export function useRegister() {
   return useMutation({
-    mutationFn: (data: { email: string; password: string; display_name: string | null }) =>
-      apiSend<Message>('POST', '/api/auth/register', data),
+    mutationFn: (data: {
+      email: string
+      password: string
+      display_name: string | null
+      accept_terms: true
+    }) => apiSend<Message>('POST', '/api/auth/register', data),
   })
 }
 
@@ -127,6 +131,22 @@ export function useUploadLogo() {
 
 export function useDeleteLogo() {
   return useProfileMutation(() => apiSend<User>('DELETE', '/api/auth/me/logo'))
+}
+
+export function useAcceptTerms() {
+  return useProfileMutation(() => apiSend<User>('POST', '/api/auth/me/accept-terms'))
+}
+
+/** A JSON file with all the user's data, downloaded by the browser. */
+export const EXPORT_DATA_URL = '/api/auth/me/export'
+
+export function useDeleteAccount() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (confirmEmail: string) =>
+      apiSend<void>('DELETE', '/api/auth/me', { confirm_email: confirmEmail }),
+    onSuccess: () => switchUser(queryClient, null),
+  })
 }
 
 export const GOOGLE_LOGIN_URL = '/api/auth/google/login'

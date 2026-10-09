@@ -41,3 +41,5 @@ email_requests = RateLimiter(limit=5, window_seconds=60 * 60)
 # Visits to shared pages per client IP; PDFs cost more to render, so they have their own limit.
 shared_pages = RateLimiter(limit=60, window_seconds=60)
 shared_pdfs = RateLimiter(limit=10, window_seconds=60)
+# Every /api request per client IP: a ceiling well above what one person clicking can reach.
+api_requests = RateLimiter(limit=300, window_seconds=60)

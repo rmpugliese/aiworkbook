@@ -15,7 +15,12 @@ from app.models import Session as UserSession
 from app.models.project import utcnow
 from tests.conftest import PASSWORD, make_user
 
-NEW = {"email": "Nuova@Example.com", "password": "password-molto-lunga", "display_name": "Ada"}
+NEW: dict[str, Any] = {
+    "email": "Nuova@Example.com",
+    "password": "password-molto-lunga",
+    "display_name": "Ada",
+    "accept_terms": True,
+}
 
 
 def link_token(path: str) -> str:

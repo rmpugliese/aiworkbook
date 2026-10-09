@@ -26,6 +26,9 @@ class User(Base):
     logo: Mapped[bytes | None] = mapped_column(LargeBinary, deferred=True)
     logo_content_type: Mapped[str | None] = mapped_column(String(40))
     logo_updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # When the user accepted the terms and privacy notice, and which version (app/legal.py).
+    terms_accepted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    terms_version: Mapped[str | None] = mapped_column(String(20))
 
     sessions: Mapped[list["Session"]] = relationship(
         back_populates="user", cascade="all, delete-orphan", passive_deletes=True

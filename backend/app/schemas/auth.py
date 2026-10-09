@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, StringConstraints
 
@@ -16,6 +16,8 @@ class RegisterIn(_Input):
     email: EmailStr
     password: Password
     display_name: DisplayName | None = None
+    # Required and must be true: the terms of use and the privacy notice.
+    accept_terms: Literal[True]
 
 
 class LoginIn(_Input):
@@ -45,6 +47,8 @@ class UserOut(BaseModel):
     google_linked: bool
     is_admin: bool
     brand_color: str | None
+    # False until the user accepts the current version of the terms and privacy notice.
+    terms_current: bool
     # Changes whenever the logo does, so browsers never show a stale cached image.
     logo_url: str | None
 
@@ -56,6 +60,10 @@ class ProfileIn(_Input):
     brand_color: Annotated[str, StringConstraints(strip_whitespace=True, max_length=7)] | None = (
         None
     )
+
+
+class DeleteAccountIn(_Input):
+    confirm_email: str
 
 
 class AdminUserOut(BaseModel):

@@ -15,6 +15,7 @@ export const USER = {
   google_linked: false,
   is_admin: false,
   brand_color: null,
+  terms_current: true,
   logo_url: null,
 }
 

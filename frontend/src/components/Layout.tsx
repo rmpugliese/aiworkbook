@@ -58,10 +58,16 @@ export function Layout() {
       </AppShell.Main>
 
       <AppShell.Footer bg="gray.0">
-        <Group h="100%" px="md" justify="center">
+        <Group h="100%" px="md" justify="center" gap="md">
           <Text size="xs" c="dimmed">
             Compatibile con la metodologia CPMAI
           </Text>
+          <Anchor component={Link} to="/privacy" size="xs" c="dimmed">
+            Privacy
+          </Anchor>
+          <Anchor component={Link} to="/terms" size="xs" c="dimmed">
+            Termini
+          </Anchor>
         </Group>
       </AppShell.Footer>
     </AppShell>

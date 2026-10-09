@@ -8,6 +8,7 @@ import {
   FileButton,
   Group,
   Image,
+  Modal,
   Paper,
   SimpleGrid,
   Stack,
@@ -15,10 +16,26 @@ import {
   TextInput,
   Title,
 } from '@mantine/core'
-import { IconAlertTriangle, IconCheck, IconPhoto, IconTrash, IconUpload } from '@tabler/icons-react'
+import {
+  IconAlertTriangle,
+  IconCheck,
+  IconDownload,
+  IconPhoto,
+  IconTrash,
+  IconUpload,
+} from '@tabler/icons-react'
 import { useState, type FormEvent } from 'react'
+import { useNavigate } from 'react-router'
 
-import { useDeleteLogo, useMe, useUpdateProfile, useUploadLogo, type User } from '../api/auth'
+import {
+  EXPORT_DATA_URL,
+  useDeleteAccount,
+  useDeleteLogo,
+  useMe,
+  useUpdateProfile,
+  useUploadLogo,
+  type User,
+} from '../api/auth'
 import { contrastWithWhite, isHexColor, MIN_CONTRAST } from '../color'
 import { DEFAULT_BRAND } from '../theme'
 
@@ -239,6 +256,82 @@ function ColorCard({ user }: { user: User }) {
   )
 }
 
+function DataCard({ user }: { user: User }) {
+  const remove = useDeleteAccount()
+  const navigate = useNavigate()
+  const [confirming, setConfirming] = useState(false)
+  const [typed, setTyped] = useState('')
+  const matches = typed.trim().toLowerCase() === user.email
+
+  function submit(event: FormEvent) {
+    event.preventDefault()
+    if (matches) remove.mutate(typed, { onSuccess: () => navigate('/login') })
+  }
+
+  return (
+    <Card>
+      <Stack>
+        <div>
+          <Title order={3}>I tuoi dati</Title>
+          <Text size="sm" c="dimmed">
+            Scarica in un file JSON tutto ciò che l'app conserva su di te: account, marchio,
+            progetti, risposte, link condivisi e registro dell'assistente.
+          </Text>
+        </div>
+        <Group>
+          <Button
+            component="a"
+            href={EXPORT_DATA_URL}
+            download
+            variant="default"
+            leftSection={<IconDownload size={16} />}
+          >
+            Scarica i miei dati
+          </Button>
+          <Button
+            variant="subtle"
+            color="red"
+            leftSection={<IconTrash size={16} />}
+            onClick={() => {
+              remove.reset()
+              setTyped('')
+              setConfirming(true)
+            }}
+          >
+            Elimina l'account
+          </Button>
+        </Group>
+      </Stack>
+      <Modal opened={confirming} onClose={() => setConfirming(false)} title="Eliminare l'account?">
+        <form onSubmit={submit}>
+          <Stack>
+            <Text size="sm">
+              Verranno eliminati definitivamente l'account, tutti i progetti con iterazioni e
+              risposte, i link condivisi e il logo. L'operazione non si può annullare: se ti serve,
+              scarica prima i tuoi dati.
+            </Text>
+            <TextInput
+              label={`Per confermare, scrivi la tua email: ${user.email}`}
+              value={typed}
+              onChange={(event) => setTyped(event.currentTarget.value)}
+              data-autofocus
+            />
+            {remove.isError && <Alert color="red">{remove.error.message}</Alert>}
+            <Group justify="flex-end">
+              <Button variant="default" onClick={() => setConfirming(false)}>
+                Annulla
+              </Button>
+              <Button type="submit" color="red" disabled={!matches} loading={remove.isPending}>
+                Elimina definitivamente
+              </Button>
+            </Group>
+          </Stack>
+        </form>
+      </Modal>
+    </Card>
+  )
+}
+
 export function ProfilePage() {
   const me = useMe()
   if (!me.data) return null
@@ -253,6 +346,7 @@ export function ProfilePage() {
       <DisplayNameCard user={me.data} />
       <LogoCard user={me.data} />
       <ColorCard user={me.data} />
+      <DataCard user={me.data} />
     </Stack>
   )
 }
