@@ -72,6 +72,7 @@ class ProjectSummary(_Output):
     created_at: UtcDatetime
     updated_at: UtcDatetime
     archived_at: UtcDatetime | None
+    ai_enabled_at: UtcDatetime | None
     iteration_count: Annotated[int, Field(ge=0)]
 
 

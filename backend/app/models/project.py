@@ -28,6 +28,8 @@ class Project(Base):
     owner_id: Mapped[int | None] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"), index=True
     )
+    # The owner's consent to send this project's content to the AI assistant's endpoint.
+    ai_enabled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
     iterations: Mapped[list["Iteration"]] = relationship(
         back_populates="project",

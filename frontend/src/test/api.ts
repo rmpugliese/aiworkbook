@@ -21,6 +21,12 @@ const AUTH_DEFAULTS: Record<string, Handler | Response> = {
   'GET /api/auth/me': Response.json(USER),
   'GET /api/auth/csrf': new Response(null, { status: 204 }),
   'GET /api/auth/providers': Response.json({ google: false }),
+  'GET /api/ai/status': Response.json({
+    available: false,
+    model: null,
+    location: null,
+    host: null,
+  }),
 }
 
 export const SIGNED_OUT = Response.json({ detail: 'Accesso richiesto.' }, { status: 401 })
@@ -70,6 +76,7 @@ export function project(overrides: Record<string, unknown> = {}) {
     created_at: now,
     updated_at: now,
     archived_at: null,
+    ai_enabled_at: null,
     iteration_count: 1,
     iterations: [iteration()],
     ...overrides,

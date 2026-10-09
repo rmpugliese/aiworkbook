@@ -422,6 +422,43 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/projects/{project_id}/ai/enable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Enable Ai
+         * @description The owner's consent to send this project's content to the assistant's endpoint.
+         */
+        post: operations["enable_ai_api_projects__project_id__ai_enable_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/projects/{project_id}/ai/disable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Disable Ai */
+        post: operations["disable_ai_api_projects__project_id__ai_disable_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/users": {
         parameters: {
             query?: never;
@@ -507,10 +544,150 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/ai": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Ai Settings */
+        get: operations["get_ai_settings_api_admin_ai_get"];
+        /** Update Ai Settings */
+        put: operations["update_ai_settings_api_admin_ai_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/ai/test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Test Ai Connection */
+        post: operations["test_ai_connection_api_admin_ai_test_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ai/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ai Status */
+        get: operations["ai_status_api_ai_status_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/projects/{project_id}/iterations/{iteration_id}/assist": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Assist
+         * @description Streams `delta` events with text, then `done`, or a single `error` event.
+         */
+        post: operations["assist_api_projects__project_id__iterations__iteration_id__assist_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AISettingsIn */
+        AISettingsIn: {
+            /** Enabled */
+            enabled: boolean;
+            /** Base Url */
+            base_url: string;
+            /** Model */
+            model: string;
+            /**
+             * Temperature
+             * @default 0.4
+             */
+            temperature: number;
+            /**
+             * Max Tokens
+             * @default 1200
+             */
+            max_tokens: number;
+            /** Api Key */
+            api_key?: string | null;
+            /**
+             * Clear Api Key
+             * @default false
+             */
+            clear_api_key: boolean;
+        };
+        /**
+         * AISettingsOut
+         * @description The API key itself is never returned.
+         */
+        AISettingsOut: {
+            /** Enabled */
+            enabled: boolean;
+            /** Base Url */
+            base_url: string;
+            /** Model */
+            model: string;
+            /** Has Api Key */
+            has_api_key: boolean;
+            /** Api Key Hint */
+            api_key_hint: string | null;
+            /** Temperature */
+            temperature: number;
+            /** Max Tokens */
+            max_tokens: number;
+            /** Location */
+            location: ("locale" | "remoto") | null;
+        };
+        /** AIStatusOut */
+        AIStatusOut: {
+            /** Available */
+            available: boolean;
+            /** Model */
+            model: string | null;
+            /** Location */
+            location: ("locale" | "remoto") | null;
+            /** Host */
+            host: string | null;
+        };
+        /** AITestOut */
+        AITestOut: {
+            /** Ok */
+            ok: boolean;
+            /** Seconds */
+            seconds?: number | null;
+            /** Detail */
+            detail: string;
+        };
         /** AdminUserOut */
         AdminUserOut: {
             /** Id */
@@ -565,6 +742,23 @@ export interface components {
             return_to_phase: number | null;
             /** Updated At */
             updated_at: string | null;
+        };
+        /** AssistIn */
+        AssistIn: {
+            /** Question Key */
+            question_key: string;
+            /**
+             * Action
+             * @enum {string}
+             */
+            action: "suggest" | "improve" | "review";
+            /**
+             * Text
+             * @default
+             */
+            text: string;
+            /** Verdict */
+            verdict?: ("go" | "maybe" | "no_go") | null;
         };
         /** ChoiceOption */
         ChoiceOption: {
@@ -785,6 +979,8 @@ export interface components {
             updated_at: string;
             /** Archived At */
             archived_at: string | null;
+            /** Ai Enabled At */
+            ai_enabled_at: string | null;
             /** Iteration Count */
             iteration_count: number;
             /** Iterations */
@@ -812,6 +1008,8 @@ export interface components {
             updated_at: string;
             /** Archived At */
             archived_at: string | null;
+            /** Ai Enabled At */
+            ai_enabled_at: string | null;
             /** Iteration Count */
             iteration_count: number;
         };
@@ -1788,6 +1986,72 @@ export interface operations {
             };
         };
     };
+    enable_ai_api_projects__project_id__ai_enable_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: number;
+            };
+            cookie?: {
+                session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    disable_ai_api_projects__project_id__ai_disable_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: number;
+            };
+            cookie?: {
+                session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_users_api_admin_users_get: {
         parameters: {
             query?: never;
@@ -1937,6 +2201,172 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_ai_settings_api_admin_ai_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AISettingsOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_ai_settings_api_admin_ai_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                session?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AISettingsIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AISettingsOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    test_ai_connection_api_admin_ai_test_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AITestOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ai_status_api_ai_status_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AIStatusOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    assist_api_projects__project_id__iterations__iteration_id__assist_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: number;
+                iteration_id: number;
+            };
+            cookie?: {
+                session?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AssistIn"];
+            };
+        };
+        responses: {
+            /** @description Server-sent events */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/event-stream": unknown;
+                };
             };
             /** @description Validation Error */
             422: {

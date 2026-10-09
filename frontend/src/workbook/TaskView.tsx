@@ -3,6 +3,7 @@ import { Link } from 'react-router'
 
 import type { Answer, AnswerIn } from '../api/answers'
 import type { Template } from '../api/template'
+import type { AssistantContext } from './AssistantPanel'
 import { QuestionField } from './QuestionField'
 import { phaseLabel, type TaskRef } from './structure'
 
@@ -14,9 +15,19 @@ type Props = {
   save: (key: string, data: AnswerIn) => Promise<unknown>
   linkTo: (path: string) => string
   template: Template
+  assistant?: AssistantContext
 }
 
-export function TaskView({ current, previous, next, answers, save, linkTo, template }: Props) {
+export function TaskView({
+  current,
+  previous,
+  next,
+  answers,
+  save,
+  linkTo,
+  template,
+  assistant,
+}: Props) {
   const { phase, group, task } = current
 
   return (
@@ -43,6 +54,7 @@ export function TaskView({ current, previous, next, answers, save, linkTo, templ
           save={save}
           template={template}
           linkTo={linkTo}
+          assistant={assistant}
         />
       ))}
 

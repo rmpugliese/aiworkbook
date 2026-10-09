@@ -4,6 +4,7 @@ import type { Answer, Verdict } from '../api/answers'
 import type { Template } from '../api/template'
 import { QuestionCard, SaveIndicator, VerdictControl } from './AnswerControls'
 import { useAnswerDraft, type SaveAnswer } from './useAnswerDraft'
+import { AssistantPanel, type AssistantContext } from './AssistantPanel'
 import { FactorMatrix } from './FactorMatrix'
 import {
   factorMatrix,
@@ -20,6 +21,7 @@ type Props = {
   save: SaveAnswer
   template: Template
   linkTo: (path: string) => string
+  assistant?: AssistantContext
 }
 
 type Suggestion =
@@ -27,7 +29,7 @@ type Suggestion =
   | { kind: 'ready'; verdict: Verdict; returnTo: number | null; message: string }
 
 /** End-of-phase Go/No-Go: the app suggests, the user decides and explains any difference. */
-export function PhaseGateField({ question, answers, save, template, linkTo }: Props) {
+export function PhaseGateField({ question, answers, save, template, linkTo, assistant }: Props) {
   const { draft, update, status, retry } = useAnswerDraft(question, answers.get(question.key), save)
   const phaseNumber = Number(question.key.slice(1, 2))
   const isPhaseOne = phaseNumber === 1
@@ -166,6 +168,15 @@ export function PhaseGateField({ question, answers, save, template, linkTo }: Pr
         error={needsReason ? 'Serve una motivazione per lo scostamento' : undefined}
         onChange={(event) => update({ text: event.currentTarget.value })}
       />
+      {assistant && (
+        <AssistantPanel
+          assistant={assistant}
+          questionKey={question.key}
+          text={draft.text}
+          verdict={draft.verdict}
+          onApply={(text) => update({ text })}
+        />
+      )}
       <SaveIndicator status={status} onRetry={retry} />
     </QuestionCard>
   )

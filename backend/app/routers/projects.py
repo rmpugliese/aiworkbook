@@ -22,6 +22,7 @@ from app.schemas.projects import (
     ProjectSummary,
     ProjectUpdate,
 )
+from app.services import ai as ai_service
 from app.services import answers as answers_service
 from app.services import export as export_service
 from app.services import projects as service
@@ -54,6 +55,7 @@ _PROJECT_COLUMNS = (
     "created_at",
     "updated_at",
     "archived_at",
+    "ai_enabled_at",
 )
 
 
@@ -198,3 +200,20 @@ def export_pdf(db: Db, user: CurrentUser, project_id: int, iteration_id: int) ->
             )
         },
     )
+
+
+@router.post("/{project_id}/ai/enable")
+def enable_ai(db: Db, user: CurrentUser, project_id: int) -> ProjectOut:
+    """The owner's consent to send this project's content to the assistant's endpoint."""
+    with _service_errors():
+        return _project_out(
+            ai_service.set_project_consent(db, project_id, owner_id=user.id, enabled=True)
+        )
+
+
+@router.post("/{project_id}/ai/disable")
+def disable_ai(db: Db, user: CurrentUser, project_id: int) -> ProjectOut:
+    with _service_errors():
+        return _project_out(
+            ai_service.set_project_consent(db, project_id, owner_id=user.id, enabled=False)
+        )

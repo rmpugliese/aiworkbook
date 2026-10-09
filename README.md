@@ -66,6 +66,18 @@ La configurazione del backend si legge da variabili d'ambiente con prefisso `APP
 - **Email in produzione**: `APP_EMAIL_BACKEND=smtp` e le variabili `APP_SMTP_*` di qualsiasi
   fornitore SMTP.
 
+## Assistente AI
+
+1. Da "Amministrazione" → "Assistente AI": URL di un endpoint compatibile con l'API OpenAI, modello
+   ed eventuale API key (cifrata nel database), poi "Prova connessione". Esempi:
+   - Ollama: `http://localhost:11434/v1`, modello come in `ollama list`
+   - LM Studio: `http://localhost:1234/v1`, modello come nell'elenco di LM Studio
+   - remoti: OpenRouter `https://openrouter.ai/api/v1`, Mistral `https://api.mistral.ai/v1`…
+2. In ogni progetto il proprietario attiva l'assistente (consenso esplicito, con l'indicazione se
+   l'endpoint è locale o remoto).
+3. Su ogni campo, il menu "Assistente": Suggerisci una bozza, Migliora il testo, Critica e
+   domande. Nulla viene applicato senza "Sostituisci" o "Aggiungi in fondo".
+
 ## Struttura
 
 ```

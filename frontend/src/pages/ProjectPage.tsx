@@ -24,6 +24,7 @@ import {
   useUpdateProject,
   type Project,
 } from '../api/projects'
+import { AIConsentCard } from '../components/AIConsentCard'
 import { DeleteProjectModal } from '../components/DeleteProjectModal'
 import { NewIterationModal } from '../components/NewIterationModal'
 import { ProjectFormModal } from '../components/ProjectFormModal'
@@ -103,6 +104,8 @@ function ProjectDetail({ project }: { project: Project }) {
         Creato il {formatDate(project.created_at)} · modificato il{' '}
         {formatDateTime(project.updated_at)}
       </Text>
+
+      <AIConsentCard project={project} />
 
       <Card withBorder padding="lg">
         <Group justify="space-between" mb="md">
