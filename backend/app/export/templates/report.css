@@ -63,6 +63,30 @@ th, td { text-align: left; vertical-align: top; padding: 2mm; border-bottom: 1px
 th { font-size: 9pt; color: #555; }
 .matrix td { width: 33%; }
 .factor { margin-bottom: 2mm; }
-.factor span { display: block; margin-top: 0.5mm; font-size: 9pt; }
+.factor span:not(.verdict) { display: block; margin-top: 0.5mm; font-size: 9pt; }
 .phases td { font-size: 9pt; }
 .outcomes { margin: 0 0 2mm; }
+
+/* On screen (the shared page): a readable column instead of A4 pages. WeasyPrint ignores it. */
+@media screen {
+  html { font-size: 16px; background: #f4f4f1; }
+  body { max-width: 860px; margin: 0 auto; padding: 0 16px 48px; background: #fff; min-height: 100vh; }
+  .share-bar { position: sticky; top: 0; z-index: 1; display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: space-between; margin: 0 -16px; padding: 12px 16px; background: #1d3c5a; color: #fff; }
+  .share-bar div { display: flex; flex-direction: column; }
+  .share-bar span { font-size: 13px; opacity: 0.85; }
+  .share-bar .button { padding: 8px 14px; border-radius: 6px; background: #fff; color: #1d3c5a; font-weight: 600; text-decoration: none; white-space: nowrap; }
+  .cover { height: auto; padding: 48px 0 32px; border-bottom: 1px solid #e3e2dd; }
+  .doc-title { font-size: 28px; }
+  .project-name { font-size: 22px; }
+  .cover-facts { grid-template-columns: 110px auto; }
+  .cover-note { margin-top: 24px; }
+  .toc { padding: 8px 0; border-bottom: 1px solid #e3e2dd; }
+  .toc a { color: #1d3c5a; text-decoration: underline; }
+  .toc a::after { content: none; }
+  .chapter { padding-top: 32px; scroll-margin-top: 120px; }
+  h2 { font-size: 24px; }
+  h3 { font-size: 18px; }
+  .verdict { font-size: 12px; }
+  .table-wrap { overflow-x: auto; }
+  .matrix, .phases { min-width: 560px; }
+}

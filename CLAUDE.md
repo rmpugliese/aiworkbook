@@ -23,7 +23,8 @@ CPMAI, con un assistente AI opzionale.
   dopo il rilascio.
 - Ogni endpoint che legge o scrive dati di un progetto richiede l'utente (`CurrentUser`) e passa
   `owner_id` ai servizi; le risorse altrui risultano 404. In sola lettura vale il token di
-  condivisione (Fase 7).
+  condivisione (Fase 8): le pagine pubbliche `/s/{token}` non usano la sessione e non modificano
+  nulla.
 - I test automatici non chiamano mai provider AI reali.
 - L'interfaccia è in italiano; il codice, gli identificatori e i commit sono in inglese.
 

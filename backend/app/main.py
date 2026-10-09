@@ -5,7 +5,7 @@ from starlette.middleware.sessions import SessionMiddleware
 
 from app.auth.web import csrf_middleware
 from app.config import get_settings
-from app.routers import admin, ai, auth, health, projects, template
+from app.routers import admin, ai, auth, health, projects, shares, template
 from app.workbook.loader import validate_all_templates
 
 
@@ -32,6 +32,8 @@ def create_app() -> FastAPI:
     app.include_router(projects.router)
     app.include_router(admin.router)
     app.include_router(ai.router)
+    app.include_router(shares.router)
+    app.include_router(shares.public_router)
     return app
 
 

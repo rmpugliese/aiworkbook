@@ -2,14 +2,13 @@ from collections.abc import Iterator
 from contextlib import contextmanager
 from datetime import datetime
 from typing import Annotated
-from urllib.parse import quote
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Query, Response, status
 from sqlalchemy.orm import Session
 
 from app.auth.web import CurrentUser
 from app.db import get_db
-from app.export.pdf import pdf_filename, render_pdf
+from app.export.pdf import attachment_header, pdf_filename, render_pdf
 from app.models import Project
 from app.schemas.answers import AnswerIn, AnswerOut
 from app.schemas.projects import (
@@ -188,17 +187,10 @@ def export_pdf(db: Db, user: CurrentUser, project_id: int, iteration_id: int) ->
             owner_id=user.id,
             generated_at=datetime.now().astimezone(),
         )
-    filename = pdf_filename(report)
     return Response(
         content=render_pdf(report),
         media_type="application/pdf",
-        # RFC 6266: an ASCII fallback plus the UTF-8 name for accented project names.
-        headers={
-            "Content-Disposition": (
-                f'attachment; filename="{filename.encode("ascii", "replace").decode()}"; '
-                f"filename*=UTF-8''{quote(filename)}"
-            )
-        },
+        headers={"Content-Disposition": attachment_header(pdf_filename(report))},
     )
 
 

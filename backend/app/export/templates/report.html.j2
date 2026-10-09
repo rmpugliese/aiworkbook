@@ -2,11 +2,24 @@
 <html lang="it">
 <head>
   <meta charset="utf-8">
+  {%- if shared %}
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  {%- endif %}
   <title>{{ r.project_name }} · {{ r.iteration_number }}. {{ r.iteration_title }}</title>
   {#- Our own stylesheet: trusted, and entities are not decoded inside <style>. #}
   <style>{{ css | safe }}</style>
 </head>
 <body>
+{%- if shared %}
+<header class="share-bar">
+  <div>
+    <strong>{{ r.project_name }}</strong>
+    <span>Documento in sola lettura · aggiornato al {{ shared.updated_on }}</span>
+  </div>
+  <a class="button" href="{{ shared.pdf_url }}">Scarica PDF</a>
+</header>
+{%- endif %}
 {%- macro verdict(v) -%}
   {%- if v -%}<span class="verdict verdict-{{ v }}">{{ VERDICT_LABEL[v] }}</span>
   {%- else -%}<span class="verdict verdict-none">Da valutare</span>{%- endif -%}
@@ -58,6 +71,7 @@
     {%- endif %}
     · Esito deciso: {{ verdict(r.phase_one_decided) }}
   </p>
+  <div class="table-wrap">
   <table class="matrix">
     <thead><tr>{% for label, _ in r.factor_groups %}<th>{{ label }}</th>{% endfor %}</tr></thead>
     <tbody><tr>
@@ -70,8 +84,10 @@
       {%- endfor %}
     </tr></tbody>
   </table>
+  </div>
 
   <h3>Esito delle fasi</h3>
+  <div class="table-wrap">
   <table class="phases">
     <thead><tr><th>Fase</th><th>Esito</th><th>Fase di ritorno</th><th>Motivazione</th></tr></thead>
     <tbody>
@@ -85,6 +101,7 @@
       {%- endfor %}
     </tbody>
   </table>
+  </div>
 </section>
 
 {%- for phase in r.phases %}

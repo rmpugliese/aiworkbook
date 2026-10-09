@@ -78,6 +78,16 @@ La configurazione del backend si legge da variabili d'ambiente con prefisso `APP
 3. Su ogni campo, il menu "Assistente": Suggerisci una bozza, Migliora il testo, Critica e
    domande. Nulla viene applicato senza "Sostituisci" o "Aggiungi in fondo".
 
+## Condivisione con il cliente
+
+Nella pagina dell'iterazione, "Condividi" crea un link in sola lettura per un destinatario, con
+scadenza facoltativa (7, 30 o 90 giorni). Chi lo apre vede il report sempre aggiornato e può
+scaricare il PDF, senza account. Il link si copia solo alla creazione (nel database c'è solo il
+suo hash); si può revocare in qualsiasi momento. Archiviare il progetto sospende i suoi link.
+
+Le pagine condivise (`/s/<token>`) le genera il backend: in sviluppo Vite le inoltra come `/api`.
+`APP_PUBLIC_URL` determina l'indirizzo dei link.
+
 ## Struttura
 
 ```

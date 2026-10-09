@@ -1,16 +1,9 @@
 import { expect, test, type Page } from '@playwright/test'
 
-import { E2E_USER } from './user.ts'
+import { signIn } from './user.ts'
 
 // Every test starts signed in, through the real sign-in page.
-test.beforeEach(async ({ page }) => {
-  await page.goto('/')
-  await expect(page.getByRole('heading', { name: 'Accedi' })).toBeVisible()
-  await page.getByLabel(/^Email/).fill(E2E_USER.email)
-  await page.getByLabel(/^Password/).fill(E2E_USER.password)
-  await page.getByRole('button', { name: 'Accedi' }).click()
-  await expect(page.getByRole('heading', { name: 'Progetti' })).toBeVisible()
-})
+test.beforeEach(async ({ page }) => signIn(page))
 
 async function waitForSaved(page: Page, question: string) {
   await expect(page.getByRole('region', { name: question }).getByRole('status')).toHaveText(

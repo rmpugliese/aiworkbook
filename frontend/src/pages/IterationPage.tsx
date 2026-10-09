@@ -28,6 +28,7 @@ import {
   type Iteration,
 } from '../api/projects'
 import { useTemplate } from '../api/template'
+import { ShareModal } from '../components/ShareModal'
 import { formatDateTime } from '../format'
 import { GoNoGoSummary } from '../workbook/GoNoGoSummary'
 import { TaskView } from '../workbook/TaskView'
@@ -69,6 +70,7 @@ export function IterationPage() {
   const projectId = Number(params.projectId)
   const iterationId = Number(params.iterationId)
   const [searchParams] = useSearchParams()
+  const [sharing, setSharing] = useState(false)
 
   const project = useProject(projectId)
   const aiStatus = useAIStatus()
@@ -133,20 +135,34 @@ export function IterationPage() {
           </Text>
         </Stack>
         <Stack gap={4} w={220} align="stretch">
-          <Button
-            component="a"
-            href={exportPdfUrl(projectId, iterationId)}
-            variant="light"
-            download
-          >
-            Scarica PDF
-          </Button>
+          <Group gap="xs" grow>
+            <Button
+              component="a"
+              href={exportPdfUrl(projectId, iterationId)}
+              variant="light"
+              download
+            >
+              Scarica PDF
+            </Button>
+            <Button variant="light" onClick={() => setSharing(true)}>
+              Condividi
+            </Button>
+          </Group>
           <Text size="sm" ta="right">
             {answered} di {total} domande compilate
           </Text>
           <Progress value={total ? (answered / total) * 100 : 0} aria-label="Avanzamento" />
         </Stack>
       </Group>
+
+      {sharing && (
+        <ShareModal
+          projectId={projectId}
+          iterationId={iterationId}
+          archived={project.data.archived_at !== null}
+          onClose={() => setSharing(false)}
+        />
+      )}
 
       <Accordion variant="contained" defaultValue={iteration.data.user_story ? null : 'story'}>
         <Accordion.Item value="story">

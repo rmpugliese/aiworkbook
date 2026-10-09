@@ -38,3 +38,6 @@ class RateLimiter:
 # Failed logins per email; account-related email requests per client IP.
 failed_logins = RateLimiter(limit=5, window_seconds=15 * 60)
 email_requests = RateLimiter(limit=5, window_seconds=60 * 60)
+# Visits to shared pages per client IP; PDFs cost more to render, so they have their own limit.
+shared_pages = RateLimiter(limit=60, window_seconds=60)
+shared_pdfs = RateLimiter(limit=10, window_seconds=60)
