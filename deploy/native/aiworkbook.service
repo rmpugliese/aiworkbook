@@ -1,0 +1,23 @@
+# /etc/systemd/system/aiworkbook.service
+[Unit]
+Description=AI Project Workbook (https://aiworkbook.perlconsulting.it)
+After=network-online.target postgresql.service
+Wants=network-online.target
+Requires=postgresql.service
+
+[Service]
+User=aiworkbook
+Group=aiworkbook
+WorkingDirectory=/srv/apps/aiworkbook
+Environment=PATH=/usr/local/bin:/usr/bin:/bin
+ExecStart=/srv/apps/aiworkbook/deploy/native/aiworkbook.sh serve
+Restart=on-failure
+RestartSec=5
+# Hardening: the app only needs its own directories.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=read-only
+
+[Install]
+WantedBy=multi-user.target
