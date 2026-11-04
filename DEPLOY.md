@@ -40,6 +40,114 @@ reindirizzamento `https://<dominio>/api/auth/google/callback` e inserisci ID e s
 
 **Assistente AI**: da "Amministrazione" → "Assistente AI" nell'app.
 
+## Server con Nginx Proxy Manager
+
+Se il server ha già Nginx Proxy Manager sulle porte 80 e 443, Caddy non serve: si usa
+`deploy/docker-compose.npm.yml`, che collega l'app alla rete Docker del proxy senza pubblicare
+porte.
+
+1. **DNS**: record `A` del sottodominio (es. `aiworkbook.perlconsulting.it`) verso l'IP del server.
+2. **Nginx Proxy Manager** → *Proxy Hosts* → *Add Proxy Host*: dominio, schema `http`, host
+   `aiworkbook-app`, porta `8000`, *Block Common Exploits*; nella scheda *Advanced*:
+   ```nginx
+   client_max_body_size 2m;
+   proxy_buffering off;
+   proxy_read_timeout 300s;
+   access_log off;
+   ```
+   Nella scheda *SSL*: nuovo certificato Let's Encrypt, *Force SSL*, *HTTP/2* (HSTS lo aggiunge
+   l'app).
+3. **App**: `git clone https://github.com/rmpugliese/aiworkbook.git /srv/apps/aiworkbook`, poi
+   in `/srv/apps/aiworkbook/deploy/`: `cp .env.example .env` e compilarlo (`APP_DOMAIN` non serve; se la rete
+   del proxy non si chiama `docker_default`, aggiungere `NPM_NETWORK=<nome>`), poi:
+   ```bash
+   docker compose -f docker-compose.npm.yml up -d --build
+   docker compose -f docker-compose.npm.yml logs -f app
+   ```
+   Per gli altri comandi di questa guida aggiungere `-f docker-compose.npm.yml`.
+
+## Server senza Docker (uv + systemd)
+
+Come gli altri servizi già presenti sul VPS: l'app gira con uv come servizio systemd sulla porta
+8000, Nginx Proxy Manager inoltra a `167.86.115.64:8000`, e iptables chiude la porta da Internet.
+File in `deploy/native/`. Comandi da eseguire come `root` su Ubuntu 22.04.
+
+**1. Pacchetti di sistema, utente e codice**
+
+```bash
+apt update && apt install -y git postgresql libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0 fonts-liberation fonts-dejavu-core
+useradd --system --create-home --home-dir /var/lib/aiworkbook --shell /bin/bash aiworkbook
+git clone https://github.com/rmpugliese/aiworkbook.git /srv/apps/aiworkbook
+chown -R aiworkbook:aiworkbook /srv/apps/aiworkbook
+curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR=/usr/local/bin sh
+```
+
+**2. Database**
+
+```bash
+sudo -u postgres createuser workbook --pwprompt      # scegli una password lunga
+sudo -u postgres createdb workbook --owner workbook
+```
+
+**3. Configurazione**
+
+```bash
+cp /srv/apps/aiworkbook/deploy/native/env.example /srv/apps/aiworkbook/deploy/.env
+chown aiworkbook:aiworkbook /srv/apps/aiworkbook/deploy/.env && chmod 600 /srv/apps/aiworkbook/deploy/.env
+nano /srv/apps/aiworkbook/deploy/.env    # segreto, password del database in APP_DATABASE_URL, SMTP
+```
+
+**4. Dipendenze e interfaccia** (Node 22 in un ambiente conda, solo per la build)
+
+```bash
+conda create -y -n aiworkbook-node -c conda-forge nodejs=22
+cd /srv/apps/aiworkbook/backend && sudo -u aiworkbook -H uv sync --frozen --no-dev
+cd /srv/apps/aiworkbook/frontend && conda run -n aiworkbook-node npm ci --no-audit --no-fund && conda run -n aiworkbook-node npm run build
+chown -R aiworkbook:aiworkbook /srv/apps/aiworkbook
+```
+
+**5. Servizio**
+
+```bash
+cp /srv/apps/aiworkbook/deploy/native/aiworkbook.service /etc/systemd/system/
+systemctl daemon-reload && systemctl enable --now aiworkbook
+journalctl -u aiworkbook -f     # migrazioni, poi "Application startup complete"
+```
+
+**6. Porta 8000 chiusa da Internet** (stessa regola dei servizi esistenti): fermare la regola,
+aggiungere `8000` all'elenco delle porte in `/etc/systemd/system/block-internal-ports.service`
+(sia in `ExecStart` sia in `ExecStop`), poi riattivarla:
+
+```bash
+systemctl stop block-internal-ports
+sed -i 's/--dports 5000,5050 /--dports 5000,5050,8000 /' /etc/systemd/system/block-internal-ports.service
+systemctl daemon-reload && systemctl start block-internal-ports
+iptables -S INPUT | grep dports
+```
+
+**7. Backup e pulizia**
+
+```bash
+install -d -o postgres -g postgres -m 700 /var/backups/aiworkbook
+crontab -e
+```
+
+e aggiungere le due righe:
+
+```cron
+30 2 * * * sudo -u postgres /srv/apps/aiworkbook/deploy/native/backup.sh
+45 2 * * * sudo -u aiworkbook -H /srv/apps/aiworkbook/deploy/native/aiworkbook.sh cleanup
+```
+
+I backup vanno in `/var/backups/aiworkbook` (14 giorni). Ripristino:
+`sudo -u postgres pg_restore --clean --if-exists -d workbook <file>.dump`.
+
+**Aggiornamenti** (come root: scarica, aggiorna le dipendenze, ricompila l'interfaccia e riavvia)
+
+```bash
+/srv/apps/aiworkbook/deploy/native/aiworkbook.sh update
+```
+
 ## Prima dell'apertura al pubblico
 
 - [ ] Far rivedere da un legale `/privacy` e `/terms` (in `frontend/src/pages/legal/`), compilare
