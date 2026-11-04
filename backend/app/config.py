@@ -26,6 +26,9 @@ class Settings(BaseSettings):
     smtp_username: str | None = None
     smtp_password: str | None = None
     smtp_starttls: bool = True
+    # Implicit TLS from the first byte, usually on port 465 (e.g. smtps.aruba.it). When set,
+    # STARTTLS is not used.
+    smtp_ssl: bool = False
 
     google_client_id: str | None = None
     google_client_secret: str | None = None
