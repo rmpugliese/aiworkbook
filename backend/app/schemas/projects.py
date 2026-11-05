@@ -80,3 +80,20 @@ class ProjectSummary(_Output):
 
 class ProjectOut(ProjectSummary):
     iterations: list[IterationOut]
+
+
+PdfFieldName = Annotated[str, StringConstraints(max_length=100)]
+PdfFieldValue = Annotated[str, StringConstraints(max_length=20_000)] | bool
+
+
+class WorkbookPdfImportIn(_Input):
+    """The fields of a fillable workbook PDF, read in the browser: the file never comes here."""
+
+    name: Name
+    client_name: OptionalName | None = None
+    fields: dict[PdfFieldName, PdfFieldValue] = Field(max_length=300)
+
+
+class WorkbookPdfImportOut(BaseModel):
+    project: ProjectOut
+    answers: int

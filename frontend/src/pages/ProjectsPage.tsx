@@ -19,6 +19,7 @@ import {
   IconBuilding,
   IconClock,
   IconFileImport,
+  IconFileTypePdf,
   IconFolder,
   IconPlus,
   IconStack2,
@@ -34,6 +35,7 @@ import {
 } from '../api/projects'
 import { PageHeader } from '../components/PageHeader'
 import { ProjectFormModal } from '../components/ProjectFormModal'
+import { WorkbookPdfImportModal } from '../components/WorkbookPdfImportModal'
 import { formatDate, iterationLabel } from '../format'
 
 function ProjectCard({ project }: { project: ProjectSummary }) {
@@ -114,6 +116,7 @@ function EmptyState({ archived, onCreate }: { archived: boolean; onCreate: () =>
 export function ProjectsPage() {
   const [view, setView] = useState<'active' | 'archived'>('active')
   const [creating, setCreating] = useState(false)
+  const [importingPdf, setImportingPdf] = useState(0)
   const showArchived = view === 'archived'
   const projects = useProjects(showArchived)
   const createProject = useCreateProject()
@@ -153,10 +156,28 @@ export function ProjectsPage() {
                 </Button>
               )}
             </FileButton>
+            <Button
+              variant="default"
+              leftSection={<IconFileTypePdf size={16} />}
+              onClick={() => setImportingPdf((count) => count + 1)}
+            >
+              Importa da workbook PDF
+            </Button>
             <Button leftSection={<IconPlus size={16} />} onClick={startCreating}>
               Nuovo progetto
             </Button>
           </>
+        }
+      />
+
+      <WorkbookPdfImportModal
+        key={importingPdf}
+        opened={importingPdf > 0}
+        onClose={() => setImportingPdf(0)}
+        onImported={(result) =>
+          navigate(`/projects/${result.project.id}`, {
+            state: { importedAnswers: result.answers },
+          })
         }
       />
 
