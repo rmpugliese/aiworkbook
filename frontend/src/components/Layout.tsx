@@ -2,15 +2,16 @@ import { Anchor, AppShell, Container, Group, Image, Text, ThemeIcon, Title } fro
 import { IconClipboardCheck } from '@tabler/icons-react'
 import { Link, Outlet } from 'react-router'
 
-import { useMe } from '../api/auth'
+import { useSite } from '../api/site'
 import { APP_NAME } from '../config'
 import { BackendStatus } from './BackendStatus'
+import { CookiePanel } from './CookiePanel'
 import { UserMenu } from './UserMenu'
 
-/** The consultant's logo when they have one, otherwise the app's mark and name. */
+/** The installation's logo when it has one, otherwise the app's mark and name. */
 function Brand() {
-  const me = useMe()
-  const logo = me.data?.logo_url
+  const site = useSite()
+  const logo = site.data?.logo_url
 
   if (logo) {
     return (
@@ -58,8 +59,8 @@ export function Layout() {
       </AppShell.Main>
 
       <AppShell.Footer bg="gray.0">
-        <Group h="100%" px="md" justify="center" gap="md">
-          <Text size="xs" c="dimmed">
+        <Group h="100%" px="md" justify="center" gap="md" wrap="nowrap">
+          <Text size="xs" c="dimmed" visibleFrom="sm">
             Compatibile con la metodologia CPMAI
           </Text>
           <Anchor component={Link} to="/privacy" size="xs" c="dimmed">
@@ -67,6 +68,10 @@ export function Layout() {
           </Anchor>
           <Anchor component={Link} to="/terms" size="xs" c="dimmed">
             Termini
+          </Anchor>
+          <CookiePanel />
+          <Anchor component={Link} to="/ai" size="xs" c="dimmed">
+            Uso dell'AI
           </Anchor>
         </Group>
       </AppShell.Footer>

@@ -119,6 +119,7 @@ describe('AI assistant', () => {
     // Formatted: a list with bold text, not raw Markdown.
     expect(await within(panel).findByText('Manca una misura.')).toBeInTheDocument()
     expect(within(panel).getAllByRole('listitem')).toHaveLength(2)
+    expect(within(panel).getByText("Generato dall'AI · da verificare")).toBeInTheDocument()
     expect(within(panel).getByText('KPI').tagName).toBe('STRONG')
     expect(within(panel).queryByRole('button', { name: 'Sostituisci' })).toBeNull()
     expect(within(panel).getByRole('button', { name: 'Chiudi' })).toBeInTheDocument()
@@ -180,7 +181,10 @@ describe('AI assistant', () => {
     const model = screen.getByRole('textbox', { name: /^Modello/ })
     await user().clear(model)
     await user().type(model, 'mistral-small')
-    await user().click(screen.getByRole('button', { name: 'Salva' }))
+    const aiCard = screen
+      .getByRole('heading', { name: 'Assistente AI' })
+      .closest('.mantine-Card-root') as HTMLElement
+    await user().click(within(aiCard).getByRole('button', { name: 'Salva' }))
 
     expect(await screen.findByText('Configurazione salvata.')).toBeInTheDocument()
     expect(calls.find((c) => c.method === 'PUT')?.body).toMatchObject({

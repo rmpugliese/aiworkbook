@@ -3,6 +3,7 @@
 from app.models.ai import AIRequest, AISettings
 from app.models.project import Answer, Iteration, Project
 from app.models.share import ShareLink
+from app.models.site import SiteSettings
 from app.models.user import EmailToken, Session, User
 
 __all__ = [
@@ -14,5 +15,6 @@ __all__ = [
     "Project",
     "Session",
     "ShareLink",
+    "SiteSettings",
     "User",
 ]

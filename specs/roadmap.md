@@ -198,6 +198,17 @@ campi, solo quando l'utente lo chiede.
 
 ---
 
+## Fase 12: Pagine legali, cookie e trasparenza sull'AI (Completata)
+
+**Obiettivo:** informative complete prima di aprire l'app ad altri utenti.
+
+- [x] Cookie policy e pannello cookie (solo cookie tecnici, nessun banner)
+- [x] Privacy e termini con i dati del titolare dall'amministrazione; marchio dell'installazione in amministrazione
+- [x] Informativa sull'uso dell'AI con fornitore, sede e modello dalla configurazione
+- [x] Etichetta "generato dall'AI" sulle proposte; nuova versione dei termini
+
+---
+
 ## Più avanti (non pianificato)
 
 - Storico delle revisioni delle risposte

@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
-import { HEALTH_OK, mockApi, USER } from '../test/api'
+import { HEALTH_OK, mockApi, site } from '../test/api'
 import { renderRoutes } from '../test/render'
 import { Layout } from './Layout'
 
@@ -16,16 +16,16 @@ describe('Layout', () => {
     expect(await screen.findByRole('button', { name: 'Menu di Ada Consulente' })).toBeVisible()
   })
 
-  it("shows the consultant's logo instead of the app name", async () => {
+  it("shows the installation's logo instead of the app name", async () => {
     mockApi({
       'GET /api/health': HEALTH_OK,
-      'GET /api/auth/me': Response.json({ ...USER, logo_url: '/api/auth/me/logo?v=1' }),
+      'GET /api/site': Response.json(site({ logo_url: '/api/site/logo?v=1' })),
     })
     renderRoutes([{ element: <Layout />, children: [{ index: true, element: <p>Contenuto</p> }] }])
 
     expect(await screen.findByRole('img', { name: 'Logo' })).toHaveAttribute(
       'src',
-      '/api/auth/me/logo?v=1',
+      '/api/site/logo?v=1',
     )
     expect(screen.queryByRole('heading', { name: 'AI Project Workbook' })).toBeNull()
   })

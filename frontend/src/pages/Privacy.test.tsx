@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 
 import { routes } from '../routes'
-import { HEALTH_OK, mockApi, SIGNED_OUT, USER } from '../test/api'
+import { HEALTH_OK, mockApi, SIGNED_OUT, site, USER } from '../test/api'
 import { renderRoutes } from '../test/render'
 
 describe('Privacy and data rights', () => {
@@ -11,8 +11,67 @@ describe('Privacy and data rights', () => {
     mockApi({ 'GET /api/health': HEALTH_OK, 'GET /api/auth/me': SIGNED_OUT })
     renderRoutes(routes, '/privacy')
     expect(await screen.findByRole('heading', { name: 'Informativa sulla privacy' })).toBeVisible()
-    expect(screen.getByText(/da far\s+verificare da un legale/)).toBeVisible()
-    expect(screen.getByRole('link', { name: "Termini d'uso" })).toHaveAttribute('href', '/terms')
+    expect(await screen.findByText(/in attesa di revisione legale/)).toBeVisible()
+    // Missing details show as visible placeholders.
+    expect(screen.getAllByText('[titolare]').length).toBeGreaterThan(0)
+    expect(
+      screen
+        .getAllByRole('link', { name: 'Termini' })
+        .some((a) => a.getAttribute('href') === '/terms'),
+    ).toBe(true)
+  })
+
+  it('shows the configured data controller and the AI service', async () => {
+    mockApi({
+      'GET /api/health': HEALTH_OK,
+      'GET /api/auth/me': SIGNED_OUT,
+      'GET /api/site': Response.json(
+        site({
+          legal: {
+            name: 'Perl Consulting',
+            address: 'Via Roma 1, Trieste',
+            vat_id: 'IT0123',
+            email: 'privacy@perl.example',
+            pec: '',
+            court: 'Trieste',
+            reviewed: true,
+            complete: true,
+          },
+          ai: {
+            available: true,
+            model: 'mistral-small',
+            provider_name: 'Fornitore UE',
+            server_location: 'Francia (UE)',
+            model_kind: 'open weight',
+            location: 'remoto',
+          },
+        }),
+      ),
+    })
+    renderRoutes(routes, '/ai')
+    expect(
+      await screen.findByRole('heading', { name: "Uso dell'intelligenza artificiale" }),
+    ).toBeVisible()
+    const table = await screen.findByRole('table', { name: 'Servizio AI in uso' })
+    expect(table).toHaveTextContent('Fornitore UE')
+    expect(table).toHaveTextContent('Francia (UE)')
+    expect(table).toHaveTextContent('mistral-small')
+    expect(screen.queryByText(/in attesa di revisione legale/)).toBeNull() // reviewed
+
+    await userEvent.click(screen.getAllByRole('link', { name: 'Privacy' })[0])
+    expect(await screen.findByText('Perl Consulting')).toBeVisible()
+    expect(screen.queryByText('[titolare]')).toBeNull()
+  })
+
+  it('lists the cookies in the footer panel', async () => {
+    mockApi({ 'GET /api/health': HEALTH_OK, 'GET /api/auth/me': SIGNED_OUT })
+    renderRoutes(routes, '/login')
+    await userEvent.click(await screen.findByRole('button', { name: 'Cookie' }))
+    const dialog = await screen.findByRole('dialog', { name: 'Cookie' })
+    for (const name of ['session', 'csrf_token', 'oauth_state']) {
+      expect(within(dialog).getByText(name)).toBeInTheDocument()
+    }
+    expect(within(dialog).getAllByText('Necessario')).toHaveLength(3)
   })
 
   it('asks a user to accept the current terms before using the app', async () => {

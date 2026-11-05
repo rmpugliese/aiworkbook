@@ -3,4 +3,4 @@
 Change it whenever the texts change in substance: everyone is asked to accept the new version.
 """
 
-TERMS_VERSION = "2026-10-09"
+TERMS_VERSION = "2026-11-05"

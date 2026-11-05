@@ -46,20 +46,14 @@ class UserOut(BaseModel):
     has_password: bool
     google_linked: bool
     is_admin: bool
-    brand_color: str | None
     # False until the user accepts the current version of the terms and privacy notice.
     terms_current: bool
-    # Changes whenever the logo does, so browsers never show a stale cached image.
-    logo_url: str | None
 
 
 class ProfileIn(_Input):
     """Only the fields sent are changed; an empty value clears the field."""
 
     display_name: DisplayName | None = None
-    brand_color: Annotated[str, StringConstraints(strip_whitespace=True, max_length=7)] | None = (
-        None
-    )
 
 
 class DeleteAccountIn(_Input):

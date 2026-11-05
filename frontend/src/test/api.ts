@@ -14,9 +14,35 @@ export const USER = {
   has_password: true,
   google_linked: false,
   is_admin: false,
-  brand_color: null,
   terms_current: true,
-  logo_url: null,
+}
+
+/** The installation as a fresh one looks: no brand, no legal details, no assistant. */
+export function site(overrides: Record<string, unknown> = {}) {
+  return {
+    brand_color: null,
+    logo_url: null,
+    terms_version: '2026-11-05',
+    legal: {
+      name: '',
+      address: '',
+      vat_id: '',
+      email: '',
+      pec: '',
+      court: '',
+      reviewed: false,
+      complete: false,
+    },
+    ai: {
+      available: false,
+      model: null,
+      provider_name: '',
+      server_location: '',
+      model_kind: '',
+      location: null,
+    },
+    ...overrides,
+  }
 }
 
 /** Signed in, CSRF available, no Google: override any of these per test. */
@@ -24,6 +50,7 @@ const AUTH_DEFAULTS: Record<string, Handler | Response> = {
   'GET /api/auth/me': Response.json(USER),
   'GET /api/auth/csrf': new Response(null, { status: 204 }),
   'GET /api/auth/providers': Response.json({ google: false }),
+  'GET /api/site': Response.json(site()),
   'GET /api/ai/status': Response.json({
     available: false,
     model: null,

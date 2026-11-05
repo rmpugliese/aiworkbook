@@ -150,10 +150,12 @@ I backup vanno in `/var/backups/aiworkbook` (14 giorni). Ripristino:
 
 ## Prima dell'apertura al pubblico
 
-- [ ] Far rivedere da un legale `/privacy` e `/terms` (in `frontend/src/pages/legal/`), compilare
-      i campi tra parentesi quadre e togliere l'avviso "Bozza" in `LegalPage.tsx`.
+- [ ] In **Amministrazione**: dati legali del titolare, marchio, e per l'assistente fornitore,
+      sede dei server e tipo di modello.
+- [ ] Far rivedere da un legale `/privacy`, `/terms`, `/cookies` e `/ai` (testi in
+      `frontend/src/pages/legal/`), poi spuntare "Testi rivisti da un legale" in Amministrazione.
 - [ ] Se i testi cambiano in modo sostanziale, aggiornare `TERMS_VERSION` in `backend/app/legal.py`
-      (e la data in `LegalPage.tsx`): tutti dovranno accettare di nuovo.
+      e la data in `frontend/src/pages/legal/links.ts`: tutti dovranno accettare di nuovo.
 - [ ] Verificare l'invio delle email e l'accesso con Google sul dominio vero.
 - [ ] Provare un ripristino dal backup (vedi sotto).
 

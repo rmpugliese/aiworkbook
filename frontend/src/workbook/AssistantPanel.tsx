@@ -1,4 +1,4 @@
-import { Alert, Button, Group, Loader, Menu, Paper, Stack, Text } from '@mantine/core'
+import { Alert, Badge, Button, Group, Loader, Menu, Paper, Stack, Text } from '@mantine/core'
 
 import { useAssist, type AssistAction } from '../api/ai'
 import { Markdown } from './Markdown'
@@ -55,9 +55,15 @@ export function AssistantPanel({ assistant, questionKey, text, verdict, onApply 
         >
           <Stack gap="xs">
             <Group justify="space-between">
-              <Text size="xs" fw={600} c="blue">
-                {LABEL[state.action]}
-              </Text>
+              <Group gap={6}>
+                <Text size="xs" fw={600} c="blue">
+                  {LABEL[state.action]}
+                </Text>
+                {/* Generated content is labelled as such (AI Act, art. 50). */}
+                <Badge size="xs" variant="light" color="violet">
+                  Generato dall'AI · da verificare
+                </Badge>
+              </Group>
               {state.status === 'streaming' && <Loader size="xs" />}
             </Group>
             {proposal && <Markdown text={proposal} />}

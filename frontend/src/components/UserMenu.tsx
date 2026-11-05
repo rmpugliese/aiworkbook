@@ -45,7 +45,7 @@ export function UserMenu() {
           </Text>
         </Menu.Label>
         <Menu.Item component={Link} to="/profile" leftSection={<IconUserCircle size={16} />}>
-          Profilo e marchio
+          Profilo
         </Menu.Item>
         {me.data.is_admin && (
           <Menu.Item component={Link} to="/admin" leftSection={<IconShieldLock size={16} />}>

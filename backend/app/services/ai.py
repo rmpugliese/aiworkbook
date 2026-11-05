@@ -52,6 +52,9 @@ def settings_out(db: DbSession) -> AISettingsOut:
         temperature=row.temperature,
         max_tokens=row.max_tokens,
         location=endpoint_location(row.base_url) if row.base_url else None,
+        provider_name=row.provider_name,
+        server_location=row.server_location,
+        model_kind=row.model_kind,
     )
 
 
@@ -62,6 +65,9 @@ def update_settings(db: DbSession, data: AISettingsIn) -> AISettingsOut:
     row.model = data.model
     row.temperature = data.temperature
     row.max_tokens = data.max_tokens
+    row.provider_name = data.provider_name
+    row.server_location = data.server_location
+    row.model_kind = data.model_kind
     if data.clear_api_key:
         row.api_key_encrypted = None
         row.api_key_hint = None

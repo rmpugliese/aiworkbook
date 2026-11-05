@@ -26,7 +26,7 @@ from app.export.report import Report, build_report
 from app.models import ShareLink
 from app.schemas.shares import ShareLinkCreated, ShareLinkIn, ShareLinkOut
 from app.services import sharing as service
-from app.services.branding import project_branding
+from app.services.branding import document_branding
 from app.services.errors import ConflictError, NotFoundError
 from app.services.sharing import SharedIteration
 from app.workbook.loader import load_template
@@ -143,7 +143,7 @@ def _report(db: Session, shared: SharedIteration) -> Report:
         template=load_template(shared.iteration.template_version),
         answers=shared.answers,
         generated_at=datetime.now().astimezone(),
-        branding=project_branding(db, shared.project),
+        branding=document_branding(db),
     )
 
 

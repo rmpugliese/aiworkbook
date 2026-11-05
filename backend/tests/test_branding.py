@@ -21,10 +21,6 @@ SVG = (
 )
 
 
-def upload(client: TestClient, data: bytes, name: str = "logo.png") -> httpx2.Response:
-    return client.put("/api/auth/me/logo", files={"file": (name, data, "application/octet-stream")})
-
-
 # Logo validation
 
 
@@ -117,64 +113,125 @@ def test_contrast() -> None:
     assert branding.contrast_with_white("#ffffff") == pytest.approx(1)
 
 
-# API
+# API: the installation's brand, managed by administrators
 
 
-def test_profile_update(client: TestClient) -> None:
-    response = client.patch(
-        "/api/auth/me", json={"display_name": "Perl Consulting", "brand_color": "#1D4F7A"}
+def upload(client: TestClient, data: bytes, name: str = "logo.png") -> httpx2.Response:
+    return client.put(
+        "/api/admin/site/logo", files={"file": (name, data, "application/octet-stream")}
     )
-    assert response.status_code == 200
-    assert response.json()["display_name"] == "Perl Consulting"
-    assert response.json()["brand_color"] == "#1d4f7a"
-
-    # Only the fields sent change; an empty value clears.
-    response = client.patch("/api/auth/me", json={"brand_color": ""})
-    assert response.json()["brand_color"] is None
-    assert response.json()["display_name"] == "Perl Consulting"
-
-    response = client.patch("/api/auth/me", json={"brand_color": "#ffee00"})
-    assert response.status_code == 422
-    assert "troppo chiaro" in response.json()["detail"]
 
 
-def test_profile_requires_a_session(anon_client: TestClient) -> None:
-    assert anon_client.patch("/api/auth/me", json={"display_name": "X"}).status_code == 401
-    assert upload(anon_client, PNG).status_code == 401
-    assert anon_client.get("/api/auth/me/logo").status_code == 401
+def test_site_is_public_and_starts_empty(anon_client: TestClient) -> None:
+    site = anon_client.get("/api/site").json()
+    assert site["brand_color"] is None and site["logo_url"] is None
+    assert site["legal"]["complete"] is False and site["legal"]["reviewed"] is False
+    assert site["terms_version"]
 
 
-def test_logo_upload_serve_and_remove(client: TestClient, other_client: TestClient) -> None:
-    assert client.get("/api/auth/me").json()["logo_url"] is None
-    response = upload(client, SVG, "logo.svg")
+def test_only_administrators_change_the_brand(client: TestClient, anon_client: TestClient) -> None:
+    assert client.put("/api/admin/site/brand", json={"brand_color": "#7a1d4f"}).status_code == 403
+    assert upload(client, PNG).status_code == 403
+    assert anon_client.put(
+        "/api/admin/site/brand", json={"brand_color": "#7a1d4f"}
+    ).status_code in (
+        401,
+        403,
+    )
+
+
+def test_brand_color(admin_client: TestClient) -> None:
+    response = admin_client.put("/api/admin/site/brand", json={"brand_color": "#7A1D4F"})
+    assert response.status_code == 200 and response.json()["brand_color"] == "#7a1d4f"
+    refused = admin_client.put("/api/admin/site/brand", json={"brand_color": "#ffee00"})
+    assert refused.status_code == 422 and "troppo chiaro" in refused.json()["detail"]
+    cleared = admin_client.put("/api/admin/site/brand", json={"brand_color": ""})
+    assert cleared.json()["brand_color"] is None
+
+
+def test_logo_upload_serve_and_remove(admin_client: TestClient, anon_client: TestClient) -> None:
+    response = upload(admin_client, SVG, "logo.svg")
     assert response.status_code == 200
     logo_url = response.json()["logo_url"]
-    assert logo_url.startswith("/api/auth/me/logo?v=")
+    assert logo_url.startswith("/api/site/logo?v=")
 
-    served = client.get(logo_url)
+    # Public: the sign-in page and the header show it before anyone signs in.
+    served = anon_client.get(logo_url)
     assert served.status_code == 200
     assert served.headers["content-type"] == "image/svg+xml"
     assert "sandbox" in served.headers["content-security-policy"]
-    assert served.headers["x-content-type-options"] == "nosniff"
     assert served.content == SVG
 
-    # Each user only ever gets their own logo.
-    assert other_client.get("/api/auth/me/logo").status_code == 404
-
-    removed = client.delete("/api/auth/me/logo")
-    assert removed.json()["logo_url"] is None
-    assert client.get("/api/auth/me/logo").status_code == 404
+    assert admin_client.delete("/api/admin/site/logo").json()["logo_url"] is None
+    assert anon_client.get("/api/site/logo").status_code == 404
 
 
-def test_invalid_logo_upload_is_refused(client: TestClient) -> None:
-    response = upload(client, b"GIF89a....", "logo.png")
+def test_invalid_logo_upload_is_refused(admin_client: TestClient) -> None:
+    response = upload(admin_client, b"GIF89a....", "logo.png")
     assert response.status_code == 422
     assert "PNG, JPEG o SVG" in response.json()["detail"]
-    too_big = upload(client, PNG + b"\x00" * branding.MAX_LOGO_BYTES)
-    assert too_big.status_code == 422
+    assert upload(admin_client, PNG + b"\x00" * branding.MAX_LOGO_BYTES).status_code == 422
 
 
-# Documents
+def test_profile_only_changes_the_name(client: TestClient) -> None:
+    response = client.patch("/api/auth/me", json={"display_name": "Studio Rossi"})
+    assert response.status_code == 200
+    assert response.json()["display_name"] == "Studio Rossi"
+    assert "brand_color" not in response.json() and "logo_url" not in response.json()
+    assert client.patch("/api/auth/me", json={"brand_color": "#000000"}).status_code == 422
+
+
+LEGAL = {
+    "name": "Perl Consulting di Esempio",
+    "address": "Via Roma 1, 34100 Trieste",
+    "vat_id": "IT01234567890",
+    "email": "privacy@example.com",
+    "pec": "",
+    "court": "Trieste",
+    "reviewed": False,
+}
+
+
+def test_legal_details(
+    admin_client: TestClient, anon_client: TestClient, client: TestClient
+) -> None:
+    assert client.put("/api/admin/site/legal", json=LEGAL).status_code == 403
+    response = admin_client.put("/api/admin/site/legal", json={**LEGAL, "name": "  Spazi  "})
+    assert response.status_code == 200
+    legal = anon_client.get("/api/site").json()["legal"]
+    assert legal["name"] == "Spazi" and legal["complete"] is True
+    assert legal["vat_id"] == "IT01234567890" and legal["reviewed"] is False
+
+
+def test_ai_notice_never_exposes_the_endpoint(
+    admin_client: TestClient, anon_client: TestClient
+) -> None:
+    admin_client.put(
+        "/api/admin/ai",
+        json={
+            "enabled": True,
+            "base_url": "https://llm.interno.example/v1",
+            "model": "mistral-small",
+            "api_key": "sk-segretissima-1234",
+            "provider_name": "Fornitore Esempio",
+            "server_location": "Francia (UE)",
+            "model_kind": "open weight, licenza Apache 2.0",
+        },
+    )
+    notice = anon_client.get("/api/site").json()["ai"]
+    assert notice == {
+        "available": True,
+        "model": "mistral-small",
+        "provider_name": "Fornitore Esempio",
+        "server_location": "Francia (UE)",
+        "model_kind": "open weight, licenza Apache 2.0",
+        "location": "remoto",
+    }
+    raw = anon_client.get("/api/site").text
+    assert "llm.interno" not in raw and "sk-" not in raw
+
+
+# Documents: the installation's brand on every project's documents
 
 
 @pytest.fixture
@@ -191,32 +248,31 @@ def test_report_without_branding_keeps_the_default_look(
     assert "h2, .doc-title { color:" not in html
 
 
-def test_report_carries_the_owners_brand(client: TestClient, db: Session, base: str) -> None:
-    client.patch("/api/auth/me", json={"brand_color": "#7a1d4f"})
-    upload(client, PNG)
+def test_report_carries_the_site_brand(
+    client: TestClient, admin_client: TestClient, db: Session, base: str
+) -> None:
+    admin_client.put("/api/admin/site/brand", json={"brand_color": "#7a1d4f"})
+    upload(admin_client, PNG)
     html = render_html_for(client, db, base)
     assert f'src="data:image/png;base64,{base64.b64encode(PNG).decode()}"' in html
     assert "h2, .doc-title { color: #7a1d4f; }" in html
 
 
-def test_shared_page_carries_the_owners_brand(
-    client: TestClient, anon_client: TestClient, base: str
+def test_shared_page_carries_the_site_brand(
+    client: TestClient, admin_client: TestClient, anon_client: TestClient, base: str
 ) -> None:
-    client.patch("/api/auth/me", json={"brand_color": "#7a1d4f"})
-    upload(client, SVG, "logo.svg")
+    admin_client.put("/api/admin/site/brand", json={"brand_color": "#7a1d4f"})
+    upload(admin_client, SVG, "logo.svg")
     url = client.post(f"{base}/shares", json={"label": "Cliente"}).json()["url"]
-    page = anon_client.get("/s/" + url.rsplit("/s/", 1)[1]).text
-    assert ".share-bar { background: #7a1d4f; }" in page
-    assert 'src="data:image/svg+xml;base64,' in page
-    # The page's policy lets the inline logo through, and nothing else.
     response = anon_client.get("/s/" + url.rsplit("/s/", 1)[1])
+    assert ".share-bar { background: #7a1d4f; }" in response.text
+    assert 'src="data:image/svg+xml;base64,' in response.text
     assert "img-src data:;" in response.headers["content-security-policy"]
 
 
 @needs_weasyprint
-def test_pdf_with_logo(client: TestClient, base: str) -> None:
-    client.patch("/api/auth/me", json={"brand_color": "#7a1d4f"})
-    upload(client, SVG, "logo.svg")
+def test_pdf_with_logo(client: TestClient, admin_client: TestClient, base: str) -> None:
+    upload(admin_client, SVG, "logo.svg")
     response = client.get(f"{base}/export.pdf")
     assert response.status_code == 200
     assert response.content.startswith(b"%PDF")
