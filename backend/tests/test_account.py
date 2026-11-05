@@ -11,7 +11,6 @@ from app.models import AIRequest, Answer, EmailToken, Iteration, Project, ShareL
 from app.models import Session as UserSession
 from app.models.project import utcnow
 from app.services import account
-from app.services.errors import InvalidRequestError
 from tests.conftest import make_user, new_client, sign_in
 
 TEXT = "p1.objectives.business_objectives.problem"
@@ -208,70 +207,119 @@ def test_cleanup_removes_only_what_has_expired(db: Session) -> None:
     assert count(db, AIRequest) == 1
 
 
-# Import
+# Moving projects: export one project, import it elsewhere
 
 
-def test_export_then_import_into_another_account(
-    client: TestClient, other_client: TestClient, db: Session
-) -> None:
+def project_file(client: TestClient, base: str) -> bytes:
+    project_id = base.split("/")[3]
+    response = client.get(f"/api/projects/{project_id}/export")
+    assert response.status_code == 200
+    assert response.headers["content-disposition"].startswith('attachment; filename="Churn')
+    assert response.headers["cache-control"] == "no-store"
+    return response.content
+
+
+def import_file(client: TestClient, content: bytes):  # type: ignore[no-untyped-def]
+    return client.post(
+        "/api/projects/import", files={"file": ("progetto.json", content, "application/json")}
+    )
+
+
+def test_one_project_moves_to_another_account(client: TestClient, other_client: TestClient) -> None:
     base = seed_project(client)
     client.patch(base, json={"user_story": "Come **operatore** voglio"})
-    client.patch("/api/auth/me", json={"brand_color": "#7a1d4f"})
-    exported = json.loads(client.get("/api/auth/me/export").content)
+    client.post("/api/projects", json={"name": "Un altro progetto"})
+    content = project_file(client, base)
+    data = json.loads(content)
+    assert data["kind"] == "project" and data["project"]["name"] == "Churn"
+    assert "Un altro progetto" not in content.decode()  # only the chosen project
 
-    target = db.scalars(select(User).where(User.email == "altro@example.com")).one()
-    counts = account.import_data(db, target, exported)
-    assert counts == {"projects": 1, "iterations": 1, "answers": 1, "skipped_answers": 0}
-
-    projects = other_client.get("/api/projects").json()
-    assert [p["name"] for p in projects] == ["Churn"]
-    project = other_client.get(f"/api/projects/{projects[0]['id']}").json()
-    assert project["client_name"] == "ACME"
-    assert project["ai_enabled_at"] is None  # consent is given again on this instance
+    response = import_file(other_client, content)
+    assert response.status_code == 201
+    project = response.json()
+    assert project["name"] == "Churn" and project["client_name"] == "ACME"
+    assert project["ai_enabled_at"] is None  # consent is given again here
     iteration = project["iterations"][0]
     assert iteration["user_story"] == "Come **operatore** voglio"
-    answers = other_client.get(
-        f"/api/projects/{project['id']}/iterations/{iteration['id']}/answers"
-    ).json()
+    path = f"/api/projects/{project['id']}/iterations/{iteration['id']}"
+    answers = other_client.get(f"{path}/answers").json()
     assert answers[0]["question_key"] == TEXT and answers[0]["text"] == "Ridurre gli abbandoni"
-    # Share links are not recreated; the brand is copied because the account had none.
-    path = f"/api/projects/{project['id']}/iterations/{iteration['id']}/shares"
-    assert other_client.get(path).json() == []
-    assert other_client.get("/api/auth/me").json()["brand_color"] == "#7a1d4f"
-    # The source account is untouched.
-    assert len(client.get("/api/projects").json()) == 1
+    assert other_client.get(f"{path}/shares").json() == []  # links are not recreated
+    # The source keeps its projects; importing twice makes a second copy, never a merge.
+    assert len(client.get("/api/projects").json()) == 2
+    assert import_file(other_client, content).status_code == 201
+    assert [p["name"] for p in other_client.get("/api/projects").json()] == ["Churn", "Churn"]
 
 
-def test_import_keeps_an_existing_brand_and_skips_unknown_answers(db: Session) -> None:
+def test_another_users_project_cannot_be_exported(
+    client: TestClient, other_client: TestClient
+) -> None:
+    project_id = seed_project(client).split("/")[3]
+    assert other_client.get(f"/api/projects/{project_id}/export").status_code == 404
+
+
+@pytest.mark.parametrize(
+    "content",
+    [
+        b"non e' json",
+        b"[1, 2]",
+        b'{"format": 99, "project": {"name": "X"}}',
+        b'{"format": 1}',
+        b'{"format": 1, "project": {"iterations": []}}',
+        b'{"format": 1, "project": {"name": "X", "iterations": [{"number": 1}]}}',
+    ],
+)
+def test_invalid_files_import_nothing(client: TestClient, content: bytes) -> None:
+    response = import_file(client, content)
+    assert response.status_code == 422
+    assert client.get("/api/projects").json() == []
+
+
+def test_import_requires_a_session(anon_client: TestClient) -> None:
+    assert import_file(anon_client, b"{}").status_code == 401
+
+
+def test_unknown_answers_are_skipped(db: Session) -> None:
     user = make_user(db)
-    user.brand_color = "#1d4f7a"
-    db.commit()
     data = {
         "format": account.EXPORT_FORMAT,
-        "brand": {"color": "#7a1d4f", "logo": None},
-        "projects": [
-            {
-                "name": "Vecchio",
-                "iterations": [
-                    {
-                        "number": 1,
-                        "title": "Iterazione 1",
-                        "template_version": 1,
-                        "answers": [
-                            {"question_key": TEXT, "text": "ok"},
-                            {"question_key": "p9.non.esiste", "text": "x"},
-                        ],
-                    }
-                ],
-            }
-        ],
+        "kind": "project",
+        "project": {
+            "name": "Vecchio",
+            "iterations": [
+                {
+                    "number": 1,
+                    "title": "Iterazione 1",
+                    "template_version": 1,
+                    "answers": [
+                        {"question_key": TEXT, "text": "ok"},
+                        {"question_key": "p9.non.esiste", "text": "x"},
+                    ],
+                }
+            ],
+        },
     }
-    counts = account.import_data(db, user, data)
+    _, counts = account.import_projects(db, user, data)
     assert counts["answers"] == 1 and counts["skipped_answers"] == 1
-    assert user.brand_color == "#1d4f7a"
 
 
-def test_import_refuses_other_files(db: Session) -> None:
-    user = make_user(db)
-    with pytest.raises(InvalidRequestError, match="Scarica i miei dati"):
-        account.import_data(db, user, {"projects": []})
+def test_the_command_line_imports_a_whole_account_with_its_brand(
+    client: TestClient, db: Session, tmp_path: object
+) -> None:
+    from pathlib import Path
+
+    from app import cli
+
+    seed_project(client)
+    client.patch("/api/auth/me", json={"brand_color": "#7a1d4f"})
+    path = Path(str(tmp_path)) / "dati.json"
+    path.write_bytes(client.get("/api/auth/me/export").content)
+    target = make_user(db, "nuovo@example.com")
+    assert target.brand_color is None
+
+    data = json.loads(path.read_text())
+    _, counts = account.import_projects(db, target, data, brand=True)
+    assert counts["projects"] == 1
+    db.refresh(target)
+    assert target.brand_color == "#7a1d4f"
+    assert "No user" in cli.import_data("assente@example.com", str(path))

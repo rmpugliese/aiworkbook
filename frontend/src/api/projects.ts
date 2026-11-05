@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
-import { apiGet, apiSend, type Schemas } from './client'
+import { apiGet, apiSend, csrfToken, errorFrom, type Schemas } from './client'
 
 export type ProjectSummary = Schemas['ProjectSummary']
 export type Project = Schemas['ProjectOut']
@@ -13,6 +13,11 @@ export type IterationUpdate = Schemas['IterationUpdate']
 /** The PDF report of an iteration, generated on the server. */
 export function exportPdfUrl(projectId: number, iterationId: number): string {
   return `/api/projects/${projectId}/iterations/${iterationId}/export.pdf`
+}
+
+/** One project as a JSON file, to import it into another account or installation. */
+export function exportProjectUrl(projectId: number): string {
+  return `/api/projects/${projectId}/export`
 }
 
 const keys = {
@@ -50,6 +55,22 @@ function useProjectMutation<TVariables, TResult>(fn: (variables: TVariables) => 
   return useMutation({
     mutationFn: fn,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: keys.all }),
+  })
+}
+
+export function useImportProject() {
+  return useProjectMutation(async (file: File) => {
+    const body = new FormData()
+    body.append('file', file)
+    const path = '/api/projects/import'
+    // No Content-Type: the browser sets the multipart boundary itself.
+    const response = await fetch(path, {
+      method: 'POST',
+      headers: { Accept: 'application/json', 'X-CSRF-Token': await csrfToken() },
+      body,
+    })
+    if (!response.ok) throw await errorFrom(response, 'POST', path)
+    return (await response.json()) as Project
   })
 }
 

@@ -98,9 +98,9 @@ export function MarkdownField({
   // Text that arrives from outside while nobody is typing here (the assistant's "Sostituisci"
   // or "Aggiungi in fondo") is shown formatted straight away.
   useEffect(() => {
-    const focused = editor.current?.contains(document.activeElement)
-    if (editing && value.trim() && !focused) setEditing(false)
     // Only a change of text triggers this: entering edit mode must not leave it again.
+    const focused = editor.current?.contains(document.activeElement)
+    if (value.trim() && !focused) setEditing(false)
   }, [value])
 
   function format(action: FormatAction) {

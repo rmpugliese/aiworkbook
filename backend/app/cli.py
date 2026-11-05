@@ -68,7 +68,7 @@ def import_data(email: str, path: str) -> str:
         if user is None:
             return f"No user {email}: register and confirm the account first."
         data = json.loads(Path(path).read_text(encoding="utf-8"))
-        counts = account.import_data(db, user, data)
+        _, counts = account.import_projects(db, user, data, brand=True)
     skipped = (
         f", {counts['skipped_answers']} unknown answers skipped"
         if counts["skipped_answers"]
@@ -95,7 +95,7 @@ def main(argv: list[str] | None = None) -> int:
     promote = commands.add_parser("make-admin", help="Make an existing user an administrator")
     promote.add_argument("--email", required=True)
     importing = commands.add_parser(
-        "import-data", help='Add the projects of a "Scarica i miei dati" file to an account'
+        "import-data", help="Add the projects of an exported file (one project or a whole account)"
     )
     importing.add_argument("--email", required=True, help="The account that receives them")
     importing.add_argument("--file", required=True, help="The exported JSON file")

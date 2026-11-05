@@ -4,6 +4,7 @@ import {
   Button,
   Card,
   Divider,
+  FileButton,
   Group,
   Loader,
   SegmentedControl,
@@ -17,6 +18,7 @@ import {
   IconArchive,
   IconBuilding,
   IconClock,
+  IconFileImport,
   IconFolder,
   IconPlus,
   IconStack2,
@@ -24,7 +26,12 @@ import {
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 
-import { useCreateProject, useProjects, type ProjectSummary } from '../api/projects'
+import {
+  useCreateProject,
+  useImportProject,
+  useProjects,
+  type ProjectSummary,
+} from '../api/projects'
 import { PageHeader } from '../components/PageHeader'
 import { ProjectFormModal } from '../components/ProjectFormModal'
 import { formatDate, iterationLabel } from '../format'
@@ -110,6 +117,7 @@ export function ProjectsPage() {
   const showArchived = view === 'archived'
   const projects = useProjects(showArchived)
   const createProject = useCreateProject()
+  const importProject = useImportProject()
   const navigate = useNavigate()
 
   function startCreating() {
@@ -123,11 +131,45 @@ export function ProjectsPage() {
         title="Progetti"
         subtitle="I tuoi progetti di intelligenza artificiale, un workbook per ogni iterazione."
         actions={
-          <Button leftSection={<IconPlus size={16} />} onClick={startCreating}>
-            Nuovo progetto
-          </Button>
+          <>
+            <FileButton
+              accept="application/json,.json"
+              onChange={(file) => {
+                if (file) {
+                  importProject.mutate(file, {
+                    onSuccess: (project) => navigate(`/projects/${project.id}`),
+                  })
+                }
+              }}
+            >
+              {(props) => (
+                <Button
+                  {...props}
+                  variant="default"
+                  leftSection={<IconFileImport size={16} />}
+                  loading={importProject.isPending}
+                >
+                  Importa progetto
+                </Button>
+              )}
+            </FileButton>
+            <Button leftSection={<IconPlus size={16} />} onClick={startCreating}>
+              Nuovo progetto
+            </Button>
+          </>
         }
       />
+
+      {importProject.isError && (
+        <Alert
+          color="red"
+          title="Importazione non riuscita"
+          withCloseButton
+          onClose={() => importProject.reset()}
+        >
+          {importProject.error.message}
+        </Alert>
+      )}
 
       <SegmentedControl
         w="fit-content"
