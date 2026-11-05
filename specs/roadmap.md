@@ -221,6 +221,17 @@ campi, solo quando l'utente lo chiede.
 
 ---
 
+## Fase 14: Statistiche degli iscritti (Completata)
+
+**Obiettivo:** capire se il servizio piace, a partire dalle iscrizioni.
+
+- [x] Scheda Statistiche in Amministrazione: iscritti, confermati, nuovi in 7 e 30 giorni
+- [x] Grafico delle iscrizioni degli ultimi 30 giorni, senza librerie di grafici
+- [x] Calcolo nel browser dall'elenco utenti, nessun nuovo endpoint
+- [ ] Statistiche di utilizzo (progetti, PDF, AI) ed email di avviso: da valutare
+
+---
+
 ## Più avanti (non pianificato)
 
 - Storico delle revisioni delle risposte
