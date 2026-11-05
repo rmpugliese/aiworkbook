@@ -71,6 +71,7 @@ describe('Go/No-Go', () => {
       verdict: 'no_go',
       choices: null,
       return_to_phase: 1,
+      base_updated_at: null,
     })
 
     await user().click(screen.getByText('GO', { exact: true }))

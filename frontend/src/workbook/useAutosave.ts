@@ -61,5 +61,13 @@ export function useAutosave<T>(
     return () => window.removeEventListener('beforeunload', warn)
   }, [status])
 
-  return { status, retry: flush }
+  /** Takes `value` as already stored (say, a colleague's version): it will not be saved. */
+  const markSaved = useCallback((value: T) => {
+    clearTimeout(timer.current)
+    timer.current = undefined
+    persisted.current = JSON.stringify(value)
+    setStatus('saved')
+  }, [])
+
+  return { status, retry: flush, markSaved }
 }

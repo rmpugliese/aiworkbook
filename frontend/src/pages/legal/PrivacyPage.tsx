@@ -44,6 +44,10 @@ export function PrivacyPage() {
                 <b>Link condivisi</b>: etichetta, scadenza, numero e data degli accessi; il link
                 stesso è conservato solo come impronta crittografica.
               </List.Item>
+              <List.Item>
+                <b>Collaborazione</b>: l'email dei colleghi che inviti in un progetto, chi li ha
+                invitati e quando, e chi ha modificato per ultimo ogni risposta.
+              </List.Item>
             </List>
           </Section>
 
@@ -79,7 +83,8 @@ export function PrivacyPage() {
               dati e devi avere una base giuridica per trattarli; per quei contenuti il titolare
               dell'app agisce come responsabile del trattamento per tuo conto (art. 28 GDPR). Evita
               di inserire categorie particolari di dati (salute, opinioni politiche, ecc.) se non
-              strettamente necessario.
+              strettamente necessario. Se inviti dei colleghi in un progetto, sei tu a decidere di
+              condividere con loro quei contenuti.
             </Text>
           </Section>
 
@@ -101,6 +106,12 @@ export function PrivacyPage() {
               <List.Item>
                 Le persone a cui invii un link condiviso, che vedono l'iterazione in sola lettura.
               </List.Item>
+              <List.Item>
+                I colleghi che inviti come collaboratori di un progetto: vedono e modificano il
+                progetto e vedono nome ed email del proprietario e degli altri collaboratori. Se sei
+                tu a essere invitato, il proprietario e gli altri collaboratori vedono il tuo nome e
+                la tua email, e chi ha modificato ogni risposta.
+              </List.Item>
             </List>
             <Text>
               I dati sono conservati nell'Unione europea e non vengono trasferiti fuori dallo Spazio
@@ -111,6 +122,10 @@ export function PrivacyPage() {
           <Section title="6. Per quanto tempo">
             <List spacing="xs">
               <List.Item>Account e contenuti: finché non elimini l'account.</List.Item>
+              <List.Item>
+                Inviti a collaborare: finché il collaboratore resta nel progetto, o finché il
+                progetto o uno dei due account non viene eliminato.
+              </List.Item>
               <List.Item>Sessioni: 30 giorni dall'ultimo utilizzo.</List.Item>
               <List.Item>
                 Link di conferma e di recupero della password: fino all'uso o alla scadenza.
@@ -145,9 +160,9 @@ export function PrivacyPage() {
           <Section title="9. Sicurezza e modifiche">
             <Text>
               Le comunicazioni sono cifrate (HTTPS), password e link sono conservati solo come
-              impronte crittografiche e i progetti sono visibili solo al loro proprietario. Se
-              questa informativa cambia in modo sostanziale, ti chiederemo di prenderne visione al
-              primo accesso successivo.
+              impronte crittografiche e i progetti sono visibili solo al loro proprietario e ai
+              collaboratori che invita. Se questa informativa cambia in modo sostanziale, ti
+              chiederemo di prenderne visione al primo accesso successivo.
             </Text>
           </Section>
         </>

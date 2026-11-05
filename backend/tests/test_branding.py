@@ -290,6 +290,6 @@ def render_html_for(client: TestClient, db: Session, base: str) -> str:
     project_id, iteration_id = (int(part) for part in base.split("/")[3::2])
     user_id = client.get("/api/auth/me").json()["id"]
     report = iteration_report(
-        db, project_id, iteration_id, owner_id=user_id, generated_at=datetime(2026, 10, 9)
+        db, project_id, iteration_id, user_id=user_id, generated_at=datetime(2026, 10, 9)
     )
     return render_html(report)

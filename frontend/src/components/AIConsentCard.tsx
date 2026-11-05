@@ -38,8 +38,13 @@ export function AIConsentCard({ project }: { project: Project }) {
           <Text size="sm" c="dimmed">
             Modello {model} su {host} ({location === 'locale' ? 'in locale' : 'servizio remoto'}).
           </Text>
+          {project.shared_by !== null && (
+            <Text size="sm" c="dimmed">
+              Lo attiva o lo disattiva il proprietario del progetto.
+            </Text>
+          )}
         </Stack>
-        {enabled ? (
+        {project.shared_by !== null ? null : enabled ? (
           <Button variant="default" loading={setAI.isPending} onClick={() => setAI.mutate(false)}>
             Disattiva
           </Button>

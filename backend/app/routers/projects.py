@@ -6,13 +6,14 @@ from datetime import datetime
 from typing import Annotated
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Query, Response, UploadFile, status
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from app.auth.web import CurrentUser
 from app.db import get_db
 from app.export.pdf import attachment_header, pdf_filename, render_pdf
-from app.models import Project
-from app.schemas.answers import AnswerIn, AnswerOut
+from app.models import Project, User
+from app.schemas.answers import AnswerConflictOut, AnswerIn, AnswerOut
 from app.schemas.projects import (
     IterationCreate,
     IterationOut,
@@ -66,13 +67,14 @@ _PROJECT_COLUMNS = (
 )
 
 
-def _summary(project: Project, iteration_count: int) -> ProjectSummary:
+def _summary(project: Project, iteration_count: int, shared_by: str | None) -> ProjectSummary:
     fields = {name: getattr(project, name) for name in _PROJECT_COLUMNS}
-    return ProjectSummary(**fields, iteration_count=iteration_count)
+    return ProjectSummary(**fields, iteration_count=iteration_count, shared_by=shared_by)
 
 
-def _project_out(project: Project) -> ProjectOut:
-    summary = _summary(project, len(project.iterations))
+def _project_out(user: User, project: Project) -> ProjectOut:
+    shared_by = None if project.owner_id == user.id else service.person_name(project.owner)
+    summary = _summary(project, len(project.iterations), shared_by)
     iterations = [IterationOut.model_validate(iteration) for iteration in project.iterations]
     return ProjectOut(**summary.model_dump(), iterations=iterations)
 
@@ -82,15 +84,17 @@ def list_projects(
     db: Db, user: CurrentUser, archived: Annotated[bool, Query()] = False
 ) -> list[ProjectSummary]:
     return [
-        _summary(project, count)
-        for project, count in service.list_projects(db, owner_id=user.id, archived=archived)
+        _summary(project, count, shared_by)
+        for project, count, shared_by in service.list_projects(
+            db, user_id=user.id, archived=archived
+        )
     ]
 
 
 @router.post("", status_code=status.HTTP_201_CREATED)
 def create_project(db: Db, user: CurrentUser, data: ProjectCreate) -> ProjectOut:
     with _service_errors():
-        return _project_out(service.create_project(db, data, owner_id=user.id))
+        return _project_out(user, service.create_project(db, data, user_id=user.id))
 
 
 # Within what the reverse proxy accepts (2 MB, see DEPLOY.md); a project file is far smaller.
@@ -118,7 +122,7 @@ async def import_project(db: Db, user: CurrentUser, file: UploadFile) -> Project
             'File non valido: usa un file scaricato con "Esporta progetto".',
         ) from error
     db.refresh(projects[0])
-    return _project_out(projects[0])
+    return _project_out(user, projects[0])
 
 
 @router.post("/import-workbook", status_code=status.HTTP_201_CREATED)
@@ -130,7 +134,7 @@ def import_workbook_pdf(
         project, answers = pdf_import_service.import_workbook_fields(db, user, data)
     except InvalidRequestError as error:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(error)) from error
-    return WorkbookPdfImportOut(project=_project_out(project), answers=answers)
+    return WorkbookPdfImportOut(project=_project_out(user, project), answers=answers)
 
 
 @router.get(
@@ -140,7 +144,7 @@ def import_workbook_pdf(
 )
 def export_project(db: Db, user: CurrentUser, project_id: int) -> Response:
     with _service_errors():
-        project = service.get_project(db, project_id, owner_id=user.id)
+        project = service.get_project(db, project_id, user_id=user.id)
     data = account_service.export_project(db, project)
     filename = f"{_UNSAFE_FILENAME.sub(' ', project.name).strip()} - progetto.json"
     return Response(
@@ -153,25 +157,29 @@ def export_project(db: Db, user: CurrentUser, project_id: int) -> Response:
 @router.get("/{project_id}")
 def get_project(db: Db, user: CurrentUser, project_id: int) -> ProjectOut:
     with _service_errors():
-        return _project_out(service.get_project(db, project_id, owner_id=user.id))
+        return _project_out(user, service.get_project(db, project_id, user_id=user.id))
 
 
 @router.patch("/{project_id}")
 def update_project(db: Db, user: CurrentUser, project_id: int, data: ProjectUpdate) -> ProjectOut:
     with _service_errors():
-        return _project_out(service.update_project(db, project_id, data, owner_id=user.id))
+        return _project_out(user, service.update_project(db, project_id, data, user_id=user.id))
 
 
 @router.post("/{project_id}/archive")
 def archive_project(db: Db, user: CurrentUser, project_id: int) -> ProjectOut:
     with _service_errors():
-        return _project_out(service.set_archived(db, project_id, owner_id=user.id, archived=True))
+        return _project_out(
+            user, service.set_archived(db, project_id, user_id=user.id, archived=True)
+        )
 
 
 @router.post("/{project_id}/unarchive")
 def unarchive_project(db: Db, user: CurrentUser, project_id: int) -> ProjectOut:
     with _service_errors():
-        return _project_out(service.set_archived(db, project_id, owner_id=user.id, archived=False))
+        return _project_out(
+            user, service.set_archived(db, project_id, user_id=user.id, archived=False)
+        )
 
 
 @router.delete("/{project_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -179,7 +187,7 @@ def delete_project(
     db: Db, user: CurrentUser, project_id: int, data: Annotated[ProjectDelete, Body()]
 ) -> None:
     with _service_errors():
-        service.delete_project(db, project_id, owner_id=user.id, confirm_name=data.confirm_name)
+        service.delete_project(db, project_id, user_id=user.id, confirm_name=data.confirm_name)
 
 
 @router.post("/{project_id}/iterations", status_code=status.HTTP_201_CREATED)
@@ -188,7 +196,7 @@ def create_iteration(
 ) -> IterationOut:
     with _service_errors():
         return IterationOut.model_validate(
-            service.create_iteration(db, project_id, data, owner_id=user.id)
+            service.create_iteration(db, project_id, data, user_id=user.id)
         )
 
 
@@ -196,7 +204,7 @@ def create_iteration(
 def get_iteration(db: Db, user: CurrentUser, project_id: int, iteration_id: int) -> IterationOut:
     with _service_errors():
         return IterationOut.model_validate(
-            service.get_iteration(db, project_id, iteration_id, owner_id=user.id)
+            service.get_iteration(db, project_id, iteration_id, user_id=user.id)
         )
 
 
@@ -206,25 +214,39 @@ def update_iteration(
 ) -> IterationOut:
     with _service_errors():
         return IterationOut.model_validate(
-            service.update_iteration(db, project_id, iteration_id, data, owner_id=user.id)
+            service.update_iteration(db, project_id, iteration_id, data, user_id=user.id)
         )
 
 
 @router.get("/{project_id}/iterations/{iteration_id}/answers")
 def list_answers(db: Db, user: CurrentUser, project_id: int, iteration_id: int) -> list[AnswerOut]:
     with _service_errors():
-        answers = answers_service.list_answers(db, project_id, iteration_id, owner_id=user.id)
+        answers = answers_service.list_answers(db, project_id, iteration_id, user_id=user.id)
     return [AnswerOut.model_validate(answer) for answer in answers]
 
 
-@router.put("/{project_id}/iterations/{iteration_id}/answers/{question_key}")
+@router.put(
+    "/{project_id}/iterations/{iteration_id}/answers/{question_key}",
+    responses={409: {"model": AnswerConflictOut, "description": "Changed by someone else"}},
+    response_model=AnswerOut,
+)
 def save_answer(
     db: Db, user: CurrentUser, project_id: int, iteration_id: int, question_key: str, data: AnswerIn
-) -> AnswerOut:
+) -> AnswerOut | JSONResponse:
     """Replaces one answer. An answer with every field empty is deleted."""
-    with _service_errors():
-        answer = answers_service.save_answer(
-            db, project_id, iteration_id, question_key, data, owner_id=user.id
+    try:
+        with _service_errors():
+            answer = answers_service.save_answer(
+                db, project_id, iteration_id, question_key, data, user_id=user.id
+            )
+    except answers_service.AnswerConflictError as conflict:
+        db.rollback()
+        body = AnswerConflictOut(
+            detail="Nel frattempo un collega ha modificato questa risposta.",
+            current=AnswerOut.model_validate(conflict.current),
+        )
+        return JSONResponse(
+            status_code=status.HTTP_409_CONFLICT, content=body.model_dump(mode="json")
         )
     if answer is None:
         return AnswerOut(
@@ -249,7 +271,7 @@ def export_pdf(db: Db, user: CurrentUser, project_id: int, iteration_id: int) ->
             db,
             project_id,
             iteration_id,
-            owner_id=user.id,
+            user_id=user.id,
             generated_at=datetime.now().astimezone(),
         )
     return Response(
@@ -264,7 +286,7 @@ def enable_ai(db: Db, user: CurrentUser, project_id: int) -> ProjectOut:
     """The owner's consent to send this project's content to the assistant's endpoint."""
     with _service_errors():
         return _project_out(
-            ai_service.set_project_consent(db, project_id, owner_id=user.id, enabled=True)
+            user, ai_service.set_project_consent(db, project_id, user_id=user.id, enabled=True)
         )
 
 
@@ -272,5 +294,5 @@ def enable_ai(db: Db, user: CurrentUser, project_id: int) -> ProjectOut:
 def disable_ai(db: Db, user: CurrentUser, project_id: int) -> ProjectOut:
     with _service_errors():
         return _project_out(
-            ai_service.set_project_consent(db, project_id, owner_id=user.id, enabled=False)
+            user, ai_service.set_project_consent(db, project_id, user_id=user.id, enabled=False)
         )

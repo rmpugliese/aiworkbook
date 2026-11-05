@@ -30,8 +30,8 @@ export function TermsPage() {
               Oggi l'app è <b>gratuita</b>. Mantenerla ha però dei costi (server, servizio di
               intelligenza artificiale, manutenzione): se diventassero non sostenibili, il fornitore
               potrà introdurre <b>piani a pagamento</b> o <b>limiti di utilizzo</b>, per esempio per
-              la personalizzazione dei documenti con il proprio marchio, per l'assistente AI o per
-              il numero di progetti. In questo caso:
+              la personalizzazione dei documenti con il proprio marchio, per l'assistente AI, per il
+              numero di progetti o di collaboratori. In questo caso:
             </Text>
             <List spacing="xs">
               <List.Item>
@@ -102,10 +102,20 @@ export function TermsPage() {
             </Text>
           </Section>
 
-          <Section title="7. Link condivisi">
+          <Section title="7. Link condivisi e collaboratori">
             <Text>
               Chi riceve un link condiviso vede l'iterazione senza account. Sei tu a decidere a chi
               inviarlo e puoi revocarlo in qualsiasi momento.
+            </Text>
+            <Text>
+              Puoi invitare dei colleghi come <b>collaboratori</b> di un tuo progetto (oggi fino a
+              cinque per progetto): vedono e modificano il workbook, scaricano i documenti e usano
+              l'assistente se lo hai attivato. Il progetto resta tuo: solo tu lo modifichi, archivi
+              o elimini, gestisci i link pubblici e i collaboratori, che puoi rimuovere in qualsiasi
+              momento. Sei responsabile di chi inviti e di avere il diritto di condividere con loro
+              i dati dei tuoi clienti. Se sei invitato in un progetto altrui, usa i suoi contenuti
+              solo per quel lavoro e rispetta gli accordi di riservatezza del proprietario; puoi
+              lasciare il progetto quando vuoi.
             </Text>
           </Section>
 

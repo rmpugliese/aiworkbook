@@ -552,6 +552,44 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/projects/{project_id}/members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Members */
+        get: operations["list_members_api_projects__project_id__members_get"];
+        put?: never;
+        /** Invite */
+        post: operations["invite_api_projects__project_id__members_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/projects/{project_id}/members/{member_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Remove
+         * @description The owner removes a collaborator; a collaborator removes themselves to leave.
+         */
+        delete: operations["remove_api_projects__project_id__members__member_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/users": {
         parameters: {
             query?: never;
@@ -984,6 +1022,12 @@ export interface components {
             /** Google Linked */
             google_linked: boolean;
         };
+        /** AnswerConflictOut */
+        AnswerConflictOut: {
+            /** Detail */
+            detail: string;
+            current: components["schemas"]["AnswerOut"];
+        };
         /**
          * AnswerIn
          * @description A full replacement of one answer. Empty fields are null (or an empty list).
@@ -997,6 +1041,8 @@ export interface components {
             choices?: string[] | null;
             /** Return To Phase */
             return_to_phase?: number | null;
+            /** Base Updated At */
+            base_updated_at?: string | null;
         };
         /** AnswerOut */
         AnswerOut: {
@@ -1012,6 +1058,10 @@ export interface components {
             return_to_phase: number | null;
             /** Updated At */
             updated_at: string | null;
+            /** Updated By Id */
+            updated_by_id?: number | null;
+            /** Updated By Name */
+            updated_by_name?: string | null;
         };
         /** AssistIn */
         AssistIn: {
@@ -1112,6 +1162,12 @@ export interface components {
              * @enum {string}
              */
             database: "ok" | "error";
+        };
+        /** InviteResult */
+        InviteResult: {
+            member: components["schemas"]["MemberOut"];
+            /** Notified */
+            notified: boolean;
         };
         /** IterationCreate */
         IterationCreate: {
@@ -1219,6 +1275,35 @@ export interface components {
             /** Password */
             password: string;
         };
+        /** MemberInvite */
+        MemberInvite: {
+            /**
+             * Email
+             * Format: email
+             */
+            email: string;
+        };
+        /** MemberOut */
+        MemberOut: {
+            /** Id */
+            id: number;
+            /** Email */
+            email: string;
+            /** Name */
+            name: string | null;
+            /** Pending */
+            pending: boolean;
+        };
+        /** MembersOut */
+        MembersOut: {
+            owner: components["schemas"]["PersonOut"];
+            /** Members */
+            members: components["schemas"]["MemberOut"][];
+            /** Limit */
+            limit: number;
+            /** Can Manage */
+            can_manage: boolean;
+        };
         /** MessageOut */
         MessageOut: {
             /** Detail */
@@ -1246,6 +1331,13 @@ export interface components {
             token: string;
             /** Password */
             password: string;
+        };
+        /** PersonOut */
+        PersonOut: {
+            /** Name */
+            name: string;
+            /** Email */
+            email: string;
         };
         /** Phase */
         Phase: {
@@ -1329,6 +1421,8 @@ export interface components {
             ai_enabled_at: string | null;
             /** Iteration Count */
             iteration_count: number;
+            /** Shared By */
+            shared_by?: string | null;
             /** Iterations */
             iterations: components["schemas"]["IterationOut"][];
         };
@@ -1358,6 +1452,8 @@ export interface components {
             ai_enabled_at: string | null;
             /** Iteration Count */
             iteration_count: number;
+            /** Shared By */
+            shared_by?: string | null;
         };
         /** ProjectUpdate */
         ProjectUpdate: {
@@ -2626,6 +2722,15 @@ export interface operations {
                     "application/json": components["schemas"]["AnswerOut"];
                 };
             };
+            /** @description Changed by someone else */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnswerConflictOut"];
+                };
+            };
             /** @description Validation Error */
             422: {
                 headers: {
@@ -2725,6 +2830,108 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ProjectOut"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_members_api_projects__project_id__members_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: number;
+            };
+            cookie?: {
+                session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MembersOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    invite_api_projects__project_id__members_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: number;
+            };
+            cookie?: {
+                session?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MemberInvite"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InviteResult"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_api_projects__project_id__members__member_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: number;
+                member_id: number;
+            };
+            cookie?: {
+                session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

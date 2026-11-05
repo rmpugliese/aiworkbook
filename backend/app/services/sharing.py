@@ -34,10 +34,8 @@ def link_status(link: ShareLink) -> LinkStatus:
     return "active"
 
 
-def list_links(
-    db: Session, project_id: int, iteration_id: int, *, owner_id: int
-) -> list[ShareLink]:
-    get_iteration(db, project_id, iteration_id, owner_id=owner_id)
+def list_links(db: Session, project_id: int, iteration_id: int, *, user_id: int) -> list[ShareLink]:
+    get_iteration(db, project_id, iteration_id, user_id=user_id, owner_only=True)
     return list(
         db.scalars(
             select(ShareLink)
@@ -52,17 +50,17 @@ def create_link(
     project_id: int,
     iteration_id: int,
     *,
-    owner_id: int,
+    user_id: int,
     label: str,
     expires_in_days: int | None,
 ) -> tuple[ShareLink, str]:
     """Returns the new link and its token, which is not stored anywhere."""
-    get_iteration(db, project_id, iteration_id, owner_id=owner_id)
+    get_iteration(db, project_id, iteration_id, user_id=user_id, owner_only=True)
     token = new_token()
     now = utcnow()
     link = ShareLink(
         iteration_id=iteration_id,
-        created_by=owner_id,
+        created_by=user_id,
         label=label,
         token_hash=token_hash(token),
         created_at=now,
@@ -74,9 +72,9 @@ def create_link(
 
 
 def _owned_link(
-    db: Session, project_id: int, iteration_id: int, link_id: int, *, owner_id: int
+    db: Session, project_id: int, iteration_id: int, link_id: int, *, user_id: int
 ) -> ShareLink:
-    get_iteration(db, project_id, iteration_id, owner_id=owner_id)
+    get_iteration(db, project_id, iteration_id, user_id=user_id, owner_only=True)
     link = db.get(ShareLink, link_id)
     if link is None or link.iteration_id != iteration_id:
         raise NotFoundError(f"share link {link_id} not found")
@@ -84,9 +82,9 @@ def _owned_link(
 
 
 def revoke_link(
-    db: Session, project_id: int, iteration_id: int, link_id: int, *, owner_id: int
+    db: Session, project_id: int, iteration_id: int, link_id: int, *, user_id: int
 ) -> ShareLink:
-    link = _owned_link(db, project_id, iteration_id, link_id, owner_id=owner_id)
+    link = _owned_link(db, project_id, iteration_id, link_id, user_id=user_id)
     if link.revoked_at is None:
         link.revoked_at = utcnow()
         db.commit()
@@ -94,9 +92,9 @@ def revoke_link(
 
 
 def delete_link(
-    db: Session, project_id: int, iteration_id: int, link_id: int, *, owner_id: int
+    db: Session, project_id: int, iteration_id: int, link_id: int, *, user_id: int
 ) -> None:
-    link = _owned_link(db, project_id, iteration_id, link_id, owner_id=owner_id)
+    link = _owned_link(db, project_id, iteration_id, link_id, user_id=user_id)
     if link_status(link) == "active":
         raise ConflictError("Revoca il link prima di eliminarlo.")
     db.delete(link)

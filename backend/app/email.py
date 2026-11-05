@@ -82,3 +82,24 @@ def send_password_reset(to: str, link: str) -> None:
         f"{link}\n\nSe non l'hai chiesto tu, ignora questo messaggio: la password attuale resta "
         "valida." + _SIGNATURE,
     )
+
+
+def send_project_shared(to: str, inviter: str, project_name: str, link: str) -> None:
+    send_email(
+        to,
+        f"{inviter} ti ha aggiunto a un progetto",
+        f"Ciao,\n\n{inviter} ti ha aggiunto come collaboratore al progetto «{project_name}». "
+        f"Lo trovi tra i tuoi progetti:\n\n{link}" + _SIGNATURE,
+    )
+
+
+def send_project_invitation(to: str, inviter: str, project_name: str, register_link: str) -> None:
+    send_email(
+        to,
+        f"{inviter} ti invita a collaborare a un progetto",
+        f"Ciao,\n\n{inviter} ti invita a collaborare al progetto «{project_name}» su AI Project "
+        "Workbook, l'app per documentare i progetti di intelligenza artificiale.\n\n"
+        f"Per partecipare iscriviti con questo indirizzo email:\n\n{register_link}\n\n"
+        "Il progetto comparirà tra i tuoi appena confermi l'indirizzo. Se non conosci chi ti "
+        "ha invitato, ignora questo messaggio." + _SIGNATURE,
+    )

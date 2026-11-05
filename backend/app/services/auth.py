@@ -13,6 +13,7 @@ from app.config import get_settings
 from app.legal import TERMS_VERSION
 from app.models import EmailToken, Project, Session, User
 from app.models.project import utcnow
+from app.services import members
 from app.services.errors import ConflictError, InvalidRequestError
 
 VERIFY_EMAIL = "verify_email"
@@ -137,6 +138,7 @@ def _mark_verified(db: DbSession, user: User) -> None:
         user.email_verified_at = utcnow()
         db.flush()
         _set_up_first_account(db, user)
+        members.activate_invitations(db, user)
 
 
 def _set_up_first_account(db: DbSession, user: User) -> None:

@@ -176,14 +176,16 @@ export function IterationPage() {
               >
                 Scarica PDF
               </Button>
-              <Button
-                variant="light"
-                size="xs"
-                leftSection={<IconShare size={14} />}
-                onClick={() => setSharing(true)}
-              >
-                Condividi
-              </Button>
+              {project.data.shared_by === null && (
+                <Button
+                  variant="light"
+                  size="xs"
+                  leftSection={<IconShare size={14} />}
+                  onClick={() => setSharing(true)}
+                >
+                  Condividi
+                </Button>
+              )}
             </Group>
           </Stack>
         </Paper>

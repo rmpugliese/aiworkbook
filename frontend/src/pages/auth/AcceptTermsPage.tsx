@@ -21,9 +21,9 @@ export function AcceptTermsPage() {
     >
       <Stack>
         <Text size="sm">
-          Riassunto: i tuoi progetti restano tuoi e visibili solo a te e a chi condividi;
-          l'assistente AI invia dati solo sui progetti in cui lo attivi; puoi scaricare i tuoi dati
-          ed eliminare l'account quando vuoi.
+          Riassunto: i tuoi progetti restano tuoi e visibili solo a te, ai colleghi che inviti come
+          collaboratori e a chi mandi un link condiviso; l'assistente AI invia dati solo sui
+          progetti in cui lo attivi; puoi scaricare i tuoi dati ed eliminare l'account quando vuoi.
         </Text>
         <Checkbox
           checked={accepted}

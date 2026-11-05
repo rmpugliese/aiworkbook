@@ -2,18 +2,19 @@ import { Button, Group, Stack, Text, Title } from '@mantine/core'
 import { IconArrowLeft, IconArrowRight } from '@tabler/icons-react'
 import { Link } from 'react-router'
 
-import type { Answer, AnswerIn } from '../api/answers'
+import type { Answer } from '../api/answers'
 import type { Template } from '../api/template'
 import type { AssistantContext } from './AssistantPanel'
 import { QuestionField } from './QuestionField'
 import { phaseLabel, type TaskRef } from './structure'
+import type { SaveAnswer } from './useAnswerDraft'
 
 type Props = {
   current: TaskRef
   previous: TaskRef | undefined
   next: TaskRef | undefined
   answers: Map<string, Answer>
-  save: (key: string, data: AnswerIn) => Promise<unknown>
+  save: SaveAnswer
   linkTo: (path: string) => string
   template: Template
   assistant?: AssistantContext

@@ -116,11 +116,12 @@ def _host(base_url: str) -> str:
     return urlparse(base_url).netloc
 
 
-def set_project_consent(db: DbSession, project_id: int, *, owner_id: int, enabled: bool) -> Project:
-    project = get_project(db, project_id, owner_id=owner_id)
+def set_project_consent(db: DbSession, project_id: int, *, user_id: int, enabled: bool) -> Project:
+    # Only the owner decides whether the project's content may go to the AI endpoint.
+    project = get_project(db, project_id, user_id=user_id, owner_only=True)
     project.ai_enabled_at = utcnow() if enabled else None
     db.commit()
-    return get_project(db, project_id, owner_id=owner_id)
+    return get_project(db, project_id, user_id=user_id)
 
 
 # --- Assisting --------------------------------------------------------------------------
@@ -145,8 +146,8 @@ def prepare_assist(
     text: str,
     verdict: str | None,
 ) -> PreparedAssist:
-    project = get_project(db, project_id, owner_id=user.id)
-    iteration = get_iteration(db, project_id, iteration_id, owner_id=user.id)
+    project = get_project(db, project_id, user_id=user.id)
+    iteration = get_iteration(db, project_id, iteration_id, user_id=user.id)
     row = _row(db)
     if not _configured(row):
         raise ConflictError("L'assistente AI non è configurato: chiedi all'amministratore.")
@@ -173,7 +174,7 @@ def prepare_assist(
         project=project,
         iteration=iteration,
         template=template,
-        answers=list_answers(db, project_id, iteration_id, owner_id=user.id),
+        answers=list_answers(db, project_id, iteration_id, user_id=user.id),
         here=here,
         current_text=text,
         current_verdict=verdict,

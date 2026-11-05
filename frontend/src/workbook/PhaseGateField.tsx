@@ -2,7 +2,7 @@ import { Alert, Checkbox, Select, Stack, Text } from '@mantine/core'
 
 import type { Answer, Verdict } from '../api/answers'
 import type { Template } from '../api/template'
-import { QuestionCard, SaveIndicator, VerdictControl } from './AnswerControls'
+import { AnswerFooter, QuestionCard, VerdictControl } from './AnswerControls'
 import { useAnswerDraft, type SaveAnswer } from './useAnswerDraft'
 import { AssistantPanel, type AssistantContext } from './AssistantPanel'
 import { FactorMatrix } from './FactorMatrix'
@@ -31,7 +31,9 @@ type Suggestion =
 
 /** End-of-phase Go/No-Go: the app suggests, the user decides and explains any difference. */
 export function PhaseGateField({ question, answers, save, template, linkTo, assistant }: Props) {
-  const { draft, update, status, retry } = useAnswerDraft(question, answers.get(question.key), save)
+  const answer = answers.get(question.key)
+  const handle = useAnswerDraft(question, answer, save)
+  const { draft, update } = handle
   const phaseNumber = Number(question.key.slice(1, 2))
   const isPhaseOne = phaseNumber === 1
   const matrix = isPhaseOne ? factorMatrix(template, answers) : null
@@ -177,7 +179,7 @@ export function PhaseGateField({ question, answers, save, template, linkTo, assi
           onApply={(text) => update({ text })}
         />
       )}
-      <SaveIndicator status={status} onRetry={retry} />
+      <AnswerFooter answer={answer} handle={handle} />
     </QuestionCard>
   )
 }
