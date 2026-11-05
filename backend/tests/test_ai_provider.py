@@ -9,7 +9,7 @@ from app.ai.provider import AIServiceError, Completion, OpenAICompatibleProvider
 
 
 def provider(
-    handler: httpx.MockTransport, api_key: str | None = "sk-test"
+    handler: httpx.MockTransport, api_key: str | None = "chiave-finta-test"
 ) -> OpenAICompatibleProvider:
     return OpenAICompatibleProvider(
         base_url="http://llm.test/v1/",
@@ -54,7 +54,7 @@ async def test_streams_the_text_and_sends_the_expected_request() -> None:
     assert (completion.usage.prompt_tokens, completion.usage.completion_tokens) == (120, 4)
     [request] = seen
     assert str(request.url) == "http://llm.test/v1/chat/completions"
-    assert request.headers["authorization"] == "Bearer sk-test"
+    assert request.headers["authorization"] == "Bearer chiave-finta-test"
     payload = json.loads(request.content)
     assert payload["model"] == "modello-di-prova" and payload["stream"] is True
     assert payload["temperature"] == 0.3 and payload["max_tokens"] == 500

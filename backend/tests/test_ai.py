@@ -90,17 +90,17 @@ def ready(admin_client: TestClient, client: TestClient, project: dict[str, Any])
 def test_admin_configures_the_endpoint_and_the_key_is_never_returned(
     admin_client: TestClient, db: Session
 ) -> None:
-    response = configure(admin_client, api_key="sk-segretissima-1234")
+    response = configure(admin_client, api_key="chiave-finta-di-test-1234")
 
     body = response.json()
     assert response.status_code == 200
     assert body["has_api_key"] is True and body["api_key_hint"] == "1234"
     assert body["location"] == "locale"
-    assert "sk-segretissima" not in response.text
-    assert "sk-segretissima" not in admin_client.get("/api/admin/ai").text
+    assert "chiave-finta-di-test" not in response.text
+    assert "chiave-finta-di-test" not in admin_client.get("/api/admin/ai").text
     stored = db.get(AISettings, 1)
     assert stored is not None and stored.api_key_encrypted
-    assert "sk-segretissima" not in stored.api_key_encrypted
+    assert "chiave-finta-di-test" not in stored.api_key_encrypted
 
 
 def test_the_key_is_kept_replaced_or_cleared(admin_client: TestClient) -> None:
@@ -112,13 +112,13 @@ def test_the_key_is_kept_replaced_or_cleared(admin_client: TestClient) -> None:
 
 
 def test_the_stored_key_decrypts_for_the_provider(admin_client: TestClient, db: Session) -> None:
-    configure(admin_client, api_key="sk-originale")
+    configure(admin_client, api_key="chiave-finta-originale")
     row = db.get(AISettings, 1)
     assert row is not None
 
     provider = ai_service.build_provider(row)
 
-    assert provider._headers["Authorization"] == "Bearer sk-originale"  # type: ignore[attr-defined]
+    assert provider._headers["Authorization"] == "Bearer chiave-finta-originale"  # type: ignore[attr-defined]
 
 
 def test_invalid_url_is_rejected(admin_client: TestClient) -> None:
