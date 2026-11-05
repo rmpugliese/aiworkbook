@@ -62,6 +62,8 @@ class IterationOut(_Output):
     status: IterationStatus
     created_at: UtcDatetime
     updated_at: UtcDatetime
+    # When the assistant first drafted or improved a text here; documents disclose it.
+    ai_assisted_at: UtcDatetime | None = None
 
 
 class ProjectSummary(_Output):

@@ -25,7 +25,31 @@ export function TermsPage() {
             </Text>
           </Section>
 
-          <Section title="2. Il servizio">
+          <Section title="2. Gratuità e possibili funzioni a pagamento">
+            <Text>
+              Oggi l'app è <b>gratuita</b>. Mantenerla ha però dei costi (server, servizio di
+              intelligenza artificiale, manutenzione): se diventassero non sostenibili, il fornitore
+              potrà introdurre <b>piani a pagamento</b> o <b>limiti di utilizzo</b>, per esempio per
+              la personalizzazione dei documenti con il proprio marchio, per l'assistente AI o per
+              il numero di progetti. In questo caso:
+            </Text>
+            <List spacing="xs">
+              <List.Item>
+                le nuove condizioni saranno comunicate con almeno <b>30 giorni di anticipo</b>, via
+                email e nell'app, e dovrai accettarle prima di continuare;
+              </List.Item>
+              <List.Item>
+                <b>nessun addebito automatico</b>: una funzione a pagamento si attiva solo con una
+                tua scelta esplicita;
+              </List.Item>
+              <List.Item>
+                l'<b>esportazione dei tuoi progetti e dei tuoi dati</b> resterà sempre disponibile e
+                gratuita, così potrai portarli via in qualsiasi momento.
+              </List.Item>
+            </List>
+          </Section>
+
+          <Section title="3. Il servizio">
             <Text>
               L'app aiuta a documentare progetti di intelligenza artificiale con una struttura
               compatibile con la metodologia CPMAI: progetti, iterazioni, domande del workbook,
@@ -36,7 +60,7 @@ export function TermsPage() {
             </Text>
           </Section>
 
-          <Section title="3. Il tuo account">
+          <Section title="4. Il tuo account">
             <List spacing="xs">
               <List.Item>Devi indicare un indirizzo email valido e confermarlo.</List.Item>
               <List.Item>
@@ -49,7 +73,7 @@ export function TermsPage() {
             </List>
           </Section>
 
-          <Section title="4. I tuoi contenuti">
+          <Section title="5. I tuoi contenuti">
             <Text>
               Ciò che inserisci resta tuo. Al fornitore concedi solo i diritti necessari a
               conservarlo, mostrarlo a te e alle persone con cui lo condividi e trasformarlo nei
@@ -64,7 +88,7 @@ export function TermsPage() {
             </Text>
           </Section>
 
-          <Section title="5. Assistente AI">
+          <Section title="6. Assistente AI">
             <Text>
               L'assistente è facoltativo e interviene solo quando lo chiedi, nei progetti in cui lo
               hai attivato. Le sue proposte sono generate automaticamente e possono essere
@@ -78,22 +102,26 @@ export function TermsPage() {
             </Text>
           </Section>
 
-          <Section title="6. Link condivisi">
+          <Section title="7. Link condivisi">
             <Text>
               Chi riceve un link condiviso vede l'iterazione senza account. Sei tu a decidere a chi
               inviarlo e puoi revocarlo in qualsiasi momento.
             </Text>
           </Section>
 
-          <Section title="7. Uso corretto">
+          <Section title="8. Uso corretto">
             <Text>
               Non usare l'app per attività illecite, per inserire contenuti che violano diritti di
-              terzi, per tentare di accedere a dati altrui o per sovraccaricare il servizio. In caso
-              di violazioni l'account può essere sospeso.
+              terzi, per tentare di accedere a dati altrui o per sovraccaricare il servizio. Non
+              usarla, né usare l'assistente, per pratiche vietate dal Regolamento (UE) 2024/1689 o
+              come sistema che prende o determina decisioni ad alto rischio su persone (per esempio
+              selezione del personale, accesso al credito o a servizi essenziali): l'app è uno
+              strumento di documentazione dei progetti, non un sistema decisionale. In caso di
+              violazioni l'account può essere sospeso.
             </Text>
           </Section>
 
-          <Section title="8. Nessuna garanzia e limitazione di responsabilità">
+          <Section title="9. Nessuna garanzia e limitazione di responsabilità">
             <Text>
               Nella misura massima consentita dalla legge, il servizio è fornito senza garanzie di
               alcun tipo, espresse o implicite, comprese quelle di funzionamento ininterrotto,
@@ -106,7 +134,7 @@ export function TermsPage() {
             </Text>
           </Section>
 
-          <Section title="9. Modifiche e interruzione">
+          <Section title="10. Modifiche e interruzione">
             <Text>
               I termini possono cambiare: le modifiche sostanziali ti saranno presentate al primo
               accesso successivo e potrai accettarle o eliminare l'account. Il servizio può essere
@@ -115,12 +143,12 @@ export function TermsPage() {
             </Text>
           </Section>
 
-          <Section title="10. Legge applicabile e contatti">
+          <Section title="11. Legge applicabile e contatti">
             <Text>
               Questi termini sono regolati dalla legge italiana. Foro competente:{' '}
               <Value value={site.legal.court} placeholder="foro" />, salvo il foro del consumatore
-              quando previsto dalla legge. Contatti:{' '}
-              <Value value={site.legal.email} placeholder="email" />.
+              quando previsto dalla legge. Per informazioni:{' '}
+              <Value value={site.legal.contact_email} placeholder="email" />.
             </Text>
           </Section>
         </>

@@ -25,6 +25,8 @@ function LegalForm({ site }: { site: Site }) {
     pec: site.legal.pec,
     court: site.legal.court,
     reviewed: site.legal.reviewed,
+    // The API answers with the privacy email when no contact email is set: start empty then.
+    contact_email: site.legal.contact_email === site.legal.email ? '' : site.legal.contact_email,
   })
   const field = (key: keyof typeof values) => ({
     value: values[key] as string,
@@ -65,6 +67,12 @@ function LegalForm({ site }: { site: Site }) {
           <TextInput label="Email per la privacy" type="email" required {...field('email')} />
           <TextInput label="PEC" type="email" description="Facoltativa" {...field('pec')} />
         </SimpleGrid>
+        <TextInput
+          label="Email per informazioni"
+          type="email"
+          description="Nel piè di pagina come «Contatti». Se vuota, si usa l'email per la privacy."
+          {...field('contact_email')}
+        />
         <TextInput
           label="Foro competente"
           description="Per i termini d'uso, es. Trieste"

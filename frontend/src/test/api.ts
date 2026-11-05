@@ -31,6 +31,7 @@ export function site(overrides: Record<string, unknown> = {}) {
       pec: '',
       court: '',
       reviewed: false,
+      contact_email: '',
       complete: false,
     },
     ai: {

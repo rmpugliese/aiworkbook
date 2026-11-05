@@ -320,3 +320,24 @@ def test_the_command_line_imports_a_whole_account(
 
     assert "1 projects" in cli.import_data("nuovo@example.com", str(path))
     assert "No user" in cli.import_data("assente@example.com", str(path))
+
+
+def test_the_ai_disclosure_travels_with_an_imported_project(db: Session) -> None:
+    user = make_user(db)
+    data = {
+        "format": account.EXPORT_FORMAT,
+        "project": {
+            "name": "Con AI",
+            "iterations": [
+                {
+                    "number": 1,
+                    "title": "Iterazione 1",
+                    "template_version": 1,
+                    "ai_assisted_at": "2026-10-01T10:00:00+00:00",
+                    "answers": [],
+                }
+            ],
+        },
+    }
+    projects, _ = account.import_projects(db, user, data)
+    assert projects[0].iterations[0].ai_assisted_at is not None

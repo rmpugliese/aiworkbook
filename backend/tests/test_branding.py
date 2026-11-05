@@ -201,6 +201,9 @@ def test_legal_details(
     legal = anon_client.get("/api/site").json()["legal"]
     assert legal["name"] == "Spazi" and legal["complete"] is True
     assert legal["vat_id"] == "IT01234567890" and legal["reviewed"] is False
+    assert legal["contact_email"] == "privacy@example.com"  # falls back to the privacy email
+    admin_client.put("/api/admin/site/legal", json={**LEGAL, "contact_email": "info@example.com"})
+    assert anon_client.get("/api/site").json()["legal"]["contact_email"] == "info@example.com"
 
 
 def test_ai_notice_never_exposes_the_endpoint(

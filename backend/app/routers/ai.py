@@ -130,7 +130,7 @@ async def assist(
             log.prompt_tokens = completion.usage.prompt_tokens
             log.completion_tokens = completion.usage.completion_tokens
             with DbSession(bind=engine) as session:
-                service.save_log(session, log)
+                service.save_log(session, log, iteration_id=prepared.iteration_id)
 
     return StreamingResponse(
         events(),

@@ -24,6 +24,8 @@ class SiteSettings(Base):
     legal_vat_id: Mapped[str] = mapped_column(String(100), default="", server_default="")
     legal_email: Mapped[str] = mapped_column(String(320), default="", server_default="")
     legal_pec: Mapped[str] = mapped_column(String(320), default="", server_default="")
+    # For general questions, in the footer ("Contatti"); the privacy email when empty.
+    contact_email: Mapped[str] = mapped_column(String(320), default="", server_default="")
     legal_court: Mapped[str] = mapped_column(String(100), default="", server_default="")
     # Until a lawyer has reviewed the texts, the legal pages say they are drafts.
     legal_reviewed: Mapped[bool] = mapped_column(Boolean, default=False, server_default=false())

@@ -28,6 +28,7 @@ h3 { font-size: 12pt; margin: 7mm 0 2mm; color: #2f6f4f; break-after: avoid; }
 .cover-facts { display: grid; grid-template-columns: 30mm auto; row-gap: 2mm; margin: 0; }
 .cover-facts dt { color: #666; }
 .cover-facts dd { margin: 0; }
+.ai-note { margin-top: 12mm; padding: 3mm 4mm; border-left: 2px solid #7a5ea8; background: #f5f1fa; color: #3d3350; font-size: 9pt; max-width: 130mm; }
 .cover-note { margin-top: 20mm; color: #888; font-size: 9pt; }
 
 /* Table of contents */
@@ -97,7 +98,8 @@ th { font-size: 9pt; color: #555; }
   .doc-title { font-size: 28px; }
   .project-name { font-size: 22px; }
   .cover-facts { grid-template-columns: 110px auto; }
-  .cover-note { margin-top: 24px; }
+  .ai-note { margin-top: 12mm; padding: 3mm 4mm; border-left: 2px solid #7a5ea8; background: #f5f1fa; color: #3d3350; font-size: 9pt; max-width: 130mm; }
+.cover-note { margin-top: 24px; }
   .toc { padding: 8px 0; border-bottom: 1px solid #e3e2dd; }
   .toc a { color: #1d3c5a; text-decoration: underline; }
   .toc a::after { content: none; }
