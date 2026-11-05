@@ -17,6 +17,10 @@ class Email:
     text: str
 
 
+class EmailDeliveryError(Exception):
+    """The mail server could not be reached or refused the message."""
+
+
 # The "memory" backend appends here; tests read and clear it.
 outbox: list[Email] = []
 
@@ -35,12 +39,17 @@ def send_email(to: str, subject: str, text: str) -> None:
         message["Subject"] = subject
         message.set_content(text)
         connect = smtplib.SMTP_SSL if settings.smtp_ssl else smtplib.SMTP
-        with connect(settings.smtp_host, settings.smtp_port, timeout=15) as smtp:
-            if settings.smtp_starttls and not settings.smtp_ssl:
-                smtp.starttls()
-            if settings.smtp_username:
-                smtp.login(settings.smtp_username, settings.smtp_password or "")
-            smtp.send_message(message)
+        try:
+            with connect(settings.smtp_host, settings.smtp_port, timeout=15) as smtp:
+                if settings.smtp_starttls and not settings.smtp_ssl:
+                    smtp.starttls()
+                if settings.smtp_username:
+                    smtp.login(settings.smtp_username, settings.smtp_password or "")
+                smtp.send_message(message)
+        except (smtplib.SMTPException, OSError) as error:
+            # Logged without the message text: it contains single-use links.
+            logger.error("email to %s not sent: %s: %s", to, type(error).__name__, error)
+            raise EmailDeliveryError(str(error)) from error
 
 
 _SIGNATURE = "\n\n—\nAI Project Workbook"

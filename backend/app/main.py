@@ -1,11 +1,13 @@
 from importlib.metadata import version
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, status
+from fastapi.responses import JSONResponse
 from starlette.middleware.sessions import SessionMiddleware
 
 from app.auth.web import csrf_middleware
 from app.config import get_settings
+from app.email import EmailDeliveryError
 from app.http import (
     configure_logging,
     global_rate_limit_middleware,
@@ -56,6 +58,15 @@ def create_app() -> FastAPI:
     app.include_router(ai.router)
     app.include_router(shares.router)
     app.include_router(shares.public_router)
+
+    @app.exception_handler(EmailDeliveryError)
+    async def email_not_sent(_request: Request, _error: EmailDeliveryError) -> JSONResponse:
+        # The same answer whatever the address, so it reveals nothing about accounts.
+        return JSONResponse(
+            {"detail": "Non è stato possibile inviare l'email. Riprova tra qualche minuto."},
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        )
+
     if settings.frontend_dist:
         mount_frontend(app, Path(settings.frontend_dist))
     # Added last, so it is the outermost layer: it also logs the session middleware's work.

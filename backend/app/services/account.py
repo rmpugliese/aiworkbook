@@ -10,8 +10,10 @@ from sqlalchemy.orm import Session as DbSession
 from app.models import AIRequest, Answer, EmailToken, Iteration, Project, Session, ShareLink, User
 from app.models.project import utcnow
 from app.services.auth import normalize_email
+from app.services.branding import prepare_logo
 from app.services.errors import ConflictError, InvalidRequestError
 from app.services.sharing import link_status
+from app.workbook.loader import find_question
 
 EXPORT_FORMAT = 1
 AI_LOG_RETENTION = timedelta(days=365)
@@ -163,3 +165,74 @@ def cleanup(db: DbSession) -> dict[str, int]:
     }
     db.commit()
     return removed
+
+
+def _parse_time(value: object) -> datetime | None:
+    return datetime.fromisoformat(value) if isinstance(value, str) else None
+
+
+def import_data(db: DbSession, user: User, data: dict[str, Any]) -> dict[str, int]:
+    """Adds the projects of an export (see export_data) to the user's account.
+
+    Projects are added, never merged. Share links are not recreated (their tokens are not in the
+    export) and the AI consent is not carried over: the owner gives it again on this instance.
+    The brand is copied only where the account has none. Answers to questions the template does
+    not know are skipped.
+    """
+    if data.get("format") != EXPORT_FORMAT:
+        raise InvalidRequestError('File non riconosciuto: usa il file di "Scarica i miei dati".')
+    counts = {"projects": 0, "iterations": 0, "answers": 0, "skipped_answers": 0}
+    for source in data.get("projects", []):
+        project = Project(
+            name=source["name"],
+            client_name=source.get("client_name"),
+            description=source.get("description"),
+            owner_id=user.id,
+            created_at=_parse_time(source.get("created_at")) or utcnow(),
+            archived_at=_parse_time(source.get("archived_at")),
+        )
+        db.add(project)
+        db.flush()
+        counts["projects"] += 1
+        for item in source.get("iterations", []):
+            iteration = Iteration(
+                project_id=project.id,
+                number=item["number"],
+                title=item["title"],
+                user_story=item.get("user_story"),
+                template_version=item["template_version"],
+                status=item.get("status", "draft"),
+                created_at=_parse_time(item.get("created_at")) or utcnow(),
+            )
+            db.add(iteration)
+            db.flush()
+            counts["iterations"] += 1
+            for answer in item.get("answers", []):
+                if find_question(iteration.template_version, answer["question_key"]) is None:
+                    counts["skipped_answers"] += 1
+                    continue
+                db.add(
+                    Answer(
+                        iteration_id=iteration.id,
+                        question_key=answer["question_key"],
+                        text=answer.get("text"),
+                        verdict=answer.get("verdict"),
+                        choices=answer.get("choices"),
+                        return_to_phase=answer.get("return_to_phase"),
+                        updated_at=_parse_time(answer.get("updated_at")) or utcnow(),
+                    )
+                )
+                counts["answers"] += 1
+            # The iteration was last touched when its source was, not now.
+            iteration.updated_at = _parse_time(item.get("updated_at")) or utcnow()
+        project.updated_at = _parse_time(source.get("updated_at")) or utcnow()
+
+    brand = data.get("brand") or {}
+    if user.brand_color is None and brand.get("color"):
+        user.brand_color = brand["color"]
+    logo = brand.get("logo")
+    if user.logo is None and logo:
+        user.logo, user.logo_content_type = prepare_logo(base64.b64decode(logo["base64"]))
+        user.logo_updated_at = utcnow()
+    db.commit()
+    return counts

@@ -1,6 +1,7 @@
 import json
 from datetime import timedelta
 
+import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session, sessionmaker
@@ -10,6 +11,7 @@ from app.models import AIRequest, Answer, EmailToken, Iteration, Project, ShareL
 from app.models import Session as UserSession
 from app.models.project import utcnow
 from app.services import account
+from app.services.errors import InvalidRequestError
 from tests.conftest import make_user, new_client, sign_in
 
 TEXT = "p1.objectives.business_objectives.problem"
@@ -204,3 +206,72 @@ def test_cleanup_removes_only_what_has_expired(db: Session) -> None:
     assert db.scalars(select(UserSession.id)).all() == ["b" * 64]
     assert db.scalars(select(EmailToken.token_hash)).all() == ["3" * 64]
     assert count(db, AIRequest) == 1
+
+
+# Import
+
+
+def test_export_then_import_into_another_account(
+    client: TestClient, other_client: TestClient, db: Session
+) -> None:
+    base = seed_project(client)
+    client.patch(base, json={"user_story": "Come **operatore** voglio"})
+    client.patch("/api/auth/me", json={"brand_color": "#7a1d4f"})
+    exported = json.loads(client.get("/api/auth/me/export").content)
+
+    target = db.scalars(select(User).where(User.email == "altro@example.com")).one()
+    counts = account.import_data(db, target, exported)
+    assert counts == {"projects": 1, "iterations": 1, "answers": 1, "skipped_answers": 0}
+
+    projects = other_client.get("/api/projects").json()
+    assert [p["name"] for p in projects] == ["Churn"]
+    project = other_client.get(f"/api/projects/{projects[0]['id']}").json()
+    assert project["client_name"] == "ACME"
+    assert project["ai_enabled_at"] is None  # consent is given again on this instance
+    iteration = project["iterations"][0]
+    assert iteration["user_story"] == "Come **operatore** voglio"
+    answers = other_client.get(
+        f"/api/projects/{project['id']}/iterations/{iteration['id']}/answers"
+    ).json()
+    assert answers[0]["question_key"] == TEXT and answers[0]["text"] == "Ridurre gli abbandoni"
+    # Share links are not recreated; the brand is copied because the account had none.
+    path = f"/api/projects/{project['id']}/iterations/{iteration['id']}/shares"
+    assert other_client.get(path).json() == []
+    assert other_client.get("/api/auth/me").json()["brand_color"] == "#7a1d4f"
+    # The source account is untouched.
+    assert len(client.get("/api/projects").json()) == 1
+
+
+def test_import_keeps_an_existing_brand_and_skips_unknown_answers(db: Session) -> None:
+    user = make_user(db)
+    user.brand_color = "#1d4f7a"
+    db.commit()
+    data = {
+        "format": account.EXPORT_FORMAT,
+        "brand": {"color": "#7a1d4f", "logo": None},
+        "projects": [
+            {
+                "name": "Vecchio",
+                "iterations": [
+                    {
+                        "number": 1,
+                        "title": "Iterazione 1",
+                        "template_version": 1,
+                        "answers": [
+                            {"question_key": TEXT, "text": "ok"},
+                            {"question_key": "p9.non.esiste", "text": "x"},
+                        ],
+                    }
+                ],
+            }
+        ],
+    }
+    counts = account.import_data(db, user, data)
+    assert counts["answers"] == 1 and counts["skipped_answers"] == 1
+    assert user.brand_color == "#1d4f7a"
+
+
+def test_import_refuses_other_files(db: Session) -> None:
+    user = make_user(db)
+    with pytest.raises(InvalidRequestError, match="Scarica i miei dati"):
+        account.import_data(db, user, {"projects": []})

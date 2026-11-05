@@ -1,7 +1,9 @@
 """Administrative commands, e.g. `uv run python -m app.cli create-user --help`."""
 
 import argparse
+import json
 import sys
+from pathlib import Path
 
 from sqlalchemy import select
 
@@ -60,6 +62,24 @@ def cleanup() -> str:
     return "Removed " + ", ".join(f"{count} {name}" for name, count in removed.items()) + "."
 
 
+def import_data(email: str, path: str) -> str:
+    with SessionLocal() as db:
+        user = db.scalar(select(User).where(User.email == normalize_email(email)))
+        if user is None:
+            return f"No user {email}: register and confirm the account first."
+        data = json.loads(Path(path).read_text(encoding="utf-8"))
+        counts = account.import_data(db, user, data)
+    skipped = (
+        f", {counts['skipped_answers']} unknown answers skipped"
+        if counts["skipped_answers"]
+        else ""
+    )
+    return (
+        f"Imported into {user.email}: {counts['projects']} projects, "
+        f"{counts['iterations']} iterations, {counts['answers']} answers{skipped}."
+    )
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="python -m app.cli")
     commands = parser.add_subparsers(dest="command", required=True)
@@ -74,11 +94,19 @@ def main(argv: list[str] | None = None) -> int:
     )
     promote = commands.add_parser("make-admin", help="Make an existing user an administrator")
     promote.add_argument("--email", required=True)
+    importing = commands.add_parser(
+        "import-data", help='Add the projects of a "Scarica i miei dati" file to an account'
+    )
+    importing.add_argument("--email", required=True, help="The account that receives them")
+    importing.add_argument("--file", required=True, help="The exported JSON file")
     commands.add_parser(
         "cleanup", help="Delete expired sessions, spent email links and AI logs over a year old"
     )
     args = parser.parse_args(argv)
 
+    if args.command == "import-data":
+        print(import_data(args.email, args.file))
+        return 0
     if args.command == "cleanup":
         print(cleanup())
         return 0

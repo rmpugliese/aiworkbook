@@ -65,6 +65,8 @@ services:
 
   cleanup:
     image: aiworkbook:latest
+    # Built by the app service: never look for it on Docker Hub.
+    pull_policy: never
     restart: unless-stopped
     env_file: .env
     environment:
