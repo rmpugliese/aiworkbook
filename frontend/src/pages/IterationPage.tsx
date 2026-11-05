@@ -33,6 +33,7 @@ import { ShareModal } from '../components/ShareModal'
 import { formatDateTime } from '../format'
 import { GoNoGoSummary } from '../workbook/GoNoGoSummary'
 import { MarkdownField } from '../workbook/MarkdownField'
+import { plainPreview } from '../workbook/markdownEditing'
 import { TaskView } from '../workbook/TaskView'
 import { WorkbookNav } from '../workbook/WorkbookNav'
 import { flattenTasks, phaseProgress } from '../workbook/structure'
@@ -198,7 +199,7 @@ export function IterationPage() {
             User story
             {iteration.data.user_story && (
               <Text size="sm" c="dimmed" lineClamp={1}>
-                {iteration.data.user_story}
+                {plainPreview(iteration.data.user_story)}
               </Text>
             )}
           </Accordion.Control>

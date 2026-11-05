@@ -125,6 +125,15 @@ describe('AI assistant', () => {
     expect(within(panel).getByRole('button', { name: 'Chiudi' })).toBeInTheDocument()
   })
 
+  it('explains an empty answer instead of showing an empty proposal', async () => {
+    iterationApi(() => stream(['done', {}]))
+    renderRoutes(routes, '/projects/1/iterations/10')
+    await user().click(await screen.findByRole('button', { name: 'Assistente' }))
+    await user().click(await screen.findByRole('menuitem', { name: 'Suggerisci una bozza' }))
+    expect(await screen.findByText(/non ha prodotto testo/)).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Sostituisci' })).toBeNull()
+  })
+
   it('reports service errors and leaves the field untouched', async () => {
     iterationApi(() => stream(['error', { detail: 'Il modello non ha risposto in tempo.' }]))
     renderRoutes(routes, '/projects/1/iterations/10')
