@@ -69,6 +69,8 @@ services:
   # Daily retention clean-up (expired sessions, spent email links, AI logs over a year old).
   cleanup:
     image: ai-project-workbook:latest
+    # Built by the app service: never look for it on Docker Hub.
+    pull_policy: never
     restart: unless-stopped
     env_file: .env
     environment:

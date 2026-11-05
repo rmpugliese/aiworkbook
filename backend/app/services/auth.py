@@ -49,7 +49,8 @@ def _aware(value: datetime) -> datetime:
 
 
 def _link(path: str, **query: str) -> str:
-    return f"{get_settings().public_url.rstrip('/')}{path}?{urlencode(query)}"
+    base = f"{get_settings().public_url.rstrip('/')}{path}"
+    return f"{base}?{urlencode(query)}" if query else base
 
 
 def _issue_token(db: DbSession, user: User, purpose: str) -> str:

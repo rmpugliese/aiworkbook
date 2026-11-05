@@ -68,3 +68,32 @@ def test_implicit_tls_on_465(smtp: type[FakeSMTP], monkeypatch: pytest.MonkeyPat
     sent = smtp.instances[-1]
     assert type(sent) is FakeSSL and sent.port == 465
     assert sent.calls == ["login:u@example.com", "send:a@example.com"]  # no STARTTLS
+
+
+class RefusingSMTP(FakeSMTP):
+    def login(self, user: str, password: str) -> None:
+        raise smtplib.SMTPServerDisconnected("Connection unexpectedly closed")
+
+
+def test_a_failed_delivery_is_a_clear_503(
+    anon_client: Any, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(smtplib, "SMTP", RefusingSMTP)
+    use(monkeypatch, smtp_port=587)
+    response = anon_client.post(
+        "/api/auth/register",
+        json={
+            "email": "nuovo@example.com",
+            "password": "password-molto-lunga",
+            "accept_terms": True,
+        },
+    )
+    assert response.status_code == 503
+    assert "Non è stato possibile inviare l'email" in response.json()["detail"]
+
+
+def test_links_without_query_have_no_question_mark() -> None:
+    from app.services.auth import _link
+
+    assert _link("/login").endswith("/login")
+    assert _link("/verify-email", token="abc").endswith("/verify-email?token=abc")
