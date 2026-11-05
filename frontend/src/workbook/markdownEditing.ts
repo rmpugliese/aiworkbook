@@ -8,6 +8,16 @@ export function withLineBreaks(text: string): string {
   return text.replace(/([^\n])\n(?=[^\n])/g, '$1  \n')
 }
 
+/** One line of Markdown as plain text, for previews: no emphasis marks, list bullets or pipes. */
+export function plainPreview(text: string): string {
+  return text
+    .replace(/(\*\*|__|\*|_|`|~~)(.+?)\1/g, '$2')
+    .replace(/^\s*(#{1,6}|[-*+]|\d+\.|>)\s+/gm, '')
+    .replace(/\|/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
 export type Edit = { text: string; start: number; end: number }
 
 export type FormatAction = 'bold' | 'italic' | 'bullets' | 'numbers' | 'table'

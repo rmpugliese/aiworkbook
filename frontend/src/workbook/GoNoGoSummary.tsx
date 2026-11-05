@@ -9,9 +9,11 @@ import { flattenTasks, phaseLabel, ROMAN } from './structure'
 
 export function VerdictBadge({ verdict }: { verdict: Verdict | null }) {
   return verdict ? (
-    <Badge color={VERDICT_COLOR[verdict]}>{VERDICT_LABEL[verdict]}</Badge>
+    <Badge color={VERDICT_COLOR[verdict]} style={{ flexShrink: 0 }}>
+      {VERDICT_LABEL[verdict]}
+    </Badge>
   ) : (
-    <Badge color="gray" variant="outline">
+    <Badge color="gray" variant="outline" style={{ flexShrink: 0, overflow: 'visible' }}>
       Da valutare
     </Badge>
   )
@@ -67,7 +69,7 @@ export function GoNoGoSummary({ template, answers, linkTo }: Props) {
         <Table.Thead>
           <Table.Tr>
             <Table.Th>Fase</Table.Th>
-            <Table.Th>Esito</Table.Th>
+            <Table.Th w={130}>Esito</Table.Th>
             <Table.Th>Fase di ritorno</Table.Th>
             <Table.Th>Motivazione</Table.Th>
           </Table.Tr>

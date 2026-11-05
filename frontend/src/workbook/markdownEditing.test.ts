@@ -1,8 +1,14 @@
 import { describe, expect, it } from 'vitest'
 
-import { applyFormat, withLineBreaks } from './markdownEditing'
+import { applyFormat, plainPreview, withLineBreaks } from './markdownEditing'
 
 describe('markdown editing', () => {
+  it('turns Markdown into a plain one-line preview', () => {
+    expect(plainPreview('Come **operatore** voglio\n- *meno* chiamate')).toBe(
+      'Come operatore voglio meno chiamate',
+    )
+  })
+
   it('keeps single line breaks and paragraphs', () => {
     expect(withLineBreaks('uno\ndue\n\ntre')).toBe('uno  \ndue\n\ntre')
   })

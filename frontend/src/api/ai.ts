@@ -113,6 +113,13 @@ export function useAssist(projectId: number, iterationId: number) {
             }
           }
         }
+        if (!received.trim()) {
+          // Typically a "reasoning" model that spent the whole length limit thinking.
+          fail(
+            "Il modello non ha prodotto testo. Se è un modello «di ragionamento», chiedi all'amministratore di aumentare la lunghezza massima della risposta.",
+          )
+          return
+        }
         setState({ status: 'done', action, text: received })
       } catch (error) {
         if (abort.signal.aborted) {
