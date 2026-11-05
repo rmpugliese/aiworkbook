@@ -52,12 +52,23 @@ const AUTH_DEFAULTS: Record<string, Handler | Response> = {
   'GET /api/auth/csrf': new Response(null, { status: 204 }),
   'GET /api/auth/providers': Response.json({ google: false }),
   'GET /api/site': Response.json(site()),
+  'GET /api/projects/1/members': Response.json(members()),
   'GET /api/ai/status': Response.json({
     available: false,
     model: null,
     location: null,
     host: null,
   }),
+}
+
+export function members(overrides: Record<string, unknown> = {}) {
+  return {
+    owner: { name: 'Ada Consulente', email: 'ada@example.com' },
+    members: [],
+    limit: 5,
+    can_manage: true,
+    ...overrides,
+  }
 }
 
 export const SIGNED_OUT = Response.json({ detail: 'Accesso richiesto.' }, { status: 401 })
@@ -109,6 +120,7 @@ export function project(overrides: Record<string, unknown> = {}) {
     archived_at: null,
     ai_enabled_at: null,
     iteration_count: 1,
+    shared_by: null,
     iterations: [iteration()],
     ...overrides,
   }

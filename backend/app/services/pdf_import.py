@@ -30,10 +30,11 @@ def import_workbook_fields(
             text=answer.text,
             verdict=answer.verdict,
             choices=answer.choices,
+            updated_by_id=user.id,
         )
         for answer in answers
     ]
     project.iterations.append(iteration)
     db.add(project)
     db.commit()
-    return get_project(db, project.id, owner_id=user.id), len(answers)
+    return get_project(db, project.id, user_id=user.id), len(answers)

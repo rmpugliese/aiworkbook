@@ -233,7 +233,7 @@ def test_shared_pdf(client: TestClient, anon_client: TestClient, base: str) -> N
 def test_the_owners_pdf_has_no_share_bar(client: TestClient, base: str, db: Session) -> None:
     project_id, iteration_id = (int(part) for part in base.split("/")[3::2])
     user_id = client.get("/api/auth/me").json()["id"]
-    report = iteration_report(db, project_id, iteration_id, owner_id=user_id, generated_at=utcnow())
+    report = iteration_report(db, project_id, iteration_id, user_id=user_id, generated_at=utcnow())
     assert 'class="share-bar"' not in render_html(report)
 
 

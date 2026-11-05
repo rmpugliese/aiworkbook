@@ -13,6 +13,7 @@ import {
   Text,
   ThemeIcon,
   Title,
+  Tooltip,
 } from '@mantine/core'
 import {
   IconArchive,
@@ -23,6 +24,7 @@ import {
   IconFolder,
   IconPlus,
   IconStack2,
+  IconUsers,
 } from '@tabler/icons-react'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router'
@@ -59,11 +61,20 @@ function ProjectCard({ project }: { project: ProjectSummary }) {
               </Group>
             </div>
           </Group>
-          {project.archived_at && (
-            <Badge color="gray" leftSection={<IconArchive size={12} />}>
-              Archiviato
-            </Badge>
-          )}
+          <Stack gap={4} align="flex-end">
+            {project.archived_at && (
+              <Badge color="gray" leftSection={<IconArchive size={12} />}>
+                Archiviato
+              </Badge>
+            )}
+            {project.shared_by !== null && (
+              <Tooltip label={`Condiviso da ${project.shared_by}`}>
+                <Badge variant="light" leftSection={<IconUsers size={12} />}>
+                  Condiviso
+                </Badge>
+              </Tooltip>
+            )}
+          </Stack>
         </Group>
         {project.description && (
           <Text size="sm" c="dimmed" lineClamp={2}>

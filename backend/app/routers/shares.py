@@ -69,7 +69,7 @@ def share_url(token: str) -> str:
 @router.get("")
 def list_links(db: Db, user: CurrentUser, project_id: int, iteration_id: int) -> list[ShareLinkOut]:
     with _errors():
-        links = service.list_links(db, project_id, iteration_id, owner_id=user.id)
+        links = service.list_links(db, project_id, iteration_id, user_id=user.id)
     return [_out(link) for link in links]
 
 
@@ -82,7 +82,7 @@ def create_link(
             db,
             project_id,
             iteration_id,
-            owner_id=user.id,
+            user_id=user.id,
             label=data.label,
             expires_in_days=data.expires_in_days,
         )
@@ -94,7 +94,7 @@ def revoke_link(
     db: Db, user: CurrentUser, project_id: int, iteration_id: int, link_id: int
 ) -> ShareLinkOut:
     with _errors():
-        link = service.revoke_link(db, project_id, iteration_id, link_id, owner_id=user.id)
+        link = service.revoke_link(db, project_id, iteration_id, link_id, user_id=user.id)
     return _out(link)
 
 
@@ -103,7 +103,7 @@ def delete_link(
     db: Db, user: CurrentUser, project_id: int, iteration_id: int, link_id: int
 ) -> None:
     with _errors():
-        service.delete_link(db, project_id, iteration_id, link_id, owner_id=user.id)
+        service.delete_link(db, project_id, iteration_id, link_id, user_id=user.id)
 
 
 # Public pages: no session, nothing to modify, and nothing that leaks to other sites.

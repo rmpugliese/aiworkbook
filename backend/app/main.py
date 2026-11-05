@@ -14,7 +14,7 @@ from app.http import (
     request_log_middleware,
     security_headers_middleware,
 )
-from app.routers import admin, ai, auth, health, projects, shares, site, template
+from app.routers import admin, ai, auth, health, members, projects, shares, site, template
 from app.spa import mount_frontend
 from app.workbook.loader import validate_all_templates
 
@@ -54,6 +54,7 @@ def create_app() -> FastAPI:
     app.include_router(template.router)
     app.include_router(auth.router)
     app.include_router(projects.router)
+    app.include_router(members.router)
     app.include_router(admin.router)
     app.include_router(ai.router)
     app.include_router(shares.router)

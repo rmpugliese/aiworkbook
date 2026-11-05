@@ -68,6 +68,7 @@ describe('IterationPage', () => {
       verdict: null,
       choices: null,
       return_to_phase: null,
+      base_updated_at: null,
     })
     const nav = screen.getByRole('navigation', { name: 'Indice del workbook' })
     expect(within(nav).getByText('1/3')).toBeInTheDocument()
@@ -101,7 +102,13 @@ describe('IterationPage', () => {
 
     expect(await screen.findByRole('heading', { name: 'Pattern', level: 2 })).toBeInTheDocument()
     expect(calls.filter((c) => c.method === 'PUT').map((c) => c.body)).toEqual([
-      { text: 'Al volo', verdict: null, choices: null, return_to_phase: null },
+      {
+        text: 'Al volo',
+        verdict: null,
+        choices: null,
+        return_to_phase: null,
+        base_updated_at: null,
+      },
     ])
   })
 
@@ -123,11 +130,23 @@ describe('IterationPage', () => {
     expect(bodies).toEqual([
       [
         `${BASE}/answers/p1.objectives.patterns.which`,
-        { text: null, verdict: null, choices: ['predictive'], return_to_phase: null },
+        {
+          text: null,
+          verdict: null,
+          choices: ['predictive'],
+          return_to_phase: null,
+          base_updated_at: null,
+        },
       ],
       [
         `${BASE}/answers/p1.gate.decision.outcome`,
-        { text: null, verdict: 'no_go', choices: null, return_to_phase: null },
+        {
+          text: null,
+          verdict: 'no_go',
+          choices: null,
+          return_to_phase: null,
+          base_updated_at: null,
+        },
       ],
     ])
   })

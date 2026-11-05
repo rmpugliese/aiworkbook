@@ -232,10 +232,21 @@ campi, solo quando l'utente lo chiede.
 
 ---
 
+## Fase 15: Collaborazione tra consulenti (Completata)
+
+**Obiettivo:** più consulenti lavorano sullo stesso progetto.
+
+- [x] Inviti per email (anche a chi non è iscritto), massimo 5 collaboratori per progetto
+- [x] Accesso del proprietario o dei collaboratori; azioni di gestione riservate al proprietario
+- [x] "Modificata da" sulle risposte e avviso di conflitto con le due versioni
+- [x] Privacy e termini aggiornati, nuova versione dei termini
+- [ ] Ruolo in sola lettura, notifiche delle modifiche, trasferimento della proprietà: da valutare
+
+---
+
 ## Più avanti (non pianificato)
 
 - Storico delle revisioni delle risposte
-- Collaborazione tra più consulenti sullo stesso progetto
 - Commenti del cliente sul documento condiviso
 - Interfaccia in inglese
 - Piani a pagamento per consulenti

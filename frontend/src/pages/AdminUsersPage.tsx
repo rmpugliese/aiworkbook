@@ -36,7 +36,7 @@ export function AdminUsersPage() {
     <Stack gap="lg" py="xl">
       <PageHeader
         title="Amministrazione"
-        subtitle="Marchio, dati legali, assistente AI e account. Il contenuto dei progetti resta visibile solo ai loro proprietari."
+        subtitle="Marchio, dati legali, assistente AI e account. Il contenuto dei progetti resta visibile solo ai loro proprietari e ai collaboratori che invitano."
       />
 
       {users.data && <SignupStatsCard users={users.data} />}

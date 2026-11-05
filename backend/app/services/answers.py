@@ -1,7 +1,9 @@
 """Reading and writing the answers of an iteration, validated against its workbook template."""
 
+from datetime import UTC, datetime
+
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from app.models import Answer, Iteration
 from app.models.project import utcnow
@@ -12,11 +14,27 @@ from app.workbook.loader import find_question
 from app.workbook.schema import GoNoGoQuestion, MultiChoiceQuestion, PhaseGateQuestion, Question
 
 
-def list_answers(db: Session, project_id: int, iteration_id: int, *, owner_id: int) -> list[Answer]:
-    get_iteration(db, project_id, iteration_id, owner_id=owner_id)
+class AnswerConflictError(Exception):
+    """Someone else saved the answer after the version the edit started from."""
+
+    def __init__(self, current: Answer) -> None:
+        super().__init__("answer changed by someone else")
+        self.current = current
+
+
+def _aware(value: datetime) -> datetime:
+    # SQLite returns naive datetimes; they are stored in UTC.
+    return value if value.tzinfo else value.replace(tzinfo=UTC)
+
+
+def list_answers(db: Session, project_id: int, iteration_id: int, *, user_id: int) -> list[Answer]:
+    get_iteration(db, project_id, iteration_id, user_id=user_id)
     return list(
         db.scalars(
-            select(Answer).where(Answer.iteration_id == iteration_id).order_by(Answer.question_key)
+            select(Answer)
+            .where(Answer.iteration_id == iteration_id)
+            .options(selectinload(Answer.author))
+            .order_by(Answer.question_key)
         )
     )
 
@@ -28,13 +46,15 @@ def save_answer(
     question_key: str,
     data: AnswerIn,
     *,
-    owner_id: int,
+    user_id: int,
 ) -> Answer | None:
     """Creates, replaces or (when every field is empty) deletes an answer.
 
-    Returns the stored answer, or None if the answer is now empty.
+    Returns the stored answer, or None if the answer is now empty. With `base_updated_at`, an
+    answer saved meanwhile by someone else raises AnswerConflictError instead of being replaced;
+    the same person's edits (say, from two tabs) never conflict.
     """
-    iteration = get_iteration(db, project_id, iteration_id, owner_id=owner_id)
+    iteration = get_iteration(db, project_id, iteration_id, user_id=user_id)
     found = find_question(iteration.template_version, question_key)
     if found is None:
         raise NotFoundError(
@@ -48,6 +68,14 @@ def save_answer(
             Answer.iteration_id == iteration_id, Answer.question_key == question_key
         )
     )
+    if (
+        "base_updated_at" in data.model_fields_set
+        and answer is not None
+        and answer.updated_by_id != user_id
+        and (data.base_updated_at is None or _aware(answer.updated_at) != data.base_updated_at)
+    ):
+        raise AnswerConflictError(answer)
+
     if _is_empty(cleaned):
         if answer is not None:
             db.delete(answer)
@@ -61,6 +89,7 @@ def save_answer(
         answer.choices = cleaned.choices
         answer.return_to_phase = cleaned.return_to_phase
         answer.updated_at = utcnow()
+        answer.updated_by_id = user_id
         result = answer
 
     _touch(iteration)

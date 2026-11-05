@@ -23,6 +23,7 @@ import {
   IconDownload,
   IconFileExport,
   IconPencil,
+  IconUsers,
   IconPlus,
   IconTrash,
 } from '@tabler/icons-react'
@@ -40,6 +41,7 @@ import {
   type Project,
 } from '../api/projects'
 import { AIConsentCard } from '../components/AIConsentCard'
+import { CollaboratorsCard } from '../components/CollaboratorsCard'
 import { DeleteProjectModal } from '../components/DeleteProjectModal'
 import { NewIterationModal } from '../components/NewIterationModal'
 import { PageHeader } from '../components/PageHeader'
@@ -58,6 +60,8 @@ function ProjectDetail({ project }: { project: Project }) {
   const deleteProject = useDeleteProject(project.id)
   const createIteration = useCreateIteration(project.id)
   const archived = project.archived_at !== null
+  // Collaborators work on the workbook; the project itself is the owner's to manage.
+  const owner = project.shared_by === null
   // Set by the workbook PDF import, to say what it found.
   const imported = (useLocation().state as { importedAnswers?: number } | null)?.importedAnswers
   const [showImported, setShowImported] = useState(imported !== undefined)
@@ -84,11 +88,18 @@ function ProjectDetail({ project }: { project: Project }) {
       <PageHeader
         title={project.name}
         badge={
-          archived && (
-            <Badge color="gray" leftSection={<IconArchive size={12} />}>
-              Archiviato
-            </Badge>
-          )
+          <>
+            {archived && (
+              <Badge color="gray" leftSection={<IconArchive size={12} />}>
+                Archiviato
+              </Badge>
+            )}
+            {!owner && (
+              <Badge variant="light" leftSection={<IconUsers size={12} />}>
+                Condiviso da {project.shared_by}
+              </Badge>
+            )}
+          </>
         }
         subtitle={
           <Group gap={6} c="dimmed" wrap="nowrap">
@@ -98,13 +109,15 @@ function ProjectDetail({ project }: { project: Project }) {
         }
         actions={
           <>
-            <Button
-              variant="default"
-              leftSection={<IconPencil size={16} />}
-              onClick={() => open('edit')}
-            >
-              Modifica
-            </Button>
+            {owner && (
+              <Button
+                variant="default"
+                leftSection={<IconPencil size={16} />}
+                onClick={() => open('edit')}
+              >
+                Modifica
+              </Button>
+            )}
             <Button
               component="a"
               href={exportProjectUrl(project.id)}
@@ -114,35 +127,36 @@ function ProjectDetail({ project }: { project: Project }) {
             >
               Esporta
             </Button>
-            {archived ? (
-              <>
+            {owner &&
+              (archived ? (
+                <>
+                  <Button
+                    variant="default"
+                    leftSection={<IconArchiveOff size={16} />}
+                    loading={setArchived.isPending}
+                    onClick={() => setArchived.mutate(false)}
+                  >
+                    Ripristina
+                  </Button>
+                  <Button
+                    color="red"
+                    variant="light"
+                    leftSection={<IconTrash size={16} />}
+                    onClick={() => open('delete')}
+                  >
+                    Elimina definitivamente
+                  </Button>
+                </>
+              ) : (
                 <Button
                   variant="default"
-                  leftSection={<IconArchiveOff size={16} />}
+                  leftSection={<IconArchive size={16} />}
                   loading={setArchived.isPending}
-                  onClick={() => setArchived.mutate(false)}
+                  onClick={() => setArchived.mutate(true)}
                 >
-                  Ripristina
+                  Archivia
                 </Button>
-                <Button
-                  color="red"
-                  variant="light"
-                  leftSection={<IconTrash size={16} />}
-                  onClick={() => open('delete')}
-                >
-                  Elimina definitivamente
-                </Button>
-              </>
-            ) : (
-              <Button
-                variant="default"
-                leftSection={<IconArchive size={16} />}
-                loading={setArchived.isPending}
-                onClick={() => setArchived.mutate(true)}
-              >
-                Archivia
-              </Button>
-            )}
+              ))}
           </>
         }
       />
@@ -250,6 +264,7 @@ function ProjectDetail({ project }: { project: Project }) {
                 </Text>
               </Stack>
             </Card>
+            <CollaboratorsCard projectId={project.id} />
             <AIConsentCard project={project} />
           </Stack>
         </Grid.Col>

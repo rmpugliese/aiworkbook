@@ -1,6 +1,6 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 
-import type { Answer, AnswerIn, Verdict } from '../api/answers'
+import { AnswerConflictError, type Answer, type AnswerIn, type Verdict } from '../api/answers'
 import type { Question } from '../api/template'
 import { useAutosave } from './useAutosave'
 
@@ -29,16 +29,52 @@ function toAnswerIn(draft: Draft): AnswerIn {
   }
 }
 
-export type SaveAnswer = (key: string, data: AnswerIn) => Promise<unknown>
+export type SaveAnswer = (key: string, data: AnswerIn) => Promise<Answer>
 
-/** The editable draft of one answer, saved automatically. Remount the caller to reset it. */
+/**
+ * The editable draft of one answer, saved automatically. Remount the caller to reset it.
+ *
+ * Each save says which stored version the edit starts from; if a colleague saved a newer one
+ * meanwhile, `conflict` holds it until the user keeps their own text or takes the colleague's.
+ */
 export function useAnswerDraft(question: Question, answer: Answer | undefined, save: SaveAnswer) {
   const [draft, setDraft] = useState(() => draftFrom(answer))
+  const [conflict, setConflict] = useState<Answer | null>(null)
+  const base = useRef(answer?.updated_at ?? null)
   const saveDraft = useCallback(
-    (value: Draft) => save(question.key, toAnswerIn(value)),
+    async (value: Draft) => {
+      try {
+        const saved = await save(question.key, {
+          ...toAnswerIn(value),
+          base_updated_at: base.current,
+        })
+        base.current = saved.updated_at
+      } catch (error) {
+        if (error instanceof AnswerConflictError) setConflict(error.current)
+        throw error
+      }
+    },
     [question.key, save],
   )
-  const { status, retry } = useAutosave(draft, saveDraft)
+  const { status, retry, markSaved } = useAutosave(draft, saveDraft)
   const update = (changes: Partial<Draft>) => setDraft((current) => ({ ...current, ...changes }))
-  return { draft, update, status, retry }
+
+  /** Saves the user's text over the colleague's version. */
+  const keepMine = () => {
+    if (!conflict) return
+    base.current = conflict.updated_at
+    setConflict(null)
+    retry()
+  }
+  /** Drops the user's edit and shows the colleague's version. */
+  const takeTheirs = () => {
+    if (!conflict) return
+    const theirs = draftFrom(conflict)
+    base.current = conflict.updated_at
+    setConflict(null)
+    markSaved(theirs)
+    setDraft(theirs)
+  }
+
+  return { draft, update, status, retry, conflict, keepMine, takeTheirs }
 }

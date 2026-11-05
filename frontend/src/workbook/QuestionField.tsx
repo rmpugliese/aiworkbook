@@ -2,7 +2,7 @@ import { Checkbox, Stack } from '@mantine/core'
 
 import type { Answer } from '../api/answers'
 import type { Question, Template } from '../api/template'
-import { QuestionCard, SaveIndicator, VerdictControl } from './AnswerControls'
+import { AnswerFooter, QuestionCard, VerdictControl } from './AnswerControls'
 import { useAnswerDraft, type SaveAnswer } from './useAnswerDraft'
 import { AssistantPanel, type AssistantContext } from './AssistantPanel'
 import { MarkdownField } from './MarkdownField'
@@ -55,7 +55,8 @@ function BasicQuestionField({
   save: SaveAnswer
   assistant?: AssistantContext
 }) {
-  const { draft, update, status, retry } = useAnswerDraft(question, answer, save)
+  const handle = useAnswerDraft(question, answer, save)
+  const { draft, update } = handle
 
   return (
     <QuestionCard question={question}>
@@ -105,7 +106,7 @@ function BasicQuestionField({
           onApply={(text) => update({ text })}
         />
       )}
-      <SaveIndicator status={status} onRetry={retry} />
+      <AnswerFooter answer={answer} handle={handle} />
     </QuestionCard>
   )
 }
