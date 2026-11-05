@@ -212,7 +212,7 @@ def test_ai_notice_never_exposes_the_endpoint(
             "enabled": True,
             "base_url": "https://llm.interno.example/v1",
             "model": "mistral-small",
-            "api_key": "sk-segretissima-1234",
+            "api_key": "chiave-finta-di-test-1234",
             "provider_name": "Fornitore Esempio",
             "server_location": "Francia (UE)",
             "model_kind": "open weight, licenza Apache 2.0",
@@ -228,7 +228,7 @@ def test_ai_notice_never_exposes_the_endpoint(
         "location": "remoto",
     }
     raw = anon_client.get("/api/site").text
-    assert "llm.interno" not in raw and "sk-" not in raw
+    assert "llm.interno" not in raw and "chiave-finta" not in raw
 
 
 # Documents: the installation's brand on every project's documents
