@@ -3,6 +3,8 @@ import { Alert, Badge, Button, Card, Group, Loader, Stack, Table, Text, Title } 
 import { useAdminAction, useAdminUsers, type AdminAction, type AdminUser } from '../api/admin'
 import { useMe } from '../api/auth'
 import { AISettingsCard } from '../components/AISettingsCard'
+import { BrandCards } from '../components/BrandCards'
+import { LegalCard } from '../components/LegalCard'
 import { PageHeader } from '../components/PageHeader'
 import { formatDate, formatDateTime } from '../format'
 
@@ -33,9 +35,11 @@ export function AdminUsersPage() {
     <Stack gap="lg" py="xl">
       <PageHeader
         title="Amministrazione"
-        subtitle="Gestione degli account. Il contenuto dei progetti resta visibile solo ai loro proprietari."
+        subtitle="Marchio, dati legali, assistente AI e account. Il contenuto dei progetti resta visibile solo ai loro proprietari."
       />
 
+      <BrandCards />
+      <LegalCard />
       <AISettingsCard />
 
       <Card>

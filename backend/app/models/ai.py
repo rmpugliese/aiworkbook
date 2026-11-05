@@ -20,6 +20,10 @@ class AISettings(Base):
     api_key_hint: Mapped[str | None] = mapped_column(String(8))  # last characters, for display
     temperature: Mapped[float] = mapped_column(Float, default=0.4)
     max_tokens: Mapped[int] = mapped_column(Integer, default=1200)
+    # What the AI notice tells users about the service: who runs it, where, which kind of model.
+    provider_name: Mapped[str] = mapped_column(String(200), default="", server_default="")
+    server_location: Mapped[str] = mapped_column(String(200), default="", server_default="")
+    model_kind: Mapped[str] = mapped_column(String(200), default="", server_default="")
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=utcnow, onupdate=utcnow
     )

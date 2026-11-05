@@ -1,6 +1,5 @@
 """The user's rights over their own data: a full export (portability) and account deletion."""
 
-import base64
 from datetime import datetime, timedelta
 from typing import Any, cast
 
@@ -10,7 +9,6 @@ from sqlalchemy.orm import Session as DbSession
 from app.models import AIRequest, Answer, EmailToken, Iteration, Project, Session, ShareLink, User
 from app.models.project import utcnow
 from app.services.auth import normalize_email
-from app.services.branding import prepare_logo
 from app.services.errors import ConflictError, InvalidRequestError
 from app.services.sharing import link_status
 from app.workbook.loader import find_question
@@ -40,17 +38,6 @@ def export_data(db: DbSession, user: User) -> dict[str, Any]:
             "is_admin": user.is_admin,
             "terms_accepted_at": _iso(user.terms_accepted_at),
             "terms_version": user.terms_version,
-        },
-        "brand": {
-            "color": user.brand_color,
-            "logo": (
-                {
-                    "content_type": user.logo_content_type,
-                    "base64": base64.b64encode(user.logo).decode(),
-                }
-                if user.logo is not None
-                else None
-            ),
         },
         "projects": [_project(db, project) for project in projects],
         "ai_requests": [
@@ -231,15 +218,14 @@ def _import_project(
 
 
 def import_projects(
-    db: DbSession, user: User, data: dict[str, Any], *, brand: bool = False
+    db: DbSession, user: User, data: dict[str, Any]
 ) -> tuple[list[Project], dict[str, int]]:
     """Adds the projects of an exported file to the user's account, all or nothing.
 
     The file is either one project ("Esporta progetto") or a whole account ("Scarica i miei
     dati"). Projects are added, never merged. Share links are not recreated (their tokens are not
     in the export) and the AI consent is not carried over: the owner gives it again here. Answers
-    to questions the template does not know are skipped. With `brand`, the logo and colour of an
-    account export are copied where the user has none.
+    to questions the template does not know are skipped.
     """
     if data.get("format") != EXPORT_FORMAT:
         raise InvalidRequestError("File non riconosciuto: usa un file esportato da questa app.")
@@ -252,12 +238,5 @@ def import_projects(
     counts = {"projects": 0, "iterations": 0, "answers": 0, "skipped_answers": 0}
     projects = [_import_project(db, user, source, counts) for source in sources]
 
-    exported_brand = data.get("brand") or {}
-    if brand and user.brand_color is None and exported_brand.get("color"):
-        user.brand_color = exported_brand["color"]
-    logo = exported_brand.get("logo")
-    if brand and user.logo is None and logo:
-        user.logo, user.logo_content_type = prepare_logo(base64.b64decode(logo["base64"]))
-        user.logo_updated_at = utcnow()
     db.commit()
     return projects, counts

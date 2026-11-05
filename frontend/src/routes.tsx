@@ -9,6 +9,8 @@ import {
   VerifyEmailPage,
 } from './pages/auth/EmailPages'
 import { LoginPage } from './pages/auth/LoginPage'
+import { AiInfoPage } from './pages/legal/AiInfoPage'
+import { CookiesPage } from './pages/legal/CookiesPage'
 import { PrivacyPage } from './pages/legal/PrivacyPage'
 import { TermsPage } from './pages/legal/TermsPage'
 import { RegisterPage } from './pages/auth/RegisterPage'
@@ -30,6 +32,8 @@ export const routes: RouteObject[] = [
       { path: 'reset-password', element: <ResetPasswordPage /> },
       { path: 'privacy', element: <PrivacyPage /> },
       { path: 'terms', element: <TermsPage /> },
+      { path: 'cookies', element: <CookiesPage /> },
+      { path: 'ai', element: <AiInfoPage /> },
       {
         element: <RequireAuth />,
         children: [

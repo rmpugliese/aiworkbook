@@ -108,25 +108,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/auth/me/logo": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get Logo */
-        get: operations["get_logo_api_auth_me_logo_get"];
-        /** Upload Logo */
-        put: operations["upload_logo_api_auth_me_logo_put"];
-        post?: never;
-        /** Delete Logo */
-        delete: operations["delete_logo_api_auth_me_logo_delete"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/auth/csrf": {
         parameters: {
             query?: never;
@@ -760,10 +741,114 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/site": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Site */
+        get: operations["get_site_api_site_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/site/logo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Logo */
+        get: operations["get_logo_api_site_logo_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/site/logo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Upload Logo */
+        put: operations["upload_logo_api_admin_site_logo_put"];
+        post?: never;
+        /** Delete Logo */
+        delete: operations["delete_logo_api_admin_site_logo_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/site/brand": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update Brand */
+        put: operations["update_brand_api_admin_site_brand_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/site/legal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update Legal */
+        put: operations["update_legal_api_admin_site_legal_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /**
+         * AINoticeOut
+         * @description What the AI notice tells users. Never the endpoint's address or key.
+         */
+        AINoticeOut: {
+            /** Available */
+            available: boolean;
+            /** Model */
+            model: string | null;
+            /** Provider Name */
+            provider_name: string;
+            /** Server Location */
+            server_location: string;
+            /** Model Kind */
+            model_kind: string;
+            /** Location */
+            location: ("locale" | "remoto") | null;
+        };
         /** AISettingsIn */
         AISettingsIn: {
             /** Enabled */
@@ -789,6 +874,21 @@ export interface components {
              * @default false
              */
             clear_api_key: boolean;
+            /**
+             * Provider Name
+             * @default
+             */
+            provider_name: string;
+            /**
+             * Server Location
+             * @default
+             */
+            server_location: string;
+            /**
+             * Model Kind
+             * @default
+             */
+            model_kind: string;
         };
         /**
          * AISettingsOut
@@ -811,6 +911,12 @@ export interface components {
             max_tokens: number;
             /** Location */
             location: ("locale" | "remoto") | null;
+            /** Provider Name */
+            provider_name: string;
+            /** Server Location */
+            server_location: string;
+            /** Model Kind */
+            model_kind: string;
         };
         /** AIStatusOut */
         AIStatusOut: {
@@ -909,10 +1015,15 @@ export interface components {
             /** File */
             file: string;
         };
-        /** Body_upload_logo_api_auth_me_logo_put */
-        Body_upload_logo_api_auth_me_logo_put: {
+        /** Body_upload_logo_api_admin_site_logo_put */
+        Body_upload_logo_api_admin_site_logo_put: {
             /** File */
             file: string;
+        };
+        /** BrandIn */
+        BrandIn: {
+            /** Brand Color */
+            brand_color: string | null;
         };
         /** ChoiceOption */
         ChoiceOption: {
@@ -1030,6 +1141,45 @@ export interface components {
             /** Status */
             status?: ("draft" | "completed") | null;
         };
+        /** LegalIn */
+        LegalIn: {
+            /** Name */
+            name: string;
+            /** Address */
+            address: string;
+            /** Vat Id */
+            vat_id: string;
+            /** Email */
+            email: string;
+            /** Pec */
+            pec: string;
+            /** Court */
+            court: string;
+            /** Reviewed */
+            reviewed: boolean;
+        };
+        /**
+         * LegalOut
+         * @description The data controller, as the legal pages show it.
+         */
+        LegalOut: {
+            /** Name */
+            name: string;
+            /** Address */
+            address: string;
+            /** Vat Id */
+            vat_id: string;
+            /** Email */
+            email: string;
+            /** Pec */
+            pec: string;
+            /** Court */
+            court: string;
+            /** Reviewed */
+            reviewed: boolean;
+            /** Complete */
+            complete: boolean;
+        };
         /** LoginIn */
         LoginIn: {
             /**
@@ -1109,8 +1259,6 @@ export interface components {
         ProfileIn: {
             /** Display Name */
             display_name?: string | null;
-            /** Brand Color */
-            brand_color?: string | null;
         };
         /** ProjectCreate */
         ProjectCreate: {
@@ -1278,6 +1426,20 @@ export interface components {
             /** Access Count */
             access_count: number;
         };
+        /**
+         * SiteOut
+         * @description Public: what every page needs before and after signing in.
+         */
+        SiteOut: {
+            /** Brand Color */
+            brand_color: string | null;
+            /** Logo Url */
+            logo_url: string | null;
+            legal: components["schemas"]["LegalOut"];
+            /** Terms Version */
+            terms_version: string;
+            ai: components["schemas"]["AINoticeOut"];
+        };
         /** Task */
         Task: {
             /** Key */
@@ -1342,12 +1504,8 @@ export interface components {
             google_linked: boolean;
             /** Is Admin */
             is_admin: boolean;
-            /** Brand Color */
-            brand_color: string | null;
             /** Terms Current */
             terms_current: boolean;
-            /** Logo Url */
-            logo_url: string | null;
         };
         /** ValidationError */
         ValidationError: {
@@ -1590,103 +1748,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_logo_api_auth_me_logo_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: {
-                session?: string | null;
-            };
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The user's logo */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "image/*": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    upload_logo_api_auth_me_logo_put: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: {
-                session?: string | null;
-            };
-        };
-        requestBody: {
-            content: {
-                "multipart/form-data": components["schemas"]["Body_upload_logo_api_auth_me_logo_put"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UserOut"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    delete_logo_api_auth_me_logo_delete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: {
-                session?: string | null;
-            };
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UserOut"];
                 };
             };
             /** @description Validation Error */
@@ -3047,6 +3108,182 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_site_api_site_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SiteOut"];
+                };
+            };
+        };
+    };
+    get_logo_api_site_logo_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The installation's logo */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/*": unknown;
+                };
+            };
+        };
+    };
+    upload_logo_api_admin_site_logo_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                session?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_upload_logo_api_admin_site_logo_put"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SiteOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_logo_api_admin_site_logo_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SiteOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_brand_api_admin_site_brand_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                session?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BrandIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SiteOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_legal_api_admin_site_legal_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                session?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LegalIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SiteOut"];
+                };
             };
             /** @description Validation Error */
             422: {

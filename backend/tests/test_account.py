@@ -68,7 +68,6 @@ def test_export_contains_all_and_only_the_users_data(
 ) -> None:
     seed_project(client)
     other_client.post("/api/projects", json={"name": "Progetto altrui"})
-    client.patch("/api/auth/me", json={"brand_color": "#1d4f7a"})
 
     response = client.get("/api/auth/me/export")
     assert response.status_code == 200
@@ -78,7 +77,6 @@ def test_export_contains_all_and_only_the_users_data(
     data = json.loads(response.content)
 
     assert data["account"]["email"] == "consulente@example.com"
-    assert data["brand"]["color"] == "#1d4f7a"
     assert [p["name"] for p in data["projects"]] == ["Churn"]
     iteration = data["projects"][0]["iterations"][0]
     assert iteration["answers"][0] == {
@@ -303,23 +301,22 @@ def test_unknown_answers_are_skipped(db: Session) -> None:
     assert counts["answers"] == 1 and counts["skipped_answers"] == 1
 
 
-def test_the_command_line_imports_a_whole_account_with_its_brand(
-    client: TestClient, db: Session, tmp_path: object
+def test_the_command_line_imports_a_whole_account(
+    client: TestClient,
+    db: Session,
+    sessions: sessionmaker[Session],
+    tmp_path: object,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     from pathlib import Path
 
     from app import cli
 
+    monkeypatch.setattr(cli, "SessionLocal", sessions)  # the test database, not dev.db
     seed_project(client)
-    client.patch("/api/auth/me", json={"brand_color": "#7a1d4f"})
     path = Path(str(tmp_path)) / "dati.json"
     path.write_bytes(client.get("/api/auth/me/export").content)
-    target = make_user(db, "nuovo@example.com")
-    assert target.brand_color is None
+    make_user(db, "nuovo@example.com")
 
-    data = json.loads(path.read_text())
-    _, counts = account.import_projects(db, target, data, brand=True)
-    assert counts["projects"] == 1
-    db.refresh(target)
-    assert target.brand_color == "#7a1d4f"
+    assert "1 projects" in cli.import_data("nuovo@example.com", str(path))
     assert "No user" in cli.import_data("assente@example.com", str(path))

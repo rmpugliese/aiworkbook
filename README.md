@@ -94,17 +94,19 @@ suo hash); si può revocare in qualsiasi momento. Archiviare il progetto sospend
 Le pagine condivise (`/s/<token>`) le genera il backend: in sviluppo Vite le inoltra come `/api`.
 `APP_PUBLIC_URL` determina l'indirizzo dei link.
 
-## Marchio del consulente
+## Marchio e dati legali
 
-Dal menu utente, "Profilo e marchio": nome visualizzato, logo (PNG, JPEG o SVG fino a 1 MB) e
-colore principale. Il marchio compare nell'intestazione dell'app, sulla copertina e nei titoli dei
-PDF e nelle pagine condivise con i clienti dei propri progetti. Il colore deve avere un contrasto
-di almeno 4,5:1 con il bianco; gli SVG con script o risorse esterne vengono rifiutati.
+In **Amministrazione**: logo e colore dell'installazione (intestazione per tutti, pagina di
+accesso, PDF e pagine condivise), dati del titolare per le pagine legali e, nella scheda
+dell'assistente, fornitore, sede dei server e tipo di modello per l'informativa sull'AI. Le pagine
+`/privacy`, `/terms`, `/cookies` e `/ai` leggono questi dati e mostrano l'avviso "Bozza" finché
+non si spunta "Testi rivisti da un legale". L'app usa solo cookie tecnici: nessun banner, un
+pannello informativo nel piè di pagina.
 
 ## Privacy e dati
 
-Alla registrazione si accettano termini d'uso e informativa (pagine `/terms` e `/privacy`, bozze
-da far rivedere da un legale). Dal profilo ogni utente scarica tutti i propri dati in JSON ed
+Alla registrazione si accettano termini d'uso e informativa; quando i testi cambiano
+(`TERMS_VERSION` in `backend/app/legal.py`) tutti li accettano di nuovo al primo accesso. Dal profilo ogni utente scarica tutti i propri dati in JSON ed
 elimina l'account. `python -m app.cli cleanup` rimuove sessioni scadute, link email usati e il
 registro AI oltre i 12 mesi.
 

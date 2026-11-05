@@ -16,6 +16,10 @@ class AISettingsIn(BaseModel):
     # None: keep the stored key. A value: replace it. clear_api_key: remove it.
     api_key: Annotated[str, StringConstraints(strip_whitespace=True, max_length=500)] | None = None
     clear_api_key: bool = False
+    # For the AI notice shown to users.
+    provider_name: Annotated[str, StringConstraints(strip_whitespace=True, max_length=200)] = ""
+    server_location: Annotated[str, StringConstraints(strip_whitespace=True, max_length=200)] = ""
+    model_kind: Annotated[str, StringConstraints(strip_whitespace=True, max_length=200)] = ""
 
     @field_validator("base_url")
     @classmethod
@@ -36,6 +40,9 @@ class AISettingsOut(BaseModel):
     temperature: float
     max_tokens: int
     location: Location | None
+    provider_name: str
+    server_location: str
+    model_kind: str
 
 
 class AITestOut(BaseModel):

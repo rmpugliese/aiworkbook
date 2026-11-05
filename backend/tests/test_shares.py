@@ -1,9 +1,10 @@
+from collections.abc import Iterator
 from datetime import timedelta
 
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, sessionmaker
 
 from app.auth import rate_limit
 from app.auth.security import token_hash
@@ -234,3 +235,26 @@ def test_the_owners_pdf_has_no_share_bar(client: TestClient, base: str, db: Sess
     user_id = client.get("/api/auth/me").json()["id"]
     report = iteration_report(db, project_id, iteration_id, owner_id=user_id, generated_at=utcnow())
     assert 'class="share-bar"' not in render_html(report)
+
+
+def test_shared_pages_set_no_cookies(
+    client: TestClient, sessions: sessionmaker[Session], base: str
+) -> None:
+    """As the cookie policy says: whoever opens a shared link leaves no trace in the browser."""
+    from fastapi.testclient import TestClient as Browser
+
+    from app.db import get_db
+    from app.main import create_app
+
+    token = token_of(create(client, base))
+    app = create_app()
+
+    def override() -> Iterator[Session]:
+        with sessions() as session:
+            yield session
+
+    app.dependency_overrides[get_db] = override
+    with Browser(app) as visitor:
+        for path in (f"/s/{token}", "/s/sconosciuto"):
+            assert "set-cookie" not in visitor.get(path).headers
+        assert not visitor.cookies

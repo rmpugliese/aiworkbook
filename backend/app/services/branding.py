@@ -1,4 +1,4 @@
-"""The consultant's brand: a logo and a main colour, shown on their reports and shared pages.
+"""The installation's brand: a logo and a main colour, shown in the app and on every document.
 
 Logos are recognised by their content, never by the file name. SVG is accepted only as plain
 vector markup: no scripts, event handlers, `javascript:` links or DTDs (which could pull external
@@ -12,7 +12,7 @@ import re
 from sqlalchemy.orm import Session
 
 from app.export.report import Branding
-from app.models import Project, User
+from app.models import SiteSettings, User
 from app.models.project import utcnow
 from app.services.errors import InvalidRequestError
 
@@ -60,31 +60,50 @@ def prepare_logo(data: bytes) -> tuple[bytes, str]:
     raise InvalidRequestError("Formato non supportato: usa un'immagine PNG, JPEG o SVG.")
 
 
-def set_logo(db: Session, user: User, data: bytes) -> User:
-    user.logo, user.logo_content_type = prepare_logo(data)
-    user.logo_updated_at = utcnow()
+def site(db: Session) -> SiteSettings:
+    """The installation's settings row, created on first use."""
+    row = db.get(SiteSettings, 1)
+    if row is None:
+        row = SiteSettings(id=1)
+        db.add(row)
+        db.commit()
+    return row
+
+
+def set_logo(db: Session, data: bytes) -> SiteSettings:
+    row = site(db)
+    row.logo, row.logo_content_type = prepare_logo(data)
+    row.logo_updated_at = utcnow()
     db.commit()
-    return user
+    return row
 
 
-def clear_logo(db: Session, user: User) -> User:
-    user.logo = None
-    user.logo_content_type = None
-    user.logo_updated_at = None
+def clear_logo(db: Session) -> SiteSettings:
+    row = site(db)
+    row.logo = None
+    row.logo_content_type = None
+    row.logo_updated_at = None
     db.commit()
-    return user
+    return row
 
 
-def logo_data_uri(user: User | None) -> str | None:
-    if user is None or user.logo is None or user.logo_content_type is None:
+def set_brand_color(db: Session, value: str | None) -> SiteSettings:
+    row = site(db)
+    row.brand_color = normalize_color(value)
+    db.commit()
+    return row
+
+
+def logo_data_uri(row: SiteSettings) -> str | None:
+    if row.logo is None or row.logo_content_type is None:
         return None
-    return f"data:{user.logo_content_type};base64,{base64.b64encode(user.logo).decode()}"
+    return f"data:{row.logo_content_type};base64,{base64.b64encode(row.logo).decode()}"
 
 
-def project_branding(db: Session, project: Project) -> Branding:
-    """The brand shown on a project's documents: its owner's."""
-    owner = db.get(User, project.owner_id) if project.owner_id is not None else None
-    return Branding(logo=logo_data_uri(owner), color=owner.brand_color if owner else None)
+def document_branding(db: Session) -> Branding:
+    """The brand on every PDF and shared page: the installation's."""
+    row = site(db)
+    return Branding(logo=logo_data_uri(row), color=row.brand_color)
 
 
 def _luminance(hex_color: str) -> float:
@@ -116,13 +135,7 @@ def normalize_color(value: str | None) -> str | None:
     return value.lower()
 
 
-def update_profile(
-    db: Session, user: User, *, fields: set[str], display_name: str | None, brand_color: str | None
-) -> User:
-    """Updates only the fields the client sent; an empty value clears the field."""
-    if "brand_color" in fields:
-        user.brand_color = normalize_color(brand_color)
-    if "display_name" in fields:
-        user.display_name = display_name or None
+def update_profile(db: Session, user: User, *, display_name: str | None) -> User:
+    user.display_name = display_name or None
     db.commit()
     return user

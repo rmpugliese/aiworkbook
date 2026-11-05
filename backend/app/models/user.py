@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, LargeBinary, String, false
+from sqlalchemy import Boolean, DateTime, ForeignKey, String, false
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db import Base
@@ -20,12 +20,6 @@ class User(Base):
     # Administrators manage accounts; they never get access to other users' projects.
     is_admin: Mapped[bool] = mapped_column(Boolean, default=False, server_default=false())
     suspended_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    # The consultant's brand, shown on their reports and shared pages. The logo is small (at most
-    # 1 MB) and lives in the database, so it follows the backups and needs no file storage.
-    brand_color: Mapped[str | None] = mapped_column(String(7))
-    logo: Mapped[bytes | None] = mapped_column(LargeBinary, deferred=True)
-    logo_content_type: Mapped[str | None] = mapped_column(String(40))
-    logo_updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     # When the user accepted the terms and privacy notice, and which version (app/legal.py).
     terms_accepted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     terms_version: Mapped[str | None] = mapped_column(String(20))

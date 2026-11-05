@@ -1,12 +1,14 @@
-import { Alert, Badge, Button, Card, Group, Modal, Stack, Text, Title } from '@mantine/core'
+import { Alert, Anchor, Badge, Button, Card, Group, Modal, Stack, Text, Title } from '@mantine/core'
 import { useState } from 'react'
 
 import { useAIStatus, useSetProjectAI } from '../api/ai'
 import type { Project } from '../api/projects'
+import { useSite } from '../api/site'
 
 /** The owner's per-project consent to send its content to the assistant's endpoint. */
 export function AIConsentCard({ project }: { project: Project }) {
   const status = useAIStatus()
+  const site = useSite()
   const setAI = useSetProjectAI(project.id)
   const [confirming, setConfirming] = useState(false)
   const enabled = project.ai_enabled_at !== null
@@ -23,6 +25,7 @@ export function AIConsentCard({ project }: { project: Project }) {
     )
   }
   const { model, host, location } = status.data
+  const notice = site.data?.ai
 
   return (
     <Card>
@@ -59,7 +62,23 @@ export function AIConsentCard({ project }: { project: Project }) {
           <Text size="sm">
             Quando chiedi aiuto all'assistente, la domanda, il testo del campo e le altre risposte
             di questa iterazione (con i dati del progetto e del cliente) vengono inviati al modello{' '}
-            <b>{model}</b> su <b>{host}</b>.
+            <b>{model}</b>
+            {notice?.provider_name ? (
+              <>
+                {' '}
+                di <b>{notice.provider_name}</b>
+                {notice.server_location && <>, con server in {notice.server_location}</>}
+              </>
+            ) : (
+              <>
+                {' '}
+                su <b>{host}</b>
+              </>
+            )}
+            .{' '}
+            <Anchor href="/ai" target="_blank" inherit>
+              Come funziona l'assistente
+            </Anchor>
           </Text>
           <Alert color={location === 'locale' ? 'green' : 'yellow'}>
             {location === 'locale'

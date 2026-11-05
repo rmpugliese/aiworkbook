@@ -29,6 +29,9 @@ function AISettingsForm({ saved }: { saved: AISettings }) {
   const [apiKey, setApiKey] = useState('')
   const [temperature, setTemperature] = useState<number>(saved.temperature)
   const [maxTokens, setMaxTokens] = useState<number>(saved.max_tokens)
+  const [providerName, setProviderName] = useState(saved.provider_name)
+  const [serverLocation, setServerLocation] = useState(saved.server_location)
+  const [modelKind, setModelKind] = useState(saved.model_kind)
 
   function submit(event: FormEvent, clearKey = false) {
     event.preventDefault()
@@ -42,6 +45,9 @@ function AISettingsForm({ saved }: { saved: AISettings }) {
         max_tokens: maxTokens,
         api_key: apiKey.trim() || null,
         clear_api_key: clearKey,
+        provider_name: providerName,
+        server_location: serverLocation,
+        model_kind: modelKind,
       },
       { onSuccess: () => setApiKey('') },
     )
@@ -95,6 +101,32 @@ function AISettingsForm({ saved }: { saved: AISettings }) {
             step={100}
             value={maxTokens}
             onChange={(value) => setMaxTokens(Number(value))}
+          />
+        </Group>
+        <Text size="sm" fw={600} mt="xs">
+          Per l'informativa agli utenti
+        </Text>
+        <Text size="xs" c="dimmed" mt={-8}>
+          Compaiono nella pagina pubblica "Uso dell'AI" e quando un utente attiva l'assistente.
+        </Text>
+        <TextInput
+          label="Fornitore del servizio"
+          placeholder="Es. Scaleway SAS, OVHcloud, oppure: server del titolare"
+          value={providerName}
+          onChange={(event) => setProviderName(event.currentTarget.value)}
+        />
+        <Group grow>
+          <TextInput
+            label="Sede dei server"
+            placeholder="Es. Francia (Unione europea)"
+            value={serverLocation}
+            onChange={(event) => setServerLocation(event.currentTarget.value)}
+          />
+          <TextInput
+            label="Tipo di modello"
+            placeholder="Es. open weight, licenza Apache 2.0"
+            value={modelKind}
+            onChange={(event) => setModelKind(event.currentTarget.value)}
           />
         </Group>
         {update.isError && <Alert color="red">{update.error.message}</Alert>}

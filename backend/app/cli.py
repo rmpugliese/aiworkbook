@@ -68,7 +68,7 @@ def import_data(email: str, path: str) -> str:
         if user is None:
             return f"No user {email}: register and confirm the account first."
         data = json.loads(Path(path).read_text(encoding="utf-8"))
-        _, counts = account.import_projects(db, user, data, brand=True)
+        _, counts = account.import_projects(db, user, data)
     skipped = (
         f", {counts['skipped_answers']} unknown answers skipped"
         if counts["skipped_answers"]
