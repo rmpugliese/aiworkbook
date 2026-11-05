@@ -4,13 +4,13 @@ from dataclasses import dataclass
 from datetime import timedelta
 from urllib.parse import urlparse
 
-from sqlalchemy import func, select
+from sqlalchemy import func, select, update
 from sqlalchemy.orm import Session as DbSession
 
 from app.ai import secrets
 from app.ai.prompts import Action, Located, build_messages, locate
 from app.ai.provider import LLMProvider, Message, OpenAICompatibleProvider, endpoint_location
-from app.models import AIRequest, AISettings, Project, User
+from app.models import AIRequest, AISettings, Iteration, Project, User
 from app.models.project import utcnow
 from app.schemas.ai import AISettingsIn, AISettingsOut, AIStatusOut
 from app.services.answers import list_answers
@@ -131,6 +131,7 @@ class PreparedAssist:
     settings: AISettings
     messages: list[Message]
     log: AIRequest
+    iteration_id: int
 
 
 def prepare_assist(
@@ -185,9 +186,17 @@ def prepare_assist(
         model=row.model,
         prompt_chars=sum(len(message["content"]) for message in messages),
     )
-    return PreparedAssist(settings=row, messages=messages, log=log)
+    return PreparedAssist(settings=row, messages=messages, log=log, iteration_id=iteration.id)
 
 
-def save_log(db: DbSession, log: AIRequest) -> None:
+def save_log(db: DbSession, log: AIRequest, *, iteration_id: int) -> None:
     db.add(log)
+    # A draft or an improved text (not a critique) means AI supported the iteration's content.
+    if log.outcome == "ok" and log.output_chars > 0 and log.action in ("suggest", "improve"):
+        db.execute(
+            update(Iteration)
+            .where(Iteration.id == iteration_id, Iteration.ai_assisted_at.is_(None))
+            # Keep updated_at: nothing the user wrote has changed.
+            .values(ai_assisted_at=utcnow(), updated_at=Iteration.updated_at)
+        )
     db.commit()

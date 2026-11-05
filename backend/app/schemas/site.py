@@ -16,6 +16,8 @@ class LegalOut(BaseModel):
     pec: str
     court: str
     reviewed: bool
+    # Where to write for information: the contact email, or else the privacy one.
+    contact_email: str
     # False while the essentials (name, address, privacy email) are missing.
     complete: bool
 
@@ -30,6 +32,7 @@ class LegalIn(BaseModel):
     pec: Line
     court: Short
     reviewed: bool
+    contact_email: Line = ""
 
 
 class AINoticeOut(BaseModel):

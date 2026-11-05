@@ -28,6 +28,7 @@ def _legal(row: SiteSettings) -> LegalOut:
         pec=row.legal_pec,
         court=row.legal_court,
         reviewed=row.legal_reviewed,
+        contact_email=row.contact_email or row.legal_email,
         complete=bool(row.legal_name and row.legal_address and row.legal_email),
     )
 
@@ -122,5 +123,6 @@ def update_legal(db: Db, _admin: Admin, data: LegalIn) -> SiteOut:
     row.legal_pec = data.pec
     row.legal_court = data.court
     row.legal_reviewed = data.reviewed
+    row.contact_email = data.contact_email
     db.commit()
     return site_out(db)

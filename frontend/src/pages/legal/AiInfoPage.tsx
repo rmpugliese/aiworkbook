@@ -14,8 +14,8 @@ export function AiInfoPage() {
             <Text>
               {APP_NAME} include un assistente basato su un modello linguistico di intelligenza
               artificiale. Questa pagina spiega che cosa fa, quando interviene, quali dati riceve e
-              dove sono i server, in linea con il Regolamento (UE) 2024/1689 sull'intelligenza
-              artificiale (AI Act) e con il GDPR.
+              dove sono i server, e come si colloca rispetto alle norme europee e italiane
+              sull'intelligenza artificiale.
             </Text>
 
             <Section title="1. Il servizio AI in uso">
@@ -117,7 +117,68 @@ export function AiInfoPage() {
               </Text>
             </Section>
 
-            <Section title="6. Altre informazioni">
+            <Section title="6. Quadro normativo">
+              <Text>Le norme di riferimento sono:</Text>
+              <List spacing="xs">
+                <List.Item>
+                  il <b>Regolamento (UE) 2024/1689 sull'intelligenza artificiale</b> (AI Act), come
+                  modificato dal Regolamento (UE) 2026/1744 (Digital Omnibus sull'IA);
+                </List.Item>
+                <List.Item>
+                  la <b>legge 23 settembre 2025, n. 132</b>, sull'intelligenza artificiale, e i
+                  relativi decreti attuativi;
+                </List.Item>
+                <List.Item>
+                  il <b>Regolamento (UE) 2016/679</b> (GDPR) per i dati personali.
+                </List.Item>
+              </List>
+              <Text>
+                L'assistente è un sistema di AI a <b>rischio limitato</b>: aiuta a redigere testi e
+                non prende decisioni su persone. Non è un sistema ad alto rischio (non valuta
+                lavoratori, studenti, accesso al credito o a servizi essenziali) e non svolge
+                pratiche vietate. L'app non sviluppa modelli propri: usa modelli per finalità
+                generali di terzi, i cui obblighi specifici spettano ai rispettivi fornitori.
+              </Text>
+              <Text>Per gli obblighi che riguardano questo tipo di sistemi:</Text>
+              <List spacing="xs">
+                <List.Item>
+                  <b>Trasparenza</b>: questa pagina, l'avviso al momento dell'attivazione e
+                  l'etichetta "Generato dall'AI · da verificare" su ogni proposta.
+                </List.Item>
+                <List.Item>
+                  <b>Supervisione umana</b>: nessun testo entra in una risposta senza la tua
+                  conferma, e puoi modificarlo o scartarlo.
+                </List.Item>
+                <List.Item>
+                  <b>Contenuti generati</b>: il PDF e la pagina condivisa di un'iterazione redatta
+                  con l'assistente lo dichiarano in copertina.
+                </List.Item>
+                <List.Item>
+                  <b>Alfabetizzazione</b>: funzioni, dati trattati e limiti sono spiegati qui, in
+                  linguaggio non tecnico.
+                </List.Item>
+              </List>
+              <Text size="sm" c="dimmed">
+                Autorità di riferimento in Italia: Agenzia per la cybersicurezza nazionale (ACN) e
+                Agenzia per l'Italia digitale (AgID) per l'intelligenza artificiale; Garante per la
+                protezione dei dati personali per il trattamento dei dati.
+              </Text>
+            </Section>
+
+            <Section title="7. Se usi l'app per la tua attività professionale">
+              <Alert color="violet" variant="light">
+                <Text size="sm">
+                  La legge n. 132/2025 (art. 13) prevede che nelle professioni intellettuali
+                  l'intelligenza artificiale sia usata solo come <b>supporto</b>, con prevalenza del
+                  lavoro del professionista, e che il professionista <b>informi il cliente</b> dei
+                  sistemi di AI utilizzati, in modo chiaro e semplice. Se usi l'assistente per il
+                  lavoro di un cliente, comunicaglielo: il PDF e la pagina condivisa lo indicano già
+                  in copertina, e questa pagina descrive il servizio usato.
+                </Text>
+              </Alert>
+            </Section>
+
+            <Section title="8. Altre informazioni">
               <Text>
                 Per i dati personali vedi l'
                 <Anchor component={Link} to="/privacy">

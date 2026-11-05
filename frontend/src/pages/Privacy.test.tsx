@@ -35,6 +35,7 @@ describe('Privacy and data rights', () => {
             pec: '',
             court: 'Trieste',
             reviewed: true,
+            contact_email: 'info@perl.example',
             complete: true,
           },
           ai: {
@@ -61,6 +62,10 @@ describe('Privacy and data rights', () => {
     await userEvent.click(screen.getAllByRole('link', { name: 'Privacy' })[0])
     expect(await screen.findByText('Perl Consulting')).toBeVisible()
     expect(screen.queryByText('[titolare]')).toBeNull()
+    expect(screen.getByRole('link', { name: 'Contatti' })).toHaveAttribute(
+      'href',
+      'mailto:info@perl.example',
+    )
   })
 
   it('lists the cookies in the footer panel', async () => {

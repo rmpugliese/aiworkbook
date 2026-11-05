@@ -85,6 +85,7 @@ def _iteration(db: DbSession, iteration: Iteration) -> dict[str, Any]:
         "user_story": iteration.user_story,
         "status": iteration.status,
         "template_version": iteration.template_version,
+        "ai_assisted_at": _iso(iteration.ai_assisted_at),
         "created_at": _iso(iteration.created_at),
         "updated_at": _iso(iteration.updated_at),
         "answers": [
@@ -190,6 +191,8 @@ def _import_project(
             user_story=item.get("user_story"),
             template_version=item["template_version"],
             status=item.get("status", "draft"),
+            # The disclosure travels with the content it describes.
+            ai_assisted_at=_parse_time(item.get("ai_assisted_at")),
             created_at=_parse_time(item.get("created_at")) or utcnow(),
         )
         db.add(iteration)

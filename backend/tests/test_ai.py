@@ -324,3 +324,49 @@ def test_hourly_limit(
     assert assist(client, project).status_code == 200
     assert assist(client, project).status_code == 200
     assert assist(client, project).status_code == 429
+
+
+# --- Disclosure in documents (legge 132/2025, art. 13) ---------------------------------
+
+
+def assisted_at(client: TestClient, project: dict[str, Any]) -> Any:
+    return client.get(project["base"]).json()["ai_assisted_at"]
+
+
+def test_a_draft_marks_the_iteration_as_ai_assisted(
+    client: TestClient, admin_client: TestClient, project: dict[str, Any], fake: FakeProvider
+) -> None:
+    ready(admin_client, client, project)
+    before = client.get(project["base"]).json()["updated_at"]
+    assert assisted_at(client, project) is None
+    assist(client, project).read()
+    assert assisted_at(client, project) is not None
+    assert client.get(project["base"]).json()["updated_at"] == before  # nothing the user wrote
+
+
+def test_a_critique_or_a_failure_does_not_mark_it(
+    client: TestClient, admin_client: TestClient, project: dict[str, Any], fake: FakeProvider
+) -> None:
+    ready(admin_client, client, project)
+    assist(client, project, action="review").read()
+    assert assisted_at(client, project) is None
+    fake.pieces, fake.error = [], "Il modello non risponde."
+    assist(client, project).read()
+    assert assisted_at(client, project) is None
+
+
+def test_documents_disclose_ai_assistance(
+    client: TestClient,
+    anon_client: TestClient,
+    admin_client: TestClient,
+    project: dict[str, Any],
+    fake: FakeProvider,
+) -> None:
+    url = client.post(f"{project['base']}/shares", json={"label": "Cliente"}).json()["url"]
+    token = url.rsplit("/s/", 1)[1]
+    note = "redatti con il supporto di un assistente di"
+    assert note not in anon_client.get(f"/s/{token}").text
+
+    ready(admin_client, client, project)
+    assist(client, project).read()
+    assert note in anon_client.get(f"/s/{token}").text

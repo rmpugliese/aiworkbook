@@ -1131,6 +1131,8 @@ export interface components {
              * Format: date-time
              */
             updated_at: string;
+            /** Ai Assisted At */
+            ai_assisted_at?: string | null;
         };
         /** IterationUpdate */
         IterationUpdate: {
@@ -1157,6 +1159,11 @@ export interface components {
             court: string;
             /** Reviewed */
             reviewed: boolean;
+            /**
+             * Contact Email
+             * @default
+             */
+            contact_email: string;
         };
         /**
          * LegalOut
@@ -1177,6 +1184,8 @@ export interface components {
             court: string;
             /** Reviewed */
             reviewed: boolean;
+            /** Contact Email */
+            contact_email: string;
             /** Complete */
             complete: boolean;
         };

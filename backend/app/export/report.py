@@ -85,6 +85,8 @@ class Report:
     phase_one: PhaseOneOutcome
     phases: list[PhaseView]
     branding: Branding = Branding()
+    # The assistant drafted or improved part of the content (legge 132/2025, art. 13).
+    ai_assisted: bool = False
 
     @property
     def phase_one_decided(self) -> Verdict | None:
@@ -161,6 +163,7 @@ def build_report(
         phase_one=phase_one_outcome(template, {k: a.verdict for k, a in by_key.items()}),
         phases=phases,
         branding=branding or Branding(),
+        ai_assisted=iteration.ai_assisted_at is not None,
     )
 
 

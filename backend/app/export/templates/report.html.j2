@@ -48,6 +48,10 @@
     <dt>Data</dt><dd>{{ generated_on }}</dd>
     <dt>Template</dt><dd>v{{ r.template_version }}</dd>
   </dl>
+  {%- if r.ai_assisted %}
+  <p class="ai-note">Alcuni contenuti sono stati redatti con il supporto di un assistente di
+  intelligenza artificiale e rivisti dal consulente, che ne resta responsabile.</p>
+  {%- endif %}
   <p class="cover-note">Compatibile con la metodologia CPMAI</p>
 </section>
 

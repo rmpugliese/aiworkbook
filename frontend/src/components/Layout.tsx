@@ -36,6 +36,7 @@ function Brand() {
 }
 
 export function Layout() {
+  const contactEmail = useSite().data?.legal.contact_email
   return (
     <AppShell header={{ height: 64 }} footer={{ height: 40 }} padding="md">
       <AppShell.Header withBorder>
@@ -73,6 +74,11 @@ export function Layout() {
           <Anchor component={Link} to="/ai" size="xs" c="dimmed">
             Uso dell'AI
           </Anchor>
+          {contactEmail && (
+            <Anchor href={`mailto:${contactEmail}`} size="xs" c="dimmed">
+              Contatti
+            </Anchor>
+          )}
         </Group>
       </AppShell.Footer>
     </AppShell>

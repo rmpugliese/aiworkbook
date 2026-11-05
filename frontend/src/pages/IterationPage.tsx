@@ -14,6 +14,7 @@ import {
   Stack,
   Text,
   Title,
+  Tooltip,
 } from '@mantine/core'
 import { IconChevronRight, IconDownload, IconShare } from '@tabler/icons-react'
 import { useCallback, useState } from 'react'
@@ -134,6 +135,15 @@ export function IterationPage() {
               {iteration.data.number}. {iteration.data.title}
             </Title>
             <Badge color="gray">Template v{iteration.data.template_version}</Badge>
+            {iteration.data.ai_assisted_at && (
+              <Tooltip
+                label="I documenti di questa iterazione indicano che alcuni contenuti sono stati redatti con l'assistente AI."
+                multiline
+                w={280}
+              >
+                <Badge color="violet">Redatta con supporto AI</Badge>
+              </Tooltip>
+            )}
           </Group>
           <Text size="sm" c="dimmed">
             Ultima modifica: {formatDateTime(iteration.data.updated_at)}
