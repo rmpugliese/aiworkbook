@@ -57,6 +57,31 @@ describe('AdminUsersPage', () => {
     expect(calls.some((c) => c.path === '/api/admin/users/2/suspend')).toBe(true)
   })
 
+  it('sums up the sign-ups', async () => {
+    const recent = new Date(Date.now() - 2 * 86_400_000).toISOString()
+    mockApi({
+      'GET /api/health': HEALTH_OK,
+      'GET /api/auth/me': Response.json(ADMIN),
+      'GET /api/admin/users': Response.json([
+        account({ id: 1, created_at: '2025-01-10T09:00:00Z' }),
+        account({ created_at: recent }),
+        account({ id: 3, created_at: recent, email_verified_at: null }),
+      ]),
+    })
+    renderRoutes(routes, '/admin')
+
+    const stat = async (label: string) =>
+      (await screen.findByText(label)).parentElement as HTMLElement
+    expect(within(await stat('Iscritti')).getByText('3')).toBeInTheDocument()
+    expect(within(await stat('Confermati')).getByText('2')).toBeInTheDocument()
+    expect(screen.getByText('1 da confermare')).toBeInTheDocument()
+    expect(within(await stat('Nuovi in 7 giorni')).getByText('2')).toBeInTheDocument()
+    expect(within(await stat('Nuovi in 30 giorni')).getByText('2')).toBeInTheDocument()
+    expect(
+      screen.getByRole('img', { name: /Iscrizioni negli ultimi 30 giorni: 2 in totale/ }),
+    ).toBeInTheDocument()
+  })
+
   it('shows the administration entry only to administrators', async () => {
     mockApi({
       'GET /api/health': HEALTH_OK,

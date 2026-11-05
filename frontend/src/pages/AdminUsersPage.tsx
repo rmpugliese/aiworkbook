@@ -6,6 +6,7 @@ import { AISettingsCard } from '../components/AISettingsCard'
 import { BrandCards } from '../components/BrandCards'
 import { LegalCard } from '../components/LegalCard'
 import { PageHeader } from '../components/PageHeader'
+import { SignupStatsCard } from '../components/SignupStatsCard'
 import { formatDate, formatDateTime } from '../format'
 
 function Status({ user }: { user: AdminUser }) {
@@ -38,6 +39,7 @@ export function AdminUsersPage() {
         subtitle="Marchio, dati legali, assistente AI e account. Il contenuto dei progetti resta visibile solo ai loro proprietari."
       />
 
+      {users.data && <SignupStatsCard users={users.data} />}
       <BrandCards />
       <LegalCard />
       <AISettingsCard />
