@@ -20,6 +20,7 @@ import {
   IconBuilding,
   IconChevronRight,
   IconDownload,
+  IconFileExport,
   IconPencil,
   IconPlus,
   IconTrash,
@@ -29,6 +30,7 @@ import { Link, useNavigate, useParams } from 'react-router'
 
 import {
   exportPdfUrl,
+  exportProjectUrl,
   useCreateIteration,
   useDeleteProject,
   useProject,
@@ -98,6 +100,15 @@ function ProjectDetail({ project }: { project: Project }) {
               onClick={() => open('edit')}
             >
               Modifica
+            </Button>
+            <Button
+              component="a"
+              href={exportProjectUrl(project.id)}
+              download
+              variant="default"
+              leftSection={<IconFileExport size={16} />}
+            >
+              Esporta
             </Button>
             {archived ? (
               <>

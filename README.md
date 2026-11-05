@@ -108,6 +108,14 @@ da far rivedere da un legale). Dal profilo ogni utente scarica tutti i propri da
 elimina l'account. `python -m app.cli cleanup` rimuove sessioni scadute, link email usati e il
 registro AI oltre i 12 mesi.
 
+## Spostare un progetto
+
+Nella pagina del progetto, **Esporta** scarica un file JSON con il progetto, le iterazioni e le
+risposte. In un altro account o in un'altra installazione, **Importa progetto** (pagina Progetti)
+lo ricrea; importare due volte crea due copie. Non vengono riportati i link condivisi né il
+consenso all'assistente AI. Da riga di comando: `python -m app.cli import-data --email … --file …`
+accetta anche il file completo di "Scarica i miei dati", logo e colore compresi.
+
 ## Pubblicazione
 
 Container Docker con PostgreSQL, Caddy (HTTPS) e backup notturno: vedi [DEPLOY.md](DEPLOY.md).

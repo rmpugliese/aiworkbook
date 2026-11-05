@@ -1,9 +1,11 @@
+import json
+import re
 from collections.abc import Iterator
 from contextlib import contextmanager
 from datetime import datetime
 from typing import Annotated
 
-from fastapi import APIRouter, Body, Depends, HTTPException, Query, Response, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Query, Response, UploadFile, status
 from sqlalchemy.orm import Session
 
 from app.auth.web import CurrentUser
@@ -21,6 +23,7 @@ from app.schemas.projects import (
     ProjectSummary,
     ProjectUpdate,
 )
+from app.services import account as account_service
 from app.services import ai as ai_service
 from app.services import answers as answers_service
 from app.services import export as export_service
@@ -28,6 +31,8 @@ from app.services import projects as service
 from app.services.errors import ConflictError, InvalidRequestError, NotFoundError
 
 router = APIRouter(prefix="/api/projects", tags=["projects"])
+
+_UNSAFE_FILENAME = re.compile(r'[\\/:*?"<>|\x00-\x1f]+')
 
 Db = Annotated[Session, Depends(get_db)]
 
@@ -83,6 +88,51 @@ def list_projects(
 def create_project(db: Db, user: CurrentUser, data: ProjectCreate) -> ProjectOut:
     with _service_errors():
         return _project_out(service.create_project(db, data, owner_id=user.id))
+
+
+# Within what the reverse proxy accepts (2 MB, see DEPLOY.md); a project file is far smaller.
+MAX_IMPORT_BYTES = 2 * 1024 * 1024
+
+
+@router.post("/import", status_code=status.HTTP_201_CREATED)
+async def import_project(db: Db, user: CurrentUser, file: UploadFile) -> ProjectOut:
+    """Creates the project of an exported file in the user's account."""
+    raw = await file.read(MAX_IMPORT_BYTES + 1)
+    if len(raw) > MAX_IMPORT_BYTES:
+        raise HTTPException(status.HTTP_413_CONTENT_TOO_LARGE, "Il file supera 2 MB.")
+    try:
+        data = json.loads(raw)
+        if not isinstance(data, dict):
+            raise ValueError
+        projects, _ = account_service.import_projects(db, user, data)
+    except InvalidRequestError as error:
+        db.rollback()  # all or nothing: no half-imported project
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(error)) from error
+    except (ValueError, KeyError, TypeError) as error:
+        db.rollback()
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_CONTENT,
+            'File non valido: usa un file scaricato con "Esporta progetto".',
+        ) from error
+    db.refresh(projects[0])
+    return _project_out(projects[0])
+
+
+@router.get(
+    "/{project_id}/export",
+    response_class=Response,
+    responses={200: {"content": {"application/json": {}}, "description": "The project as a file"}},
+)
+def export_project(db: Db, user: CurrentUser, project_id: int) -> Response:
+    with _service_errors():
+        project = service.get_project(db, project_id, owner_id=user.id)
+    data = account_service.export_project(db, project)
+    filename = f"{_UNSAFE_FILENAME.sub(' ', project.name).strip()} - progetto.json"
+    return Response(
+        content=json.dumps(data, ensure_ascii=False, indent=2),
+        media_type="application/json",
+        headers={"Content-Disposition": attachment_header(filename), "Cache-Control": "no-store"},
+    )
 
 
 @router.get("/{project_id}")
