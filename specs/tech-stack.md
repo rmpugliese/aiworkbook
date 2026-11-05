@@ -69,6 +69,8 @@ backend/
 - **Campi in Markdown**: lettura impaginata con `react-markdown` + `remark-gfm` (tabelle, niente
   HTML), modifica come testo con una barra di formattazione; nel PDF e nella pagina condivisa
   `markdown-it-py` con HTML disattivato. Un a capo singolo resta un a capo
+- **Import da workbook PDF**: `pdf-lib` legge i campi del modulo nel browser (import dinamico,
+  fuori dal bundle principale); il PDF non viene inviato al server
 - **Test**: **Vitest** e **Testing Library**; **Playwright** per i test end-to-end a partire dalla
   fase di compilazione
 - **Qualità**: **oxlint** (il linter predefinito del template Vite), Prettier e `tsc -b` come

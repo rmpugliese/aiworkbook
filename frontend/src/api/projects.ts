@@ -117,3 +117,13 @@ export function useUpdateIteration(projectId: number, iterationId: number) {
     apiSend<Iteration>('PATCH', `/api/projects/${projectId}/iterations/${iterationId}`, data),
   )
 }
+
+export type WorkbookPdfImport = Schemas['WorkbookPdfImportIn']
+export type WorkbookPdfImportResult = Schemas['WorkbookPdfImportOut']
+
+/** A new project from the fields of a fillable workbook PDF (read in the browser). */
+export function useImportWorkbookPdf() {
+  return useProjectMutation((data: WorkbookPdfImport) =>
+    apiSend<WorkbookPdfImportResult>('POST', '/api/projects/import-workbook', data),
+  )
+}

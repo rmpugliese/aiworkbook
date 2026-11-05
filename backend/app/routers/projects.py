@@ -22,11 +22,14 @@ from app.schemas.projects import (
     ProjectOut,
     ProjectSummary,
     ProjectUpdate,
+    WorkbookPdfImportIn,
+    WorkbookPdfImportOut,
 )
 from app.services import account as account_service
 from app.services import ai as ai_service
 from app.services import answers as answers_service
 from app.services import export as export_service
+from app.services import pdf_import as pdf_import_service
 from app.services import projects as service
 from app.services.errors import ConflictError, InvalidRequestError, NotFoundError
 
@@ -116,6 +119,18 @@ async def import_project(db: Db, user: CurrentUser, file: UploadFile) -> Project
         ) from error
     db.refresh(projects[0])
     return _project_out(projects[0])
+
+
+@router.post("/import-workbook", status_code=status.HTTP_201_CREATED)
+def import_workbook_pdf(
+    db: Db, user: CurrentUser, data: WorkbookPdfImportIn
+) -> WorkbookPdfImportOut:
+    """Creates a project from the fields of a fillable workbook PDF, read in the browser."""
+    try:
+        project, answers = pdf_import_service.import_workbook_fields(db, user, data)
+    except InvalidRequestError as error:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(error)) from error
+    return WorkbookPdfImportOut(project=_project_out(project), answers=answers)
 
 
 @router.get(

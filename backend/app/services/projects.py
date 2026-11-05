@@ -51,7 +51,7 @@ def create_project(db: Session, data: ProjectCreate, *, owner_id: int) -> Projec
         client_name=data.client_name or None,
         description=data.description or None,
     )
-    project.iterations.append(_new_iteration(number=1, title="Iterazione 1", user_story=None))
+    project.iterations.append(new_iteration(number=1, title="Iterazione 1", user_story=None))
     db.add(project)
     db.commit()
     return get_project(db, project.id, owner_id=owner_id)
@@ -114,7 +114,7 @@ def create_iteration(
         user_story = source.user_story
 
     next_number = max((iteration.number for iteration in project.iterations), default=0) + 1
-    iteration = _new_iteration(number=next_number, title=data.title, user_story=user_story)
+    iteration = new_iteration(number=next_number, title=data.title, user_story=user_story)
     if source is not None:
         iteration.answers = [
             Answer(
@@ -152,7 +152,7 @@ def update_iteration(
     return iteration
 
 
-def _new_iteration(*, number: int, title: str, user_story: str | None) -> Iteration:
+def new_iteration(*, number: int, title: str, user_story: str | None) -> Iteration:
     return Iteration(
         number=number,
         title=title,

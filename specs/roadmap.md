@@ -209,6 +209,18 @@ campi, solo quando l'utente lo chiede.
 
 ---
 
+## Fase 13: Import da workbook PDF compilabile (Completata)
+
+**Obiettivo:** chi ha già compilato il workbook PDF crea un progetto senza ricopiare le risposte.
+
+- [x] Lettura dei campi nel browser con `pdf-lib`: il PDF non viene inviato né salvato
+- [x] Tabella campo → domanda (solo nomi e chiavi, nessun testo PMI), Go/No-Go e pattern AI
+- [x] Progetto nuovo con l'iterazione 1 compilata e riepilogo delle risposte importate
+- [x] Test: mappatura, modulo non riconosciuto o vuoto, limiti, lettura di un PDF generato
+- [ ] Import con AI di PDF appiattiti o scansionati (eventuale funzione a pagamento)
+
+---
+
 ## Più avanti (non pianificato)
 
 - Storico delle revisioni delle risposte

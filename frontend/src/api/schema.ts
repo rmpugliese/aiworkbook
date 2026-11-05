@@ -336,6 +336,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/projects/import-workbook": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Import Workbook Pdf
+         * @description Creates a project from the fields of a fillable workbook PDF, read in the browser.
+         */
+        post: operations["import_workbook_pdf_api_projects_import_workbook_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/projects/{project_id}/export": {
         parameters: {
             query?: never;
@@ -1529,6 +1549,26 @@ export interface components {
             /** Context */
             ctx?: Record<string, never>;
         };
+        /**
+         * WorkbookPdfImportIn
+         * @description The fields of a fillable workbook PDF, read in the browser: the file never comes here.
+         */
+        WorkbookPdfImportIn: {
+            /** Name */
+            name: string;
+            /** Client Name */
+            client_name?: string | null;
+            /** Fields */
+            fields: {
+                [key: string]: string | boolean;
+            };
+        };
+        /** WorkbookPdfImportOut */
+        WorkbookPdfImportOut: {
+            project: components["schemas"]["ProjectOut"];
+            /** Answers */
+            answers: number;
+        };
     };
     responses: never;
     parameters: never;
@@ -2163,6 +2203,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ProjectOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    import_workbook_pdf_api_projects_import_workbook_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                session?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WorkbookPdfImportIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WorkbookPdfImportOut"];
                 };
             };
             /** @description Validation Error */

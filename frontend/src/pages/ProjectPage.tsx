@@ -18,6 +18,7 @@ import {
   IconArchive,
   IconArchiveOff,
   IconBuilding,
+  IconCheck,
   IconChevronRight,
   IconDownload,
   IconFileExport,
@@ -26,7 +27,7 @@ import {
   IconTrash,
 } from '@tabler/icons-react'
 import { useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router'
+import { Link, useLocation, useNavigate, useParams } from 'react-router'
 
 import {
   exportPdfUrl,
@@ -57,6 +58,9 @@ function ProjectDetail({ project }: { project: Project }) {
   const deleteProject = useDeleteProject(project.id)
   const createIteration = useCreateIteration(project.id)
   const archived = project.archived_at !== null
+  // Set by the workbook PDF import, to say what it found.
+  const imported = (useLocation().state as { importedAnswers?: number } | null)?.importedAnswers
+  const [showImported, setShowImported] = useState(imported !== undefined)
 
   function open(next: Dialog) {
     updateProject.reset()
@@ -142,6 +146,23 @@ function ProjectDetail({ project }: { project: Project }) {
           </>
         }
       />
+
+      {showImported && (
+        <Alert
+          color="green"
+          icon={<IconCheck size={18} />}
+          title={
+            imported === 1
+              ? 'Importata 1 risposta dal workbook PDF'
+              : `Importate ${imported} risposte dal workbook PDF`
+          }
+          withCloseButton
+          onClose={() => setShowImported(false)}
+        >
+          Le trovi nell'iterazione 1: rileggile e completa le domande rimaste vuote, comprese le
+          decisioni di fine fase.
+        </Alert>
+      )}
 
       {setArchived.isError && <Alert color="red">{setArchived.error.message}</Alert>}
 
