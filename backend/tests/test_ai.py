@@ -269,6 +269,34 @@ def test_the_prompt_carries_the_project_context(
         assert expected in content, expected
 
 
+def test_instructions_guide_a_single_request(
+    admin_client: TestClient,
+    client: TestClient,
+    project: dict[str, Any],
+    fake: FakeProvider,
+    db: Session,
+) -> None:
+    ready(admin_client, client, project)
+
+    assist(client, project)
+    assist(client, project, instructions="  ")
+    assist(client, project, instructions="Tono formale, al massimo 3 punti")
+
+    plain, blank, guided = (call[1]["content"] for call in fake.calls)
+    assert blank == plain and "INDICAZIONI DEL CONSULENTE" not in plain
+    assert guided.startswith(plain)
+    assert guided.endswith(
+        'INDICAZIONI DEL CONSULENTE PER QUESTA RICHIESTA:\n"""\n'
+        'Tono formale, al massimo 3 punti\n"""'
+    )
+    assert "le regole precedenti restano sempre valide" in fake.calls[0][0]["content"]
+    logs = db.scalars(select(AIRequest).order_by(AIRequest.id)).all()
+    assert logs[2].prompt_chars > logs[0].prompt_chars
+
+    assert assist(client, project, instructions="x" * 1001).status_code == 422
+    assert len(fake.calls) == 3
+
+
 def test_long_context_is_truncated(
     admin_client: TestClient,
     client: TestClient,

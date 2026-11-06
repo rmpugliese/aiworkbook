@@ -244,6 +244,17 @@ campi, solo quando l'utente lo chiede.
 
 ---
 
+## Fase 16: Indicazioni per l'assistente AI (Completata)
+
+**Obiettivo:** orientare le proposte dell'assistente su tono, contenuto e lunghezza.
+
+- [x] Campo facoltativo di indicazioni nel riquadro "Assistente", valido per la singola richiesta
+- [x] Indicazioni non salvate né registrate nei log; regole di base dell'assistente invariate
+- [x] Pagina "Uso dell'AI" aggiornata su cosa riceve il servizio AI
+- [ ] Istruzioni salvate nel progetto o nel profilo: da valutare
+
+---
+
 ## Più avanti (non pianificato)
 
 - Storico delle revisioni delle risposte

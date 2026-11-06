@@ -1,4 +1,16 @@
-import { Alert, Badge, Button, Group, Loader, Menu, Paper, Stack, Text } from '@mantine/core'
+import {
+  Alert,
+  Badge,
+  Button,
+  Group,
+  Loader,
+  Paper,
+  Popover,
+  Stack,
+  Text,
+  Textarea,
+} from '@mantine/core'
+import { useState } from 'react'
 
 import { useAssist, type AssistAction } from '../api/ai'
 import { Markdown } from './Markdown'
@@ -11,6 +23,8 @@ const LABEL: Record<AssistAction, string> = {
   review: 'Critica e domande',
 }
 
+const INSTRUCTIONS_LIMIT = 1000
+
 type Props = {
   assistant: AssistantContext
   questionKey: string
@@ -19,31 +33,87 @@ type Props = {
   onApply: (text: string) => void
 }
 
-/** The "Assistente" menu of a field and the proposal it streams back. Nothing is applied
+/** The "Assistente" popover of a field (optional guidance, then the action) and the proposal it streams back. Nothing is applied
  * without the user's choice. */
 export function AssistantPanel({ assistant, questionKey, text, verdict, onApply }: Props) {
   const { state, run, stop, reset } = useAssist(assistant.projectId, assistant.iterationId)
-  const ask = (action: AssistAction) => run({ questionKey, action, text, verdict })
+  // Guidance for the requests on this field: kept while the page is open, never saved.
+  const [instructions, setInstructions] = useState('')
+  const [opened, setOpened] = useState(false)
+  const ask = (action: AssistAction) => {
+    setOpened(false)
+    run({ questionKey, action, text, verdict, instructions: instructions.trim() })
+  }
   const proposal = state.status === 'idle' ? '' : state.text.trim()
   const appliable = state.status === 'done' && state.action !== 'review' && proposal
 
   return (
     <Stack gap="xs">
       <Group justify="flex-end">
-        <Menu position="bottom-end" withinPortal>
-          <Menu.Target>
-            <Button size="compact-xs" variant="light" disabled={state.status === 'streaming'}>
+        <Popover
+          opened={opened}
+          onChange={setOpened}
+          position="bottom-end"
+          width={340}
+          shadow="md"
+          withinPortal
+          // Stays put while typing: without layout (tests) the target would count as detached.
+          hideDetached={false}
+        >
+          <Popover.Target>
+            <Button
+              size="compact-xs"
+              variant="light"
+              disabled={state.status === 'streaming'}
+              onClick={() => setOpened((open) => !open)}
+            >
               Assistente
             </Button>
-          </Menu.Target>
-          <Menu.Dropdown>
-            <Menu.Item onClick={() => ask('suggest')}>{LABEL.suggest}</Menu.Item>
-            <Menu.Item onClick={() => ask('improve')} disabled={!text.trim()}>
-              {LABEL.improve}
-            </Menu.Item>
-            <Menu.Item onClick={() => ask('review')}>{LABEL.review}</Menu.Item>
-          </Menu.Dropdown>
-        </Menu>
+          </Popover.Target>
+          <Popover.Dropdown>
+            <Stack gap="xs">
+              <Textarea
+                size="xs"
+                label="Indicazioni per l'assistente (facoltative)"
+                description={`Non vengono salvate. ${instructions.length}/${INSTRUCTIONS_LIMIT}`}
+                placeholder="Es. tono formale, al massimo 5 punti, concentrati sui rischi GDPR"
+                autosize
+                minRows={2}
+                maxRows={8}
+                maxLength={INSTRUCTIONS_LIMIT}
+                value={instructions}
+                onChange={(event) => setInstructions(event.currentTarget.value)}
+              />
+              <Stack gap={4}>
+                <Button
+                  size="xs"
+                  variant="light"
+                  justify="flex-start"
+                  onClick={() => ask('suggest')}
+                >
+                  {LABEL.suggest}
+                </Button>
+                <Button
+                  size="xs"
+                  variant="light"
+                  justify="flex-start"
+                  onClick={() => ask('improve')}
+                  disabled={!text.trim()}
+                >
+                  {LABEL.improve}
+                </Button>
+                <Button
+                  size="xs"
+                  variant="light"
+                  justify="flex-start"
+                  onClick={() => ask('review')}
+                >
+                  {LABEL.review}
+                </Button>
+              </Stack>
+            </Stack>
+          </Popover.Dropdown>
+        </Popover>
       </Group>
 
       {state.status !== 'idle' && (

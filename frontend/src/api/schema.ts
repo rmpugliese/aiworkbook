@@ -1079,6 +1079,11 @@ export interface components {
             text: string;
             /** Verdict */
             verdict?: ("go" | "maybe" | "no_go") | null;
+            /**
+             * Instructions
+             * @default
+             */
+            instructions: string;
         };
         /** Body_import_project_api_projects_import_post */
         Body_import_project_api_projects_import_post: {

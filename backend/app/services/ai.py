@@ -145,6 +145,7 @@ def prepare_assist(
     action: Action,
     text: str,
     verdict: str | None,
+    instructions: str = "",
 ) -> PreparedAssist:
     project = get_project(db, project_id, user_id=user.id)
     iteration = get_iteration(db, project_id, iteration_id, user_id=user.id)
@@ -178,6 +179,7 @@ def prepare_assist(
         here=here,
         current_text=text,
         current_verdict=verdict,
+        instructions=instructions,
     )
     log = AIRequest(
         user_id=user.id,

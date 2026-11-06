@@ -103,6 +103,7 @@ async def assist(
             action=data.action,
             text=data.text,
             verdict=data.verdict,
+            instructions=data.instructions,
         )
         provider = factory(prepared.settings)
     engine = db.get_bind()
