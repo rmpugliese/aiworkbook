@@ -65,3 +65,5 @@ class AssistIn(BaseModel):
     action: Literal["suggest", "improve", "review"]
     text: Annotated[str, Field(max_length=20_000)] = ""
     verdict: Literal["go", "maybe", "no_go"] | None = None
+    # Guidance for this request only: never stored.
+    instructions: Annotated[str, StringConstraints(strip_whitespace=True, max_length=1000)] = ""

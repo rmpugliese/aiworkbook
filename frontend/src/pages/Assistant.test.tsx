@@ -77,7 +77,7 @@ describe('AI assistant', () => {
     await act(() => vi.advanceTimersByTimeAsync(1100))
 
     await user().click(screen.getByRole('button', { name: 'Assistente' }))
-    await user().click(await screen.findByRole('menuitem', { name: 'Suggerisci una bozza' }))
+    await user().click(await screen.findByRole('button', { name: 'Suggerisci una bozza' }))
 
     const panel = await screen.findByLabelText("Proposta dell'assistente")
     expect(await within(panel).findByText('Ridurre gli abbandoni.')).toBeInTheDocument()
@@ -89,6 +89,7 @@ describe('AI assistant', () => {
       action: 'suggest',
       text: 'Bozza',
       verdict: null,
+      instructions: '',
     })
 
     await user().click(within(panel).getByRole('button', { name: 'Aggiungi in fondo' }))
@@ -102,6 +103,25 @@ describe('AI assistant', () => {
     expect(saved.text).toBe('Bozza\n\nRidurre gli abbandoni.')
   })
 
+  it('sends the guidance written for the request, without saving it', async () => {
+    const calls = iterationApi(() => stream(['delta', { text: 'Tre punti.' }], ['done', {}]))
+    renderRoutes(routes, '/projects/1/iterations/10')
+
+    await user().click(await screen.findByRole('button', { name: 'Assistente' }))
+    await user().type(
+      await screen.findByLabelText("Indicazioni per l'assistente (facoltative)"),
+      '  Al massimo tre punti ',
+    )
+    await user().click(await screen.findByRole('button', { name: 'Critica e domande' }))
+
+    await screen.findByText('Tre punti.')
+    expect(calls.find((c) => c.path === `${BASE}/assist`)?.body).toMatchObject({
+      action: 'review',
+      instructions: 'Al massimo tre punti',
+    })
+    expect(calls.some((c) => c.method === 'PUT')).toBe(false)
+  })
+
   it('shows a review without offering to apply it', async () => {
     iterationApi(() =>
       stream(
@@ -113,7 +133,7 @@ describe('AI assistant', () => {
     renderRoutes(routes, '/projects/1/iterations/10')
 
     await user().click(await screen.findByRole('button', { name: 'Assistente' }))
-    await user().click(await screen.findByRole('menuitem', { name: 'Critica e domande' }))
+    await user().click(await screen.findByRole('button', { name: 'Critica e domande' }))
 
     const panel = await screen.findByLabelText("Proposta dell'assistente")
     // Formatted: a list with bold text, not raw Markdown.
@@ -129,7 +149,7 @@ describe('AI assistant', () => {
     iterationApi(() => stream(['done', {}]))
     renderRoutes(routes, '/projects/1/iterations/10')
     await user().click(await screen.findByRole('button', { name: 'Assistente' }))
-    await user().click(await screen.findByRole('menuitem', { name: 'Suggerisci una bozza' }))
+    await user().click(await screen.findByRole('button', { name: 'Suggerisci una bozza' }))
     expect(await screen.findByText(/non ha prodotto testo/)).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Sostituisci' })).toBeNull()
   })
@@ -140,7 +160,7 @@ describe('AI assistant', () => {
     const field = await screen.findByRole('textbox', { name: 'Quale problema risolvete?' })
 
     await user().click(screen.getByRole('button', { name: 'Assistente' }))
-    await user().click(await screen.findByRole('menuitem', { name: 'Suggerisci una bozza' }))
+    await user().click(await screen.findByRole('button', { name: 'Suggerisci una bozza' }))
 
     expect(await screen.findByText('Il modello non ha risposto in tempo.')).toBeInTheDocument()
     expect(field).toHaveValue('')

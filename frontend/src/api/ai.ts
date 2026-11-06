@@ -60,6 +60,7 @@ type AssistRequest = {
   action: AssistAction
   text: string
   verdict: 'go' | 'maybe' | 'no_go' | null
+  instructions: string
 }
 
 /** Reads the assistant's server-sent events: `delta` pieces, then `done` or `error`. */
@@ -68,7 +69,7 @@ export function useAssist(projectId: number, iterationId: number) {
   const controller = useRef<AbortController | null>(null)
 
   const run = useCallback(
-    async ({ questionKey, action, text, verdict }: AssistRequest) => {
+    async ({ questionKey, action, text, verdict, instructions }: AssistRequest) => {
       controller.current?.abort()
       const abort = new AbortController()
       controller.current = abort
@@ -86,7 +87,7 @@ export function useAssist(projectId: number, iterationId: number) {
             'Content-Type': 'application/json',
             'X-CSRF-Token': await csrfToken(),
           },
-          body: JSON.stringify({ question_key: questionKey, action, text, verdict }),
+          body: JSON.stringify({ question_key: questionKey, action, text, verdict, instructions }),
         })
         if (!response.ok || !response.body) {
           fail((await errorFrom(response, 'POST', path)).message)

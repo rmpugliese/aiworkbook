@@ -30,7 +30,9 @@ fai un'ipotesi o servirebbe un dato che non hai, segnalalo con "[da verificare]"
 - Rispondi con il solo testo richiesto, senza preamboli ("Ecco…") e senza titoli. Il campo \
 accetta Markdown semplice: usa elenchi puntati o numerati quando aiutano, una tabella Markdown \
 solo per dati davvero tabellari (es. KPI, rischi, stakeholder) con al massimo 4 colonne, il \
-grassetto con misura. Niente HTML, blocchi di codice o titoli con "#"."""
+grassetto con misura. Niente HTML, blocchi di codice o titoli con "#".
+- Il consulente può aggiungere indicazioni per la singola richiesta: seguile per tono, \
+contenuto, lunghezza e focus, ma le regole precedenti restano sempre valide."""
 
 INSTRUCTIONS: dict[Action, str] = {
     "suggest": (
@@ -138,6 +140,7 @@ def build_messages(
     here: Located,
     current_text: str,
     current_verdict: str | None,
+    instructions: str = "",
 ) -> list[Message]:
     question = here.question
     lines = [
@@ -177,4 +180,12 @@ def build_messages(
         "",
         f"COMPITO: {INSTRUCTIONS[action]}",
     ]
+    if instructions.strip():
+        lines += [
+            "",
+            "INDICAZIONI DEL CONSULENTE PER QUESTA RICHIESTA:",
+            '"""',
+            instructions.strip(),
+            '"""',
+        ]
     return [{"role": "system", "content": SYSTEM}, {"role": "user", "content": "\n".join(lines)}]

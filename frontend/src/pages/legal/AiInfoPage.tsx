@@ -95,9 +95,9 @@ export function AiInfoPage() {
               <Text>
                 Per rispondere con cognizione di causa, insieme alla domanda il servizio AI riceve:
                 nome, cliente e descrizione del progetto, titolo e user story dell'iterazione, la
-                guida del task, il testo attuale del campo e le altre risposte dell'iterazione (fino
-                a circa 12.000 caratteri). Non riceve la tua email, la password né dati di altri
-                progetti.
+                guida del task, il testo attuale del campo, le altre risposte dell'iterazione (fino
+                a circa 12.000 caratteri) e le eventuali indicazioni che scrivi per la richiesta.
+                Non riceve la tua email, la password né dati di altri progetti.
               </Text>
               <Text>
                 L'app conserva per 12 mesi solo i <b>metadati</b> di ogni richiesta (data, azione,
