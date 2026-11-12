@@ -6,8 +6,8 @@ Chi apre l'indirizzo principale senza aver fatto l'accesso oggi vede solo il mod
 fase aggiunge una **pagina di presentazione** sull'indirizzo principale, per chi non ha fatto
 l'accesso; chi ha fatto l'accesso continua a vedere i propri progetti.
 
-- In alto: titolo e sottotitolo (come la copertina del carosello), "Gratis · in fase
-  sperimentale", pulsanti **Registrati gratis** e **Accedi**, e il **video di presentazione**.
+- In alto: titolo e sottotitolo (come la copertina del carosello), "Gratuito · in continua
+  evoluzione", pulsanti **Registrati gratis** e **Accedi**, e il **video di presentazione**.
 - Le funzioni, con testo breve e screenshot statici: compilazione guidata, Go/No-Go, assistente
   AI (con le indicazioni), condivisione con il cliente, PDF con il proprio logo, import dal
   workbook PDF, collaborazione tra colleghi.

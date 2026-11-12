@@ -142,7 +142,7 @@ export function HomePage() {
       <SimpleGrid cols={{ base: 1, md: 2 }} spacing={48} verticalSpacing="xl">
         <Stack gap="lg" justify="center">
           <Badge variant="light" size="lg" w="fit-content">
-            Gratis · in fase sperimentale
+            Gratuito · in continua evoluzione
           </Badge>
           <Title order={1} fz={{ base: 36, sm: 48 }} lh={1.1}>
             Il workbook CPMAI, finalmente digitale
@@ -197,8 +197,8 @@ export function HomePage() {
         <Stack gap="md" align="flex-start">
           <Title order={2}>Provalo e dimmi cosa ne pensi</Title>
           <Text c="dimmed" size="lg" maw={720}>
-            È gratuito e ancora sperimentale: i commenti di chi lo usa decidono le prossime
-            funzioni. Per iniziare bastano un'email e una password.
+            È gratuito e cresce con chi lo usa: i tuoi suggerimenti decidono le prossime funzioni.
+            Per iniziare bastano un'email e una password.
           </Text>
           <SignUpButtons />
           <Text size="xs" c="dimmed">
