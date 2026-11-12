@@ -15,6 +15,7 @@ class Email:
     to: str
     subject: str
     text: str
+    reply_to: str | None = None
 
 
 class EmailDeliveryError(Exception):
@@ -25,9 +26,9 @@ class EmailDeliveryError(Exception):
 outbox: list[Email] = []
 
 
-def send_email(to: str, subject: str, text: str) -> None:
+def send_email(to: str, subject: str, text: str, *, reply_to: str | None = None) -> None:
     settings = get_settings()
-    email = Email(to=to, subject=subject, text=text)
+    email = Email(to=to, subject=subject, text=text, reply_to=reply_to)
     if settings.email_backend == "memory":
         outbox.append(email)
     elif settings.email_backend == "console":
@@ -37,6 +38,8 @@ def send_email(to: str, subject: str, text: str) -> None:
         message["From"] = settings.email_from
         message["To"] = to
         message["Subject"] = subject
+        if reply_to:
+            message["Reply-To"] = reply_to
         message.set_content(text)
         connect = smtplib.SMTP_SSL if settings.smtp_ssl else smtplib.SMTP
         try:
@@ -102,4 +105,20 @@ def send_project_invitation(to: str, inviter: str, project_name: str, register_l
         f"Per partecipare iscriviti con questo indirizzo email:\n\n{register_link}\n\n"
         "Il progetto comparirà tra i tuoi appena confermi l'indirizzo. Se non conosci chi ti "
         "ha invitato, ignora questo messaggio." + _SIGNATURE,
+    )
+
+
+FEEDBACK_KINDS = {"idea": "idea", "problem": "problema", "other": "altro"}
+
+
+def send_feedback(to: str, kind: str, sender_name: str, sender_email: str, message: str) -> None:
+    """A user's suggestion, to the installation's contact address; replies go to the user."""
+    label = FEEDBACK_KINDS[kind]
+    send_email(
+        to,
+        f"Suggerimento: {label}",
+        f"{sender_name} <{sender_email}> ha inviato un suggerimento ({label}) da AI Project "
+        f"Workbook.\n\n{message}\n\nRispondi a questa email per scrivere direttamente a chi l'ha "
+        "inviato." + _SIGNATURE,
+        reply_to=sender_email,
     )

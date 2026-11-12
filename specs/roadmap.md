@@ -279,6 +279,18 @@ vuole può sostenere Glioblastoma.IT ODV con una donazione spontanea.
 
 ---
 
+## Fase 19: Suggerimenti degli utenti (Completata)
+
+**Obiettivo:** chi usa l'app manda un'idea o segnala un problema in un clic, e riceve risposta.
+
+- [x] «Suggerisci un'idea» nel menu utente e nel piè di pagina
+- [x] Invio per email all'indirizzo di contatto, con risposta diretta a chi scrive
+- [x] Indirizzo di contatto in chiaro nella home per chi non ha l'account
+- [x] Informativa privacy aggiornata
+- [x] Test: invio, validazione, accesso, indirizzo mancante, limite
+
+---
+
 ## Più avanti (non pianificato)
 
 - Storico delle revisioni delle risposte
