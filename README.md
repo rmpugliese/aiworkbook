@@ -107,6 +107,9 @@ Ogni utente può caricare dal **Profilo** il proprio logo: sostituisce quello de
 copertina dei PDF che scarica lui. Sempre in Amministrazione si configura un invito facoltativo a
 una donazione (interruttore, testo e link), mostrato nel profilo accanto al logo personale.
 
+Chi apre l'indirizzo principale senza aver fatto l'accesso vede una pagina di presentazione con
+video e screenshot (`frontend/src/assets/home/`); chi ha fatto l'accesso vede i propri progetti.
+
 ## Privacy e dati
 
 Alla registrazione si accettano termini d'uso e informativa; quando i testi cambiano

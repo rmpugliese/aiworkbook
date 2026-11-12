@@ -268,6 +268,17 @@ vuole può sostenere Glioblastoma.IT ODV con una donazione spontanea.
 
 ---
 
+## Fase 18: Pagina iniziale pubblica (Completata)
+
+**Obiettivo:** chi arriva sull'indirizzo principale capisce cos'è l'app e perché registrarsi.
+
+- [x] Presentazione per chi non ha fatto l'accesso; progetti per chi l'ha fatto
+- [x] Video di presentazione sul nostro server, caricato solo al play
+- [x] Funzioni con testi brevi e screenshot statici dai caroselli
+- [x] Test: visitatore, utente con accesso, ritorno alla pagina chiesta dopo l'accesso
+
+---
+
 ## Più avanti (non pianificato)
 
 - Storico delle revisioni delle risposte

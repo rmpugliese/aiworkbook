@@ -150,9 +150,9 @@ describe('authentication', () => {
   it('returns to sign-in when the session expires during use', async () => {
     mockApi({
       'GET /api/health': HEALTH_OK,
-      'GET /api/projects?archived=false': SIGNED_OUT,
+      'GET /api/projects/1': SIGNED_OUT,
     })
-    renderRoutes(routes, '/')
+    renderRoutes(routes, '/projects/1')
 
     await waitFor(() => expect(screen.getByRole('heading', { name: 'Accedi' })).toBeInTheDocument())
   })
