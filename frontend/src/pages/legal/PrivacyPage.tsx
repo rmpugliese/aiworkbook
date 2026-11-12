@@ -50,6 +50,11 @@ export function PrivacyPage() {
                 <b>Collaborazione</b>: l'email dei colleghi che inviti in un progetto, chi li ha
                 invitati e quando, e chi ha modificato per ultimo ogni risposta.
               </List.Item>
+              <List.Item>
+                <b>Suggerimenti</b>: se usi «Suggerisci un'idea», il tuo messaggio, il tuo nome e la
+                tua email arrivano per email all'indirizzo di contatto del titolare, che ti può
+                rispondere. L'app non li conserva.
+              </List.Item>
             </List>
           </Section>
 
@@ -133,6 +138,10 @@ export function PrivacyPage() {
                 Link di conferma e di recupero della password: fino all'uso o alla scadenza.
               </List.Item>
               <List.Item>Registro delle richieste all'assistente AI: 12 mesi.</List.Item>
+              <List.Item>
+                Suggerimenti: nella casella email del titolare, finché servono per rispondere e
+                valutare la proposta.
+              </List.Item>
               <List.Item>Copie di sicurezza del database: 14 giorni.</List.Item>
             </List>
           </Section>

@@ -14,7 +14,18 @@ from app.http import (
     request_log_middleware,
     security_headers_middleware,
 )
-from app.routers import admin, ai, auth, health, members, projects, shares, site, template
+from app.routers import (
+    admin,
+    ai,
+    auth,
+    feedback,
+    health,
+    members,
+    projects,
+    shares,
+    site,
+    template,
+)
 from app.spa import mount_frontend
 from app.workbook.loader import validate_all_templates
 
@@ -59,6 +70,7 @@ def create_app() -> FastAPI:
     app.include_router(ai.router)
     app.include_router(shares.router)
     app.include_router(site.router)
+    app.include_router(feedback.router)
     app.include_router(shares.public_router)
 
     @app.exception_handler(EmailDeliveryError)

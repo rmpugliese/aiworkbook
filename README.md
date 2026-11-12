@@ -110,6 +110,10 @@ una donazione (interruttore, testo e link), mostrato nel profilo accanto al logo
 Chi apre l'indirizzo principale senza aver fatto l'accesso vede una pagina di presentazione con
 video e screenshot (`frontend/src/assets/home/`); chi ha fatto l'accesso vede i propri progetti.
 
+Dal menu utente e dal piè di pagina, **Suggerisci un'idea** manda un messaggio per email
+all'indirizzo di contatto (o, se manca, all'email privacy), con «rispondi a» impostato su chi
+scrive. L'app non salva i messaggi; il limite è di 5 all'ora per utente.
+
 ## Privacy e dati
 
 Alla registrazione si accettano termini d'uso e informativa; quando i testi cambiano

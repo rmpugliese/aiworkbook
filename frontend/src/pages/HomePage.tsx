@@ -1,4 +1,5 @@
 import {
+  Anchor,
   Badge,
   Box,
   Button,
@@ -20,6 +21,8 @@ import {
   IconUsers,
 } from '@tabler/icons-react'
 import { Link } from 'react-router'
+
+import { useSite } from '../api/site'
 
 import assistente from '../assets/home/assistente.webp'
 import collaborazione from '../assets/home/collaborazione.webp'
@@ -137,6 +140,7 @@ function FeatureRow({ feature, flip }: { feature: Feature; flip: boolean }) {
 
 /** What a visitor sees before signing in: what the app does, and a way in. */
 export function HomePage() {
+  const contactEmail = useSite().data?.legal.contact_email
   return (
     <Stack gap={80} py={48}>
       <SimpleGrid cols={{ base: 1, md: 2 }} spacing={48} verticalSpacing="xl">
@@ -201,6 +205,14 @@ export function HomePage() {
             Per iniziare bastano un'email e una password.
           </Text>
           <SignUpButtons />
+          {contactEmail && (
+            <Text size="sm">
+              Hai domande? Scrivi a{' '}
+              <Anchor href={`mailto:${contactEmail}`} fw={600}>
+                {contactEmail}
+              </Anchor>
+            </Text>
+          )}
           <Text size="xs" c="dimmed">
             Compatibile con la metodologia CPMAI; non affiliato né approvato da PMI.
           </Text>

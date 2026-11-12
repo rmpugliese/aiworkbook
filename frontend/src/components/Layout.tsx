@@ -1,11 +1,15 @@
 import { Anchor, AppShell, Container, Group, Image, Text, ThemeIcon, Title } from '@mantine/core'
 import { IconClipboardCheck } from '@tabler/icons-react'
+import { useState } from 'react'
 import { Link, Outlet } from 'react-router'
+
+import { useMe } from '../api/auth'
 
 import { useSite } from '../api/site'
 import { APP_NAME } from '../config'
 import { BackendStatus } from './BackendStatus'
 import { CookiePanel } from './CookiePanel'
+import { FeedbackModal } from './FeedbackModal'
 import { UserMenu } from './UserMenu'
 
 /** The installation's logo when it has one, otherwise the app's mark and name. */
@@ -32,6 +36,27 @@ function Brand() {
         {APP_NAME}
       </Title>
     </Group>
+  )
+}
+
+/** In the footer for signed-in users; on a phone the user menu has it. */
+function FeedbackLink() {
+  const me = useMe()
+  const [open, setOpen] = useState(false)
+  if (!me.data) return null
+  return (
+    <>
+      <Anchor
+        component="button"
+        size="xs"
+        c="dimmed"
+        visibleFrom="sm"
+        onClick={() => setOpen(true)}
+      >
+        Suggerisci un'idea
+      </Anchor>
+      {open && <FeedbackModal onClose={() => setOpen(false)} />}
+    </>
   )
 }
 
@@ -79,6 +104,7 @@ export function Layout() {
               Contatti
             </Anchor>
           )}
+          {contactEmail && <FeedbackLink />}
         </Group>
       </AppShell.Footer>
     </AppShell>
