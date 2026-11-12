@@ -15,6 +15,7 @@ export const USER = {
   google_linked: false,
   is_admin: false,
   terms_current: true,
+  logo_url: null as string | null,
 }
 
 /** The installation as a fresh one looks: no brand, no legal details, no assistant. */
@@ -42,6 +43,7 @@ export function site(overrides: Record<string, unknown> = {}) {
       model_kind: '',
       location: null,
     },
+    donation: null,
     ...overrides,
   }
 }

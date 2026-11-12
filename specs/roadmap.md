@@ -255,6 +255,19 @@ campi, solo quando l'utente lo chiede.
 
 ---
 
+## Fase 17: Logo personale nel PDF e invito a sostenere un'ODV (Completata)
+
+**Obiettivo:** ogni consulente consegna al cliente un PDF con il proprio logo, gratuitamente; chi
+vuole può sostenere Glioblastoma.IT ODV con una donazione spontanea.
+
+- [x] Logo personale nel profilo (stesse regole del logo del sito), usato nel PDF di chi lo genera
+- [x] Pagina condivisa, app e pagine legali con il logo del sito; colore sempre del sito
+- [x] Invito alla donazione nel profilo, configurabile in Amministrazione (interruttore, testo, link)
+- [x] Privacy policy ed export dei dati aggiornati
+- [x] Test: validazione del logo, PDF con e senza logo personale, collaboratore, pagina condivisa
+
+---
+
 ## Più avanti (non pianificato)
 
 - Storico delle revisioni delle risposte

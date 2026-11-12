@@ -103,6 +103,10 @@ dell'assistente, fornitore, sede dei server e tipo di modello per l'informativa 
 non si spunta "Testi rivisti da un legale". L'app usa solo cookie tecnici: nessun banner, un
 pannello informativo nel piè di pagina.
 
+Ogni utente può caricare dal **Profilo** il proprio logo: sostituisce quello del sito solo sulla
+copertina dei PDF che scarica lui. Sempre in Amministrazione si configura un invito facoltativo a
+una donazione (interruttore, testo e link), mostrato nel profilo accanto al logo personale.
+
 ## Privacy e dati
 
 Alla registrazione si accettano termini d'uso e informativa; quando i testi cambiano

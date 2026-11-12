@@ -3,6 +3,7 @@ from datetime import datetime
 from sqlalchemy.orm import Session
 
 from app.export.report import Report, build_report
+from app.models import User
 from app.services.answers import list_answers
 from app.services.branding import document_branding
 from app.services.projects import get_iteration, get_project
@@ -20,5 +21,6 @@ def iteration_report(
         template=load_template(iteration.template_version),
         answers=list_answers(db, project_id, iteration_id, user_id=user_id),
         generated_at=generated_at,
-        branding=document_branding(db),
+        # The logo of whoever downloads it: owner and collaborators may each have their own.
+        branding=document_branding(db, db.get(User, user_id)),
     )

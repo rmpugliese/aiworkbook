@@ -38,6 +38,8 @@ def export_data(db: DbSession, user: User) -> dict[str, Any]:
             "is_admin": user.is_admin,
             "terms_accepted_at": _iso(user.terms_accepted_at),
             "terms_version": user.terms_version,
+            # The image itself stays out of the file: it is the user's own and can be removed.
+            "has_logo": user.logo_updated_at is not None,
         },
         "projects": [_project(db, project) for project in projects],
         "ai_requests": [

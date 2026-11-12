@@ -24,7 +24,9 @@ export function PrivacyPage() {
               <List.Item>
                 <b>Account</b>: email, nome visualizzato, password (conservata solo come impronta
                 crittografica, mai in chiaro), date di registrazione e di conferma, accettazione dei
-                termini; se accedi con Google, l'identificativo e l'email forniti da Google.
+                termini; se accedi con Google, l'identificativo e l'email forniti da Google; se lo
+                carichi, il tuo logo per i PDF (lo puoi rimuovere quando vuoi e si cancella con
+                l'account).
               </List.Item>
               <List.Item>
                 <b>Contenuti che inserisci</b>: progetti, nomi dei clienti, descrizioni, user story,

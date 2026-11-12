@@ -29,6 +29,8 @@ function adminApi() {
     'GET /api/auth/me': Response.json(ADMIN),
     'GET /api/admin/users': Response.json([]),
     'GET /api/admin/ai': Response.json(AI_SETTINGS),
+    'GET /api/admin/site/donation': Response.json({ enabled: false, text: '', url: '' }),
+    'PUT /api/admin/site/donation': (body) => Response.json(body),
     'GET /api/site': () => Response.json(current),
     'PUT /api/admin/site/brand': (body) => {
       const color = (body as { brand_color: string }).brand_color
@@ -81,6 +83,26 @@ describe('Administration: brand and legal details', () => {
     )
     await userEvent.click(screen.getByRole('button', { name: 'Rimuovi' }))
     expect(await screen.findByText('Nessun logo')).toBeVisible()
+  })
+
+  it('saves the invitation to donate, starting from the suggested text', async () => {
+    const calls = adminApi()
+    renderRoutes(routes, '/admin')
+    const card = (await screen.findByRole('heading', { name: 'Invito a una donazione' })).closest(
+      '.mantine-Card-root',
+    ) as HTMLElement
+    await userEvent.click(
+      await within(card).findByRole('button', { name: 'Usa il testo proposto' }),
+    )
+    await userEvent.click(within(card).getByRole('switch', { name: /Mostra l'invito/ }))
+    await userEvent.click(within(card).getByRole('button', { name: 'Salva' }))
+
+    expect(await within(card).findByText('Invito salvato.')).toBeVisible()
+    const sent = calls.find((c) => c.path === '/api/admin/site/donation' && c.method === 'PUT')
+      ?.body as { enabled: boolean; text: string; url: string }
+    expect(sent.enabled).toBe(true)
+    expect(sent.text).toMatch(/Glioblastoma\.IT ODV.*presiede l'associazione/)
+    expect(sent.url).toBe('https://www.glioblastomamultiforme.it/contributi/')
   })
 
   it('saves the legal details, warning while they are missing', async () => {

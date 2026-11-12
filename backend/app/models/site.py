@@ -30,6 +30,11 @@ class SiteSettings(Base):
     # Until a lawyer has reviewed the texts, the legal pages say they are drafts.
     legal_reviewed: Mapped[bool] = mapped_column(Boolean, default=False, server_default=false())
     legal_notes: Mapped[str | None] = mapped_column(Text)
+    # An optional invitation to donate to an organisation, shown in the profile next to the
+    # user's logo. Shown only when enabled and both text and link are set.
+    donation_enabled: Mapped[bool] = mapped_column(Boolean, default=False, server_default=false())
+    donation_text: Mapped[str] = mapped_column(Text, default="", server_default="")
+    donation_url: Mapped[str] = mapped_column(String(500), default="", server_default="")
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=utcnow, onupdate=utcnow
     )

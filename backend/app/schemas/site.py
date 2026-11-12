@@ -46,6 +46,29 @@ class AINoticeOut(BaseModel):
     location: Literal["locale", "remoto"] | None
 
 
+class DonationOut(BaseModel):
+    """The invitation to donate, as the profile shows it: only when enabled and complete."""
+
+    text: str
+    url: str
+
+
+class DonationSettingsOut(BaseModel):
+    """For administrators: the invitation as stored, shown or not."""
+
+    enabled: bool
+    text: str
+    url: str
+
+
+class DonationIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    enabled: bool
+    text: Annotated[str, StringConstraints(strip_whitespace=True, max_length=600)]
+    url: Annotated[str, StringConstraints(strip_whitespace=True, max_length=500)]
+
+
 class SiteOut(BaseModel):
     """Public: what every page needs before and after signing in."""
 
@@ -55,6 +78,7 @@ class SiteOut(BaseModel):
     legal: LegalOut
     terms_version: str
     ai: AINoticeOut
+    donation: DonationOut | None
 
 
 class BrandIn(BaseModel):
