@@ -4,6 +4,7 @@ import { useAdminAction, useAdminUsers, type AdminAction, type AdminUser } from 
 import { useMe } from '../api/auth'
 import { AISettingsCard } from '../components/AISettingsCard'
 import { BrandCards } from '../components/BrandCards'
+import { DonationCard } from '../components/DonationCard'
 import { LegalCard } from '../components/LegalCard'
 import { PageHeader } from '../components/PageHeader'
 import { SignupStatsCard } from '../components/SignupStatsCard'
@@ -42,6 +43,7 @@ export function AdminUsersPage() {
       {users.data && <SignupStatsCard users={users.data} />}
       <BrandCards />
       <LegalCard />
+      <DonationCard />
       <AISettingsCard />
 
       <Card>

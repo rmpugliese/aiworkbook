@@ -108,6 +108,25 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/auth/me/logo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Logo */
+        get: operations["get_logo_api_auth_me_logo_get"];
+        /** Upload Logo */
+        put: operations["upload_logo_api_auth_me_logo_put"];
+        post?: never;
+        /** Delete Logo */
+        delete: operations["delete_logo_api_auth_me_logo_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/csrf": {
         parameters: {
             query?: never;
@@ -885,6 +904,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/site/donation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Donation */
+        get: operations["get_donation_api_admin_site_donation_get"];
+        /** Update Donation */
+        put: operations["update_donation_api_admin_site_donation_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1095,6 +1132,11 @@ export interface components {
             /** File */
             file: string;
         };
+        /** Body_upload_logo_api_auth_me_logo_put */
+        Body_upload_logo_api_auth_me_logo_put: {
+            /** File */
+            file: string;
+        };
         /** BrandIn */
         BrandIn: {
             /** Brand Color */
@@ -1111,6 +1153,37 @@ export interface components {
         DeleteAccountIn: {
             /** Confirm Email */
             confirm_email: string;
+        };
+        /** DonationIn */
+        DonationIn: {
+            /** Enabled */
+            enabled: boolean;
+            /** Text */
+            text: string;
+            /** Url */
+            url: string;
+        };
+        /**
+         * DonationOut
+         * @description The invitation to donate, as the profile shows it: only when enabled and complete.
+         */
+        DonationOut: {
+            /** Text */
+            text: string;
+            /** Url */
+            url: string;
+        };
+        /**
+         * DonationSettingsOut
+         * @description For administrators: the invitation as stored, shown or not.
+         */
+        DonationSettingsOut: {
+            /** Enabled */
+            enabled: boolean;
+            /** Text */
+            text: string;
+            /** Url */
+            url: string;
         };
         /** EmailIn */
         EmailIn: {
@@ -1569,6 +1642,7 @@ export interface components {
             /** Terms Version */
             terms_version: string;
             ai: components["schemas"]["AINoticeOut"];
+            donation: components["schemas"]["DonationOut"] | null;
         };
         /** Task */
         Task: {
@@ -1636,6 +1710,8 @@ export interface components {
             is_admin: boolean;
             /** Terms Current */
             terms_current: boolean;
+            /** Logo Url */
+            logo_url: string | null;
         };
         /** ValidationError */
         ValidationError: {
@@ -1898,6 +1974,103 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_logo_api_auth_me_logo_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The user's own logo */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/*": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    upload_logo_api_auth_me_logo_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                session?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_upload_logo_api_auth_me_logo_put"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_logo_api_auth_me_logo_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserOut"];
                 };
             };
             /** @description Validation Error */
@@ -3579,6 +3752,72 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SiteOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_donation_api_admin_site_donation_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DonationSettingsOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_donation_api_admin_site_donation_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                session?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DonationIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DonationSettingsOut"];
                 };
             };
             /** @description Validation Error */

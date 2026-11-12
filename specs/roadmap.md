@@ -255,6 +255,30 @@ campi, solo quando l'utente lo chiede.
 
 ---
 
+## Fase 17: Logo personale nel PDF e invito a sostenere un'ODV (Completata)
+
+**Obiettivo:** ogni consulente consegna al cliente un PDF con il proprio logo, gratuitamente; chi
+vuole può sostenere Glioblastoma.IT ODV con una donazione spontanea.
+
+- [x] Logo personale nel profilo (stesse regole del logo del sito), usato nel PDF di chi lo genera
+- [x] Pagina condivisa, app e pagine legali con il logo del sito; colore sempre del sito
+- [x] Invito alla donazione nel profilo, configurabile in Amministrazione (interruttore, testo, link)
+- [x] Privacy policy ed export dei dati aggiornati
+- [x] Test: validazione del logo, PDF con e senza logo personale, collaboratore, pagina condivisa
+
+---
+
+## Fase 18: Pagina iniziale pubblica (Completata)
+
+**Obiettivo:** chi arriva sull'indirizzo principale capisce cos'è l'app e perché registrarsi.
+
+- [x] Presentazione per chi non ha fatto l'accesso; progetti per chi l'ha fatto
+- [x] Video di presentazione sul nostro server, caricato solo al play
+- [x] Funzioni con testi brevi e screenshot statici dai caroselli
+- [x] Test: visitatore, utente con accesso, ritorno alla pagina chiesta dopo l'accesso
+
+---
+
 ## Più avanti (non pianificato)
 
 - Storico delle revisioni delle risposte

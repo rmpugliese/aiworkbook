@@ -4,6 +4,7 @@ import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router'
 
 import { EXPORT_DATA_URL, useDeleteAccount, useMe, useUpdateProfile, type User } from '../api/auth'
+import { OwnLogoCard } from '../components/OwnLogoCard'
 
 function DisplayNameCard({ user }: { user: User }) {
   const update = useUpdateProfile()
@@ -127,9 +128,10 @@ export function ProfilePage() {
     <Stack gap="lg" py="xl" maw={880}>
       <div>
         <Title order={1}>Profilo</Title>
-        <Text c="dimmed">I tuoi dati personali e i diritti sui tuoi dati.</Text>
+        <Text c="dimmed">I tuoi dati personali, il tuo logo e i diritti sui tuoi dati.</Text>
       </div>
       <DisplayNameCard user={me.data} />
+      <OwnLogoCard user={me.data} />
       <DataCard user={me.data} />
     </Stack>
   )

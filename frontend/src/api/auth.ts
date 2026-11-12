@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
 
-import { ApiError, apiGet, apiSend, type Schemas } from './client'
+import { ApiError, apiGet, apiPutFile, apiSend, type Schemas } from './client'
 import { ME_KEY } from './queryClient'
 
 export type User = Schemas['UserOut']
@@ -111,6 +111,15 @@ function useProfileMutation<TVariables>(fn: (variables: TVariables) => Promise<U
 
 export function useUpdateProfile() {
   return useProfileMutation((data: ProfileIn) => apiSend<User>('PATCH', '/api/auth/me', data))
+}
+
+/** The user's own logo, on the PDFs they download. */
+export function useUploadOwnLogo() {
+  return useProfileMutation((file: File) => apiPutFile<User>('/api/auth/me/logo', file))
+}
+
+export function useDeleteOwnLogo() {
+  return useProfileMutation(() => apiSend<User>('DELETE', '/api/auth/me/logo'))
 }
 
 export function useAcceptTerms() {

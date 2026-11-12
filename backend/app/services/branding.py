@@ -1,5 +1,8 @@
 """The installation's brand: a logo and a main colour, shown in the app and on every document.
 
+A user may add their own logo: it replaces the site's on the PDFs that user downloads, and nowhere
+else (the colour stays the site's).
+
 Logos are recognised by their content, never by the file name. SVG is accepted only as plain
 vector markup: no scripts, event handlers, `javascript:` links or DTDs (which could pull external
 entities while the PDF is rendered). It is always displayed through `<img>` as well, where SVG
@@ -94,16 +97,47 @@ def set_brand_color(db: Session, value: str | None) -> SiteSettings:
     return row
 
 
-def logo_data_uri(row: SiteSettings) -> str | None:
+def set_user_logo(db: Session, user: User, data: bytes) -> User:
+    user.logo, user.logo_content_type = prepare_logo(data)
+    user.logo_updated_at = utcnow()
+    db.commit()
+    return user
+
+
+def clear_user_logo(db: Session, user: User) -> User:
+    user.logo = None
+    user.logo_content_type = None
+    user.logo_updated_at = None
+    db.commit()
+    return user
+
+
+def logo_data_uri(row: SiteSettings | User) -> str | None:
     if row.logo is None or row.logo_content_type is None:
         return None
     return f"data:{row.logo_content_type};base64,{base64.b64encode(row.logo).decode()}"
 
 
-def document_branding(db: Session) -> Branding:
-    """The brand on every PDF and shared page: the installation's."""
+def document_branding(db: Session, user: User | None = None) -> Branding:
+    """The brand on a PDF or shared page: the installation's, with the logo of the user who
+    downloads the PDF when they have one. Shared pages pass no user."""
     row = site(db)
-    return Branding(logo=logo_data_uri(row), color=row.brand_color)
+    logo = (logo_data_uri(user) if user is not None else None) or logo_data_uri(row)
+    return Branding(logo=logo, color=row.brand_color)
+
+
+DONATION_TEXT_LIMIT = 600
+
+
+def set_donation(db: Session, *, enabled: bool, text: str, url: str) -> SiteSettings:
+    if url and not url.startswith("https://"):
+        raise InvalidRequestError("Il link dell'invito deve iniziare con https://.")
+    row = site(db)
+    row.donation_enabled = enabled
+    row.donation_text = text
+    row.donation_url = url
+    db.commit()
+    return row
 
 
 def _luminance(hex_color: str) -> float:

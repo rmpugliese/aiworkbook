@@ -177,7 +177,7 @@ def test_profile_only_changes_the_name(client: TestClient) -> None:
     response = client.patch("/api/auth/me", json={"display_name": "Studio Rossi"})
     assert response.status_code == 200
     assert response.json()["display_name"] == "Studio Rossi"
-    assert "brand_color" not in response.json() and "logo_url" not in response.json()
+    assert "brand_color" not in response.json()
     assert client.patch("/api/auth/me", json={"brand_color": "#000000"}).status_code == 422
 
 
@@ -293,3 +293,132 @@ def render_html_for(client: TestClient, db: Session, base: str) -> str:
         db, project_id, iteration_id, user_id=user_id, generated_at=datetime(2026, 10, 9)
     )
     return render_html(report)
+
+
+# The user's own logo: on the PDFs they download, nowhere else
+
+
+def upload_own(client: TestClient, data: bytes, name: str = "logo.png") -> httpx2.Response:
+    return client.put("/api/auth/me/logo", files={"file": (name, data, "application/octet-stream")})
+
+
+def test_own_logo_upload_serve_and_remove(
+    client: TestClient, other_client: TestClient, anon_client: TestClient
+) -> None:
+    assert client.get("/api/auth/me").json()["logo_url"] is None
+    response = upload_own(client, SVG, "logo.svg")
+    assert response.status_code == 200
+    logo_url = response.json()["logo_url"]
+    assert logo_url.startswith("/api/auth/me/logo?v=")
+
+    served = client.get(logo_url)
+    assert served.status_code == 200 and served.content == SVG
+    assert "sandbox" in served.headers["content-security-policy"]
+    assert served.headers["cache-control"].startswith("private")
+    # The URL names no user: everyone else gets their own (none) or must sign in.
+    assert other_client.get(logo_url).status_code == 404
+    assert anon_client.get(logo_url).status_code == 401
+
+    assert client.delete("/api/auth/me/logo").json()["logo_url"] is None
+    assert client.get("/api/auth/me/logo").status_code == 404
+
+
+def test_invalid_own_logo_is_refused(client: TestClient) -> None:
+    response = upload_own(client, b"GIF89a....")
+    assert response.status_code == 422 and "PNG, JPEG o SVG" in response.json()["detail"]
+    assert upload_own(client, PNG + b"\x00" * branding.MAX_LOGO_BYTES).status_code == 422
+    unsafe = b'<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>'
+    assert upload_own(client, unsafe, "logo.svg").status_code == 422
+    assert client.get("/api/auth/me").json()["logo_url"] is None
+
+
+def data_uri(data: bytes, media_type: str = "image/png") -> str:
+    return f'src="data:{media_type};base64,{base64.b64encode(data).decode()}"'
+
+
+def test_report_carries_the_own_logo_and_the_site_colour(
+    client: TestClient, admin_client: TestClient, db: Session, base: str
+) -> None:
+    admin_client.put("/api/admin/site/brand", json={"brand_color": "#7a1d4f"})
+    upload(admin_client, PNG)
+    upload_own(client, JPEG, "logo.jpg")
+    html = render_html_for(client, db, base)
+    assert data_uri(JPEG, "image/jpeg") in html and data_uri(PNG) not in html
+    assert "h2, .doc-title { color: #7a1d4f; }" in html
+
+    client.delete("/api/auth/me/logo")
+    assert data_uri(PNG) in render_html_for(client, db, base)
+
+
+def test_each_member_gets_their_own_logo(
+    client: TestClient, other_client: TestClient, db: Session, base: str
+) -> None:
+    project_id = int(base.split("/")[3])
+    invited = client.post(
+        f"/api/projects/{project_id}/members", json={"email": "altro@example.com"}
+    )
+    assert invited.status_code == 201
+    upload_own(client, PNG)
+    upload_own(other_client, JPEG, "logo.jpg")
+    assert data_uri(PNG) in render_html_for(client, db, base)
+    assert data_uri(JPEG, "image/jpeg") in render_html_for(other_client, db, base)
+
+
+def test_shared_page_keeps_the_site_logo(
+    client: TestClient, admin_client: TestClient, anon_client: TestClient, base: str
+) -> None:
+    upload(admin_client, PNG)
+    upload_own(client, JPEG, "logo.jpg")
+    url = client.post(f"{base}/shares", json={"label": "Cliente"}).json()["url"]
+    token = url.rsplit("/s/", 1)[1]
+    page = anon_client.get("/s/" + token).text
+    assert data_uri(PNG) in page and data_uri(JPEG, "image/jpeg") not in page
+
+
+def test_data_export_says_whether_there_is_a_logo(client: TestClient) -> None:
+    assert client.get("/api/auth/me/export").json()["account"]["has_logo"] is False
+    upload_own(client, PNG)
+    exported = client.get("/api/auth/me/export")
+    assert exported.json()["account"]["has_logo"] is True
+    assert base64.b64encode(PNG).decode() not in exported.text
+
+
+# The invitation to donate
+
+
+DONATION = {
+    "enabled": True,
+    "text": "  Se l'app ti è utile, puoi sostenere un'associazione.  ",
+    "url": "https://www.example.org/contributi/",
+}
+
+
+def test_donation_is_hidden_until_enabled_and_complete(
+    admin_client: TestClient, anon_client: TestClient
+) -> None:
+    assert anon_client.get("/api/site").json()["donation"] is None
+    response = admin_client.put("/api/admin/site/donation", json=DONATION)
+    assert response.status_code == 200
+    assert response.json()["text"] == "Se l'app ti è utile, puoi sostenere un'associazione."
+    assert anon_client.get("/api/site").json()["donation"] == {
+        "text": "Se l'app ti è utile, puoi sostenere un'associazione.",
+        "url": "https://www.example.org/contributi/",
+    }
+    for change in ({"enabled": False}, {"text": ""}, {"url": ""}):
+        admin_client.put("/api/admin/site/donation", json={**DONATION, **change})
+        assert anon_client.get("/api/site").json()["donation"] is None
+    # Switched off, the text stays for the next time.
+    admin_client.put("/api/admin/site/donation", json={**DONATION, "enabled": False})
+    assert admin_client.get("/api/admin/site/donation").json()["text"].startswith("Se l'app")
+
+
+def test_donation_settings_are_for_administrators_only(
+    client: TestClient, admin_client: TestClient
+) -> None:
+    assert client.get("/api/admin/site/donation").status_code == 403
+    assert client.put("/api/admin/site/donation", json=DONATION).status_code == 403
+    for url in ("http://www.example.org/", "javascript:alert(1)", "www.example.org"):
+        refused = admin_client.put("/api/admin/site/donation", json={**DONATION, "url": url})
+        assert refused.status_code == 422
+    too_long = admin_client.put("/api/admin/site/donation", json={**DONATION, "text": "x" * 601})
+    assert too_long.status_code == 422

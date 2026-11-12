@@ -30,10 +30,82 @@ import { DEFAULT_BRAND } from '../theme'
 const SWATCHES = ['#1d4f7a', '#0f5257', '#2f4858', '#5b3a7a', '#7a1d4f', '#8a3b12', '#1f2937']
 const LOGO_TYPES = 'image/png,image/jpeg,image/svg+xml'
 
+type LogoMutation = {
+  isPending: boolean
+  error: Error | null
+  reset: () => void
+}
+
+/** Preview, upload and removal of a logo: the site's or a user's own. */
+export function LogoPicker({
+  logoUrl,
+  upload,
+  remove,
+  onUpload,
+  onRemove,
+}: {
+  logoUrl: string | null
+  upload: LogoMutation
+  remove: LogoMutation
+  onUpload: (file: File) => void
+  onRemove: () => void
+}) {
+  const error = upload.error ?? remove.error
+  return (
+    <>
+      <Paper withBorder bg="gray.0" h={140} p="md">
+        <Center h="100%">
+          {logoUrl ? (
+            <Image src={logoUrl} alt="Logo attuale" mah={108} maw="100%" fit="contain" />
+          ) : (
+            <Stack gap={4} align="center" c="dimmed">
+              <IconPhoto size={32} stroke={1.4} />
+              <Text size="sm">Nessun logo</Text>
+            </Stack>
+          )}
+        </Center>
+      </Paper>
+      {error && (
+        <Alert color="red" icon={<IconAlertTriangle size={16} />}>
+          {error.message}
+        </Alert>
+      )}
+      <Group>
+        <FileButton
+          accept={LOGO_TYPES}
+          onChange={(file) => {
+            remove.reset()
+            if (file) onUpload(file)
+          }}
+        >
+          {(props) => (
+            <Button {...props} leftSection={<IconUpload size={16} />} loading={upload.isPending}>
+              {logoUrl ? 'Sostituisci logo' : 'Carica logo'}
+            </Button>
+          )}
+        </FileButton>
+        {logoUrl && (
+          <Button
+            variant="subtle"
+            color="red"
+            leftSection={<IconTrash size={16} />}
+            loading={remove.isPending}
+            onClick={() => {
+              upload.reset()
+              onRemove()
+            }}
+          >
+            Rimuovi
+          </Button>
+        )}
+      </Group>
+    </>
+  )
+}
+
 function LogoCard({ site }: { site: Site }) {
   const upload = useUploadSiteLogo()
   const remove = useDeleteSiteLogo()
-  const error = upload.error ?? remove.error
 
   return (
     <Card>
@@ -42,56 +114,18 @@ function LogoCard({ site }: { site: Site }) {
           <Title order={3}>Logo</Title>
           <Text size="sm" c="dimmed">
             Il marchio dell'installazione: nell'intestazione dell'app per tutti gli utenti, nella
-            pagina di accesso, sulla copertina dei PDF e nelle pagine condivise con i clienti. PNG,
-            JPEG o SVG, fino a 1 MB; meglio con sfondo trasparente.
+            pagina di accesso, nelle pagine condivise con i clienti e sulla copertina dei PDF di chi
+            non ha caricato un proprio logo. PNG, JPEG o SVG, fino a 1 MB; meglio con sfondo
+            trasparente.
           </Text>
         </div>
-        <Paper withBorder bg="gray.0" h={140} p="md">
-          <Center h="100%">
-            {site.logo_url ? (
-              <Image src={site.logo_url} alt="Logo attuale" mah={108} maw="100%" fit="contain" />
-            ) : (
-              <Stack gap={4} align="center" c="dimmed">
-                <IconPhoto size={32} stroke={1.4} />
-                <Text size="sm">Nessun logo</Text>
-              </Stack>
-            )}
-          </Center>
-        </Paper>
-        {error && (
-          <Alert color="red" icon={<IconAlertTriangle size={16} />}>
-            {error.message}
-          </Alert>
-        )}
-        <Group>
-          <FileButton
-            accept={LOGO_TYPES}
-            onChange={(file) => {
-              remove.reset()
-              if (file) upload.mutate(file)
-            }}
-          >
-            {(props) => (
-              <Button {...props} leftSection={<IconUpload size={16} />} loading={upload.isPending}>
-                {site.logo_url ? 'Sostituisci logo' : 'Carica logo'}
-              </Button>
-            )}
-          </FileButton>
-          {site.logo_url && (
-            <Button
-              variant="subtle"
-              color="red"
-              leftSection={<IconTrash size={16} />}
-              loading={remove.isPending}
-              onClick={() => {
-                upload.reset()
-                remove.mutate()
-              }}
-            >
-              Rimuovi
-            </Button>
-          )}
-        </Group>
+        <LogoPicker
+          logoUrl={site.logo_url}
+          upload={upload}
+          remove={remove}
+          onUpload={(file) => upload.mutate(file)}
+          onRemove={() => remove.mutate()}
+        />
       </Stack>
     </Card>
   )

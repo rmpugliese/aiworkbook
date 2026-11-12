@@ -71,3 +71,17 @@ export async function apiSend<T>(
   }
   return (response.status === 204 ? undefined : await response.json()) as T
 }
+
+/** Uploads one file as multipart form data (field "file") with PUT. */
+export async function apiPutFile<T>(path: string, file: File): Promise<T> {
+  const body = new FormData()
+  body.append('file', file)
+  // No Content-Type: the browser sets the multipart boundary itself.
+  const response = await fetch(path, {
+    method: 'PUT',
+    headers: { Accept: 'application/json', 'X-CSRF-Token': await csrfToken() },
+    body,
+  })
+  if (!response.ok) throw await errorFrom(response, 'PUT', path)
+  return (await response.json()) as T
+}

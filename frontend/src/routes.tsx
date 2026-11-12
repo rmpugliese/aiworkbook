@@ -15,10 +15,10 @@ import { PrivacyPage } from './pages/legal/PrivacyPage'
 import { TermsPage } from './pages/legal/TermsPage'
 import { RegisterPage } from './pages/auth/RegisterPage'
 import { AdminUsersPage } from './pages/AdminUsersPage'
+import { StartPage } from './pages/StartPage'
 import { IterationPage } from './pages/IterationPage'
 import { ProfilePage } from './pages/ProfilePage'
 import { ProjectPage } from './pages/ProjectPage'
-import { ProjectsPage } from './pages/ProjectsPage'
 
 export const routes: RouteObject[] = [
   {
@@ -34,10 +34,10 @@ export const routes: RouteObject[] = [
       { path: 'terms', element: <TermsPage /> },
       { path: 'cookies', element: <CookiesPage /> },
       { path: 'ai', element: <AiInfoPage /> },
+      { index: true, element: <StartPage /> },
       {
         element: <RequireAuth />,
         children: [
-          { index: true, element: <ProjectsPage /> },
           { path: 'projects/:projectId', element: <ProjectPage /> },
           { path: 'projects/:projectId/iterations/:iterationId', element: <IterationPage /> },
           { path: 'admin', element: <AdminUsersPage /> },

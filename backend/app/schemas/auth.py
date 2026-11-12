@@ -48,6 +48,9 @@ class UserOut(BaseModel):
     is_admin: bool
     # False until the user accepts the current version of the terms and privacy notice.
     terms_current: bool
+    # The user's own logo for their PDFs; the URL changes whenever the logo does, so browsers
+    # never show a stale cached image.
+    logo_url: str | None
 
 
 class ProfileIn(_Input):

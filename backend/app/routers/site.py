@@ -10,7 +10,16 @@ from app.db import get_db
 from app.legal import TERMS_VERSION
 from app.models import AISettings, SiteSettings
 from app.routers.admin import Admin
-from app.schemas.site import AINoticeOut, BrandIn, LegalIn, LegalOut, SiteOut
+from app.schemas.site import (
+    AINoticeOut,
+    BrandIn,
+    DonationIn,
+    DonationOut,
+    DonationSettingsOut,
+    LegalIn,
+    LegalOut,
+    SiteOut,
+)
 from app.services import branding
 from app.services.errors import InvalidRequestError
 
@@ -46,6 +55,12 @@ def _ai_notice(db: Session) -> AINoticeOut:
     )
 
 
+def _donation(row: SiteSettings) -> DonationOut | None:
+    if not (row.donation_enabled and row.donation_text and row.donation_url):
+        return None
+    return DonationOut(text=row.donation_text, url=row.donation_url)
+
+
 def site_out(db: Session) -> SiteOut:
     row = branding.site(db)
     return SiteOut(
@@ -58,6 +73,7 @@ def site_out(db: Session) -> SiteOut:
         legal=_legal(row),
         terms_version=TERMS_VERSION,
         ai=_ai_notice(db),
+        donation=_donation(row),
     )
 
 
@@ -126,3 +142,23 @@ def update_legal(db: Db, _admin: Admin, data: LegalIn) -> SiteOut:
     row.contact_email = data.contact_email
     db.commit()
     return site_out(db)
+
+
+def _donation_settings(row: SiteSettings) -> DonationSettingsOut:
+    return DonationSettingsOut(
+        enabled=row.donation_enabled, text=row.donation_text, url=row.donation_url
+    )
+
+
+@router.get("/api/admin/site/donation")
+def get_donation(db: Db, _admin: Admin) -> DonationSettingsOut:
+    return _donation_settings(branding.site(db))
+
+
+@router.put("/api/admin/site/donation")
+def update_donation(db: Db, _admin: Admin, data: DonationIn) -> DonationSettingsOut:
+    try:
+        row = branding.set_donation(db, enabled=data.enabled, text=data.text, url=data.url)
+    except InvalidRequestError as error:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(error)) from error
+    return _donation_settings(row)

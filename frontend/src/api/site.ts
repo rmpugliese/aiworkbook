@@ -1,9 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
-import { apiGet, apiSend, csrfToken, errorFrom, type Schemas } from './client'
+import { apiGet, apiPutFile, apiSend, type Schemas } from './client'
 
 export type Site = Schemas['SiteOut']
 export type LegalIn = Schemas['LegalIn']
+export type DonationSettings = Schemas['DonationSettingsOut']
 
 const SITE_KEY = ['site'] as const
 
@@ -32,19 +33,7 @@ export function useUpdateBrandColor() {
 }
 
 export function useUploadSiteLogo() {
-  return useSiteMutation(async (file: File) => {
-    const body = new FormData()
-    body.append('file', file)
-    const path = '/api/admin/site/logo'
-    // No Content-Type: the browser sets the multipart boundary itself.
-    const response = await fetch(path, {
-      method: 'PUT',
-      headers: { Accept: 'application/json', 'X-CSRF-Token': await csrfToken() },
-      body,
-    })
-    if (!response.ok) throw await errorFrom(response, 'PUT', path)
-    return (await response.json()) as Site
-  })
+  return useSiteMutation((file: File) => apiPutFile<Site>('/api/admin/site/logo', file))
 }
 
 export function useDeleteSiteLogo() {
@@ -53,4 +42,27 @@ export function useDeleteSiteLogo() {
 
 export function useUpdateLegal() {
   return useSiteMutation((data: LegalIn) => apiSend<Site>('PUT', '/api/admin/site/legal', data))
+}
+
+const DONATION_KEY = ['admin', 'donation'] as const
+
+/** The invitation to donate as stored, shown or not: for administrators. */
+export function useDonationSettings() {
+  return useQuery({
+    queryKey: DONATION_KEY,
+    queryFn: () => apiGet<DonationSettings>('/api/admin/site/donation'),
+  })
+}
+
+export function useUpdateDonation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: DonationSettings) =>
+      apiSend<DonationSettings>('PUT', '/api/admin/site/donation', data),
+    onSuccess: (settings) => {
+      queryClient.setQueryData(DONATION_KEY, settings)
+      // The profile shows the invitation from the public site settings.
+      void queryClient.invalidateQueries({ queryKey: SITE_KEY })
+    },
+  })
 }
